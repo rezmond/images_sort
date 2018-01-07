@@ -1,0 +1,11 @@
+bin/
+/include/
+/lib/
+/local/
+/src_images/
+/result/
+/backup_images/
+
+pip-selfcheck.json
+images_sort.sublime-workspace
+*.sublime-project
