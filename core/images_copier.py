@@ -22,11 +22,11 @@ class ImagesCopier(object):
     RESULT_FOLDER_PATH = os.path.join(ROOT_PATH, RESULT_FOLDER_NAME)
 
     BLOCKS = {
-        u'Зима (начало)': (1, 2),
-        u'Весна': (3, 5),
-        u'Лето': (6, 8),
-        u'Осень': (9, 11),
-        u'Зима (конец)': (12, 12),
+        'Зима (начало)': (1, 2),
+        'Весна': (3, 5),
+        'Лето': (6, 8),
+        'Осень': (9, 11),
+        'Зима (конец)': (12, 12),
     }
 
     def __init__(self):
@@ -56,7 +56,7 @@ class ImagesCopier(object):
         while os.path.isfile(dst_file_path):
             if filecmp.cmp(file_dict['path'], dst_file_path):
                 return 'already_exists', dst_file_path
-            curr_file_name = u'{0}_{1}'.format(file_dict['name'], num)
+            curr_file_name = '{0}_{1}'.format(file_dict['name'], num)
             dst_file_path = os.path.join(dst_dir, curr_file_name)
             num += 1
         return 'moved', dst_file_path
@@ -121,11 +121,11 @@ class ImagesCopier(object):
             date = self._get_datetime(exif_data.values)
             # years
             year_in_string = str(date.year)
-            if year_in_string not in self._sorted_by_year.keys():
+            if year_in_string not in set(self._sorted_by_year.keys()):
                 self._sorted_by_year[year_in_string] = {}
             # month
             month_in_string = self._get_block_name(date.month)
-            if month_in_string not in self._sorted_by_year[year_in_string].keys():
+            if month_in_string not in set(self._sorted_by_year[year_in_string].keys()):
                 self._sorted_by_year[year_in_string][month_in_string] = []
             self._sorted_by_year[year_in_string][month_in_string]\
                 .append(file_dict)

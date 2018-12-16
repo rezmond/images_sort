@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+from functools import reduce
+from operator import methodcaller
 import exifread
 import os
 import filecmp
 import getopt
 import shutil
 import sys
-from operator import methodcaller
 
 
 class Console(object):
-    NOT_TRUE_ANSWER_MSG = u'пожалуйста введите одно из следующих значений'
+    NOT_TRUE_ANSWER_MSG = 'пожалуйста введите одно из следующих значений'
 
     def __init__(self, allowed_commands):
         super(Console, self).__init__()
@@ -23,17 +24,17 @@ class Console(object):
 
     @property
     def quoted_allowed_commands(self):
-        return map(lambda x: '"%s"' % x, self._allowed_commands)
+        return map('"{}"'.format, self._allowed_commands)
 
     def ask_user(self, message):
-        user_answer = raw_input(message).lower()
+        user_answer = input(message).lower()
 
-        not_true_answer_msg = u'{0}: {1}\n'.format(
+        not_true_answer_msg = '{0}: {1}\n'.format(
             self.NOT_TRUE_ANSWER_MSG.capitalize(), ', '.join(self.quoted_allowed_commands))\
             .encode('utf-8')
 
         while user_answer not in self.allowed_commands:
-            user_answer = raw_input(not_true_answer_msg).lower()
+            user_answer = input(not_true_answer_msg).lower()
 
         return user_answer
 
@@ -67,11 +68,11 @@ class Sorter(object):
     RESULT_FOLDER_PATH = os.path.join(ROOT_PATH, RESULT_FOLDER_NAME)
 
     BLOCKS = {
-        u'Зима (начало)': (1, 2),
-        u'Весна': (3, 5),
-        u'Лето': (6, 8),
-        u'Осень': (9, 11),
-        u'Зима (конец)': (12, 12),
+        'Зима (начало)': (1, 2),
+        'Весна': (3, 5),
+        'Лето': (6, 8),
+        'Осень': (9, 11),
+        'Зима (конец)': (12, 12),
     }
 
     def __init__(self, source_folder, dst_folder):
@@ -87,14 +88,14 @@ class Sorter(object):
         folder_paths = (self._source_folder, self._dst_folder)
         if not self._source_folder:
             raise ValueError(
-                u'Не задана папка источник'.encode('utf-8'))
+                'Не задана папка источник'.encode('utf-8'))
         if not self._dst_folder:
             raise ValueError(
-                u'Не задана папка приёмник'.encode('utf-8'))
+                'Не задана папка приёмник'.encode('utf-8'))
         for path in folder_paths:
             if not os.path.isdir(path):
                 raise ValueError(
-                    u'Папка "{0}" не найдена'.format(path).encode('utf-8'))
+                    'Папка "{0}" не найдена'.format(path).encode('utf-8'))
 
     @staticmethod
     def cmp_files(dst_dir, file_dict):
@@ -107,7 +108,7 @@ class Sorter(object):
         while os.path.isfile(dst_file_path):
             if filecmp.cmp(file_dict['path'], dst_file_path):
                 return 'already_exists', dst_file_path
-            curr_file_name = u'{0}_{1}'.format(file_dict['name'], num)
+            curr_file_name = '{0}_{1}'.format(file_dict['name'], num)
             dst_file_path = os.path.join(dst_dir, curr_file_name)
             num += 1
         return 'moved', dst_file_path
@@ -156,10 +157,10 @@ class Sorter(object):
         }
 
         result_messages_map = {
-            'already_exists': u'Уже есть в соответвующей папке',
-            'moved': u'Успешно перемещено в соответвующую папку',
-            'no_exif': u'Не иммеют exif',
-            'errors': u'Файлов при обработке которых были ошибки',
+            'already_exists': 'Уже есть в соответвующей папке',
+            'moved': 'Успешно перемещено в соответвующую папку',
+            'no_exif': 'Не иммеют exif',
+            'errors': 'Файлов при обработке которых были ошибки',
         }
 
         # формирование структуры по exif
@@ -173,10 +174,10 @@ class Sorter(object):
                 continue
             date = self.get_datetime(exif_data.values)
             year_in_string = str(date.year)
-            if year_in_string not in sorted_by_year.keys():
+            if year_in_string not in set(sorted_by_year.keys()):
                 sorted_by_year[year_in_string] = {}
             month_in_string = self.get_block_name(date.month)
-            if month_in_string not in sorted_by_year[year_in_string].keys():
+            if month_in_string not in set(sorted_by_year[year_in_string].keys()):
                 sorted_by_year[year_in_string][month_in_string] = []
             sorted_by_year[year_in_string][month_in_string].append(file_dict)
 
@@ -205,7 +206,7 @@ class Sorter(object):
             return
 
         are_images_need_delete = (
-            u'Удалить {0} перемещённых и {1} уже существующих файлов? (yes|no):\n'
+            'Удалить {0} перемещённых и {1} уже существующих файлов? (yes|no):\n'
             .format(moved_len, already_exists_len)
             .encode('utf-8'))
 
@@ -213,40 +214,43 @@ class Sorter(object):
             self.resolution_getter.ask_user(are_images_need_delete))
 
         if images_need_delete:
-            print u'Удаляем:\n'.encode('utf-8')
+            print('Удаляем:\n'.encode('utf-8'))
         else:
-            print u'Перемещено:'.encode('utf-8')
+            print('Перемещено:'.encode('utf-8'))
 
         for i in result['moved']:
-            if isinstance(i, unicode):
-                print i.encode('utf-8')
+            if isinstance(i, str):
+                print(i.encode('utf-8'))
             else:
-                print i
+                print(i)
 
         if images_need_delete:
-            print
+            print()
         else:
-            print u'Уже сущенствует:'.encode('utf-8')
+            print('Уже сущенствует:'.encode('utf-8'))
 
         for i in result['already_exists']:
-            if isinstance(i, unicode):
-                print i.encode('utf-8')
+            if isinstance(i, str):
+                print(i.encode('utf-8'))
             else:
-                print i
+                print(i)
 
         if not images_need_delete:
             return
 
-        map(os.remove, result['moved'])
-        map(os.remove, result['already_exists'])
+        for moved in result['moved']:
+            os.remove(moved)
+
+        for exists in result['already_exists']:
+            os.remove(exists)
 
         def _make_result_message(item):
-            return u'{0:>40}: {1}'.format(
+            return '{0:>40}: {1}'.format(
                 result_messages_map[item], len(result[item]))
 
         result_msg = (
             map(_make_result_message, ('moved', 'already_exists', 'no_exif', 'errors')))
-        print(u'{0}\n{1}\n{2}'.format(*result_msg)).encode('utf-8')
+        print(('{0}\n{1}\n{2}'.format(*result_msg)).encode('utf-8'))
 
 
 def main(argv):
@@ -257,12 +261,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "hi:o:", ["ifile=", "ofile="])
     except getopt.GetoptError:
-        print '{0} -i <sourcefolder> -o <dstfolder>'.format(MAIN_PROGRAMM)
+        print('{0} -i <sourcefolder> -o <dstfolder>'.format(MAIN_PROGRAMM))
         sys.exit(2)
 
     for opt, arg in opts:
         if opt == '-h':
-            print '{0} -i <sourcefolder> -o <dstfolder>'.format(MAIN_PROGRAMM)
+            print('{0} -i <sourcefolder> -o <dstfolder>'.format(MAIN_PROGRAMM))
             sys.exit()
         elif opt in ("-i", "--ifolder"):
             source_folder = arg
