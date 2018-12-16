@@ -78,7 +78,7 @@ class Sorter(object):
     def __init__(self, source_folder, dst_folder):
         super(Sorter, self).__init__()
         self._source_folder = source_folder
-        self._dst_folder = dst_folder.decode('utf-8')
+        self._dst_folder = dst_folder
         self._check_folders_exists()
 
         self.resolution_getter = ResolverConsole(
@@ -87,15 +87,12 @@ class Sorter(object):
     def _check_folders_exists(self):
         folder_paths = (self._source_folder, self._dst_folder)
         if not self._source_folder:
-            raise ValueError(
-                'Не задана папка источник'.encode('utf-8'))
+            raise ValueError('Не задана папка источник')
         if not self._dst_folder:
-            raise ValueError(
-                'Не задана папка приёмник'.encode('utf-8'))
+            raise ValueError('Не задана папка приёмник')
         for path in folder_paths:
             if not os.path.isdir(path):
-                raise ValueError(
-                    'Папка "{0}" не найдена'.format(path).encode('utf-8'))
+                raise ValueError('Папка "{0}" не найдена'.format(path))
 
     @staticmethod
     def cmp_files(dst_dir, file_dict):
