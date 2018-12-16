@@ -22,16 +22,16 @@ class Console(object):
     def allowed_commands(self):
         return self._allowed_commands
 
-    @property
-    def quoted_allowed_commands(self):
+    def get_quoted_allowed_commands(self):
         return map('"{}"'.format, self._allowed_commands)
 
     def ask_user(self, message):
         user_answer = input(message).lower()
 
         not_true_answer_msg = '{0}: {1}\n'.format(
-            self.NOT_TRUE_ANSWER_MSG.capitalize(), ', '.join(self.quoted_allowed_commands))\
-            .encode('utf-8')
+            self.NOT_TRUE_ANSWER_MSG.capitalize(),
+            ', '.join(self.get_quoted_allowed_commands)
+        ).encode('utf-8')
 
         while user_answer not in self.allowed_commands:
             user_answer = input(not_true_answer_msg).lower()
@@ -275,6 +275,7 @@ def main(argv):
 
     sorter = Sorter(source_folder, dst_folder)
     sorter.sort()
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
