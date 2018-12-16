@@ -263,7 +263,7 @@ def main(argv):
 
     for opt, arg in opts:
         if opt == '-h':
-            print('{0} -i <sourcefolder> -o <dstfolder>'.format(MAIN_PROGRAMM))
+            print('{0} -i <source/folder> -o <dst/folder>'.format(MAIN_PROGRAMM))
             sys.exit()
         elif opt in ("-i", "--ifolder"):
             source_folder = arg
