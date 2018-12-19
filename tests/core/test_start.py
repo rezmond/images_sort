@@ -11,5 +11,5 @@ class TestStart:
         with pytest.raises(ValueError) as exc_info:
             main('test')
 
-        assert str(exc_info.value) == 'Не задана папка источник', \
+        assert str(exc_info.value) == 'The source folder was not passed', \
             'Should raise exception with correct message'

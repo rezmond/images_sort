@@ -48,9 +48,9 @@ class Sorter:
     def _check_folders_exists(self):
         folder_paths = (self._source_folder, self._dst_folder)
         if not self._source_folder:
-            raise ValueError('Не задана папка источник')
+            raise ValueError('The source folder was not passed')
         if not self._dst_folder:
-            raise ValueError('Не задана папка приёмник')
+            raise ValueError('The destination folder was not passed')
         for path in folder_paths:
             if not os.path.isdir(path):
                 raise ValueError('Папка "{0}" не найдена'.format(path))
