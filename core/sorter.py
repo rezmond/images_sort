@@ -57,6 +57,21 @@ class Sorter:
 
     @staticmethod
     def _cmp_files(dst_dir, file_dict):
+        """
+        Check the destination folder for already existed files with the
+        same names.
+
+        If a file exists and it is identical, then the current method
+        will return fully path to target folder with the "already_exists"
+        result type.
+
+        If a file with that name exists but it is not identical, then the 
+        current method will rename the target file name added a number til
+        the name will unique.
+
+        :return: (<result_type>, <fully/path/to/file>)
+        :rtype: typle(str, str)
+        """
         num = 1
         curr_file_name = file_dict['name']
         try:
