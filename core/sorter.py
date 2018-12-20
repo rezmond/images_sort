@@ -102,7 +102,7 @@ class Sorter:
         raise IndexError('Not found blocks name for month "{0}"'.format(month))
 
     @staticmethod
-    def get_datetime(src):
+    def _get_datetime(src):
         return datetime.strptime(src, '%Y:%m:%d %H:%M:%S')
 
     def get_images_list(self, current_dir_path):
@@ -154,7 +154,7 @@ class Sorter:
                 # print file_dict['name'], file_dict['path']
                 result['no_exif'].append(file_dict['path'])
                 continue
-            date = self.get_datetime(exif_data.values)
+            date = self._get_datetime(exif_data.values)
             year_in_string = str(date.year)
             if year_in_string not in set(sorted_by_year.keys()):
                 sorted_by_year[year_in_string] = {}
