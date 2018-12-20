@@ -120,6 +120,7 @@ class Sorter:
             if not os.path.isfile(node_path):
                 result.extend(self._get_images_list(node_path))
                 continue
+
             if self._is_allowed_extension(node_path):
                 result.append({
                     'path': node_path,
