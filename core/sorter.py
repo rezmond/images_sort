@@ -56,7 +56,7 @@ class Sorter:
                 raise ValueError('Папка "{0}" не найдена'.format(path))
 
     @staticmethod
-    def cmp_files(dst_dir, file_dict):
+    def _cmp_files(dst_dir, file_dict):
         num = 1
         curr_file_name = file_dict['name']
         try:
@@ -150,7 +150,7 @@ class Sorter:
                     os.makedirs(dst_dir_path)
                 for file_dict in m_value:
                     result_type, result_path = (
-                        self.cmp_files(dst_dir_path, file_dict))
+                        self._cmp_files(dst_dir_path, file_dict))
                     if result_type == 'moved':
                         shutil.copy2(file_dict['path'], result_path)
                     elif result_type not in ('already_exists', 'errors'):
