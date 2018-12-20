@@ -22,7 +22,7 @@ class Sorter:
     IMAGES_FOLDER_NAME = 'src_images'
     RESULT_FOLDER_NAME = 'result'
 
-    ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
+    ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     IMAGES_PATH = os.path.join(ROOT_PATH, IMAGES_FOLDER_NAME)
     RESULT_FOLDER_PATH = os.path.join(ROOT_PATH, RESULT_FOLDER_NAME)
 
