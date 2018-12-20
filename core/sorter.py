@@ -86,7 +86,7 @@ class Sorter:
             num += 1
         return 'moved', dst_file_path
 
-    def get_block_name(self, month):
+    def _get_block_name(self, month):
         if month not in range(1, 13):
             raise ValueError(
                 'Month number must be from 1 to 12. Not "{0}"'.format(month))
@@ -153,7 +153,7 @@ class Sorter:
             year_in_string = str(date.year)
             if year_in_string not in set(sorted_by_year.keys()):
                 sorted_by_year[year_in_string] = {}
-            month_in_string = self.get_block_name(date.month)
+            month_in_string = self._get_block_name(date.month)
             if month_in_string not in set(sorted_by_year[year_in_string].keys()):
                 sorted_by_year[year_in_string][month_in_string] = []
             sorted_by_year[year_in_string][month_in_string].append(file_dict)
