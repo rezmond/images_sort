@@ -87,6 +87,10 @@ class Sorter:
         return 'moved', dst_file_path
 
     def get_block_name(self, month):
+        if month not in range(1, 13):
+            raise ValueError(
+                'Month number must be from 1 to 12. Not "{0}"'.format(month))
+
         for key, value in self.BLOCKS.items():
             if value[0] <= month <= value[1]:
                 return key
