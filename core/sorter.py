@@ -4,8 +4,6 @@ import filecmp
 import os
 import shutil
 from datetime import datetime
-from functools import reduce
-from operator import methodcaller
 
 import exifread
 
@@ -40,7 +38,13 @@ class Sorter:
         super(Sorter, self).__init__()
         self._source_folder = source_folder
         self._dst_folder = dst_folder
+        self._sorted_by_year = {}
         self._check_folders_exists()
+        self._structed_files_data = {
+            'already_exists': [],
+            'moved': [],
+            'no_exif': []
+        }
 
         self.resolution_getter = ResolverConsole(
             true_commands=('yes',), false_commands=('no',))
@@ -105,131 +109,77 @@ class Sorter:
     def _get_datetime(src):
         return datetime.strptime(src, '%Y:%m:%d %H:%M:%S')
 
-    def get_images_list(self, current_dir_path):
+    def _get_images_list(self, current_dir_path=None):
         """
-        Получение списка всех подходящих по разширению файлов, с учётом вложенности.
+        It returns all suitable by extension files taking into account nesting
         """
-        def _reduce_dirs_nodes(res, node_name):
+        if current_dir_path is None:
+            current_dir_path = self.IMAGES_PATH
+
+        result = []
+        for node_name in os.listdir(current_dir_path):
             node_path = os.path.join(current_dir_path, node_name)
             if not os.path.isfile(node_path):
-                return res + self.get_images_list(node_path)
+                result.extend(self._get_images_list(node_path))
+                continue
+            if self._is_allowed_extension(node_path):
+                result.append({
+                    'path': node_path,
+                    'name': node_name
+                })
+        return result
 
-            if not self._self_is_allowed_file_type(node_path):
-                return res
-            return res + [{
-                'path': node_path,
-                'name': node_name
-            }]
-
-        return reduce(_reduce_dirs_nodes, os.listdir(current_dir_path), [])
-
-    def _self_is_allowed_file_type(self, node_path):
+    def _is_allowed_extension(self, node_path):
+        """
+        Is the file name extension allowed
+        """
         return os.path.splitext(node_path)[1] in self.ALLOWED_EXTENSIONS
 
-    def sort(self):
-        # print u'\n'.join(get_images_list(IMAGES_PATH)).encode('utf-8')
+    @staticmethod
+    def __make_dir_if_not_exists(path):
+        """Если целевой папки не было создано"""
+        if not os.path.exists(path):
+            os.makedirs(path)
 
-        sorted_by_year = {}
-
-        result = {
-            'already_exists': [],
-            'moved': [],
-            'no_exif': [],
-            'errors': [],
-        }
-
-        result_messages_map = {
-            'already_exists': 'Уже есть в соответвующей папке',
-            'moved': 'Успешно перемещено в соответвующую папку',
-            'no_exif': 'Не иммеют exif',
-            'errors': 'Файлов при обработке которых были ошибки',
-        }
-
+    def scan(self):
         # формирование структуры по exif
-        for file_dict in self.get_images_list(self._source_folder):
+        for file_dict in self._get_images_list():
             with open(file_dict['path'], 'rb') as current_file:
                 tags = exifread.process_file(current_file)
             exif_data = tags.get('EXIF DateTimeOriginal', None)
             if not exif_data:
-                # print file_dict['name'], file_dict['path']
-                result['no_exif'].append(file_dict['path'])
+                self._structed_files_data['no_exif'].append(file_dict['path'])
                 continue
             date = self._get_datetime(exif_data.values)
+            # years
             year_in_string = str(date.year)
-            if year_in_string not in set(sorted_by_year.keys()):
-                sorted_by_year[year_in_string] = {}
+            if year_in_string not in set(self._sorted_by_year.keys()):
+                self._sorted_by_year[year_in_string] = {}
+            # month
             month_in_string = self._get_block_name(date.month)
-            if month_in_string not in set(sorted_by_year[year_in_string].keys()):
-                sorted_by_year[year_in_string][month_in_string] = []
-            sorted_by_year[year_in_string][month_in_string].append(file_dict)
+            if month_in_string not in set(self._sorted_by_year[year_in_string].keys()):
+                self._sorted_by_year[year_in_string][month_in_string] = []
+            self._sorted_by_year[year_in_string][month_in_string]\
+                .append(file_dict)
 
+    def _move_by_month(self, year_name, month_items):
+        for m_name, m_value in month_items:
+            dst_dir_path = (
+                os.path.join(self.RESULT_FOLDER_PATH, year_name, m_name))
+            self.__make_dir_if_not_exists(dst_dir_path)
+            for file_dict in m_value:
+                result_type, result_path = (
+                    self._cmp_files(dst_dir_path, file_dict))
+                if result_type == 'moved':
+                    shutil.copy2(file_dict['path'], result_path)
+                elif result_type != 'already_exists':
+                    raise Exception('No result')
+                self._structed_files_data[result_type]\
+                    .append(file_dict['path'])
+
+    def move(self):
         # перемещение файлов
-        for y_name, y_value in sorted_by_year.items():
-            for m_name, m_value in sorted_by_year[y_name].items():
-                path_chain = map(
-                    methodcaller('encode', 'utf-8'), (self._dst_folder, y_name, m_name))
-                dst_dir_path = os.path.join(*path_chain)
-                # если целвой папки не было создано
-                if not os.path.exists(dst_dir_path):
-                    os.makedirs(dst_dir_path)
-                for file_dict in m_value:
-                    result_type, result_path = (
-                        self._cmp_files(dst_dir_path, file_dict))
-                    if result_type == 'moved':
-                        shutil.copy2(file_dict['path'], result_path)
-                    elif result_type not in ('already_exists', 'errors'):
-                        raise Exception('No result')
-                    result[result_type].append(file_dict['path'])
-
-        moved_len = len(result['moved'])
-        already_exists_len = len(result['already_exists'])
-
-        if (moved_len + already_exists_len) == 0:
-            return
-
-        are_images_need_delete = (
-            'Удалить {0} перемещённых и {1} уже существующих файлов? (yes|no):\n'
-            .format(moved_len, already_exists_len)
-            .encode('utf-8'))
-
-        images_need_delete = (
-            self.resolution_getter.ask_user(are_images_need_delete))
-
-        if images_need_delete:
-            print('Удаляем:\n'.encode('utf-8'))
-        else:
-            print('Перемещено:'.encode('utf-8'))
-
-        for i in result['moved']:
-            if isinstance(i, str):
-                print(i.encode('utf-8'))
-            else:
-                print(i)
-
-        if images_need_delete:
-            print()
-        else:
-            print('Уже сущенствует:'.encode('utf-8'))
-
-        for i in result['already_exists']:
-            if isinstance(i, str):
-                print(i.encode('utf-8'))
-            else:
-                print(i)
-
-        if not images_need_delete:
-            return
-
-        for moved in result['moved']:
-            os.remove(moved)
-
-        for exists in result['already_exists']:
-            os.remove(exists)
-
-        def _make_result_message(item):
-            return '{0:>40}: {1}'.format(
-                result_messages_map[item], len(result[item]))
-
-        result_msg = (
-            map(_make_result_message, ('moved', 'already_exists', 'no_exif', 'errors')))
-        print(('{0}\n{1}\n{2}'.format(*result_msg)).encode('utf-8'))
+        year_items = self._sorted_by_year.items()
+        for y_name, y_value in year_items:
+            month_items = self._sorted_by_year[y_name].items()
+            self._move_by_month(y_value, month_items)
