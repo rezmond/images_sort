@@ -87,6 +87,11 @@ class Sorter:
         return 'moved', dst_file_path
 
     def _get_block_name(self, month):
+        """
+        Return month name in human readable format
+        :param month: month number(from 1 to 12)
+        :rtype: str
+        """
         if month not in range(1, 13):
             raise ValueError(
                 'Month number must be from 1 to 12. Not "{0}"'.format(month))
