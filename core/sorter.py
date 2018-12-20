@@ -109,12 +109,10 @@ class Sorter:
     def _get_datetime(src):
         return datetime.strptime(src, '%Y:%m:%d %H:%M:%S')
 
-    def _get_images_list(self, current_dir_path=None):
+    def _get_images_list(self, current_dir_path):
         """
         It returns all suitable by extension files taking into account nesting
         """
-        if current_dir_path is None:
-            current_dir_path = self.IMAGES_PATH
 
         result = []
         for node_name in os.listdir(current_dir_path):
@@ -143,7 +141,8 @@ class Sorter:
 
     def scan(self):
         # формирование структуры по exif
-        for file_dict in self._get_images_list():
+        files_info = self._get_images_list(self._source_folder)
+        for file_dict in files_info:
             with open(file_dict['path'], 'rb') as current_file:
                 tags = exifread.process_file(current_file)
             exif_data = tags.get('EXIF DateTimeOriginal', None)
