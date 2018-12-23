@@ -50,14 +50,14 @@ class Sorter:
             true_commands=('yes',), false_commands=('no',))
 
     def _check_folders_exists(self):
-        folder_paths = (self._source_folder, self._dst_folder)
         if not self._source_folder:
             raise ValueError('The source folder was not passed')
+        if not os.path.isdir(self._source_folder):
+            raise ValueError(
+                'The folder "{0}" not found'.format(self._source_folder))
+
         if not self._dst_folder:
             raise ValueError('The destination folder was not passed')
-        for path in folder_paths:
-            if not os.path.isdir(path):
-                raise ValueError('Папка "{0}" не найдена'.format(path))
 
     @staticmethod
     def _cmp_files(dst_dir, file_dict):
