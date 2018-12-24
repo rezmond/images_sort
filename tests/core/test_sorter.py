@@ -18,7 +18,7 @@ class TestSorter:
         assert 'destination' in str(exc_info.value), \
             'Should catch not passed destination folder'
 
-        assert Sorter('tests/data', 'out'), 'Should be silent'
+        assert Sorter('tests/data', 'tests/out'), 'Should be silent'
 
         with pytest.raises(ValueError) as exc_info:
             Sorter('test_1', 'test_2')
@@ -26,5 +26,5 @@ class TestSorter:
             'Should catch not existed folder'
 
     def test_scan(self):
-        sorter = Sorter('tests/data', 'tests/data')
+        sorter = Sorter('tests/data', 'tests/out')
         sorter.scan()
