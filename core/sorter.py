@@ -90,13 +90,13 @@ class Sorter:
         :param month: month number(from 1 to 12)
         :rtype: str
         """
-        if month not in range(1, 13):
-            raise ValueError(
-                'Month number must be from 1 to 12. Not "{0}"'.format(month))
+        assert month in range(1, 13), \
+            'Month number must be from 1 to 12. Not "{0}"'.format(month)
 
         for key, value in self.BLOCKS.items():
             if value[0] <= month <= value[1]:
                 return key
+
         raise IndexError('Not found blocks name for month "{0}"'.format(month))
 
     @staticmethod
