@@ -177,4 +177,4 @@ class Sorter:
         year_items = self._sorted_by_year.items()
         for y_name, y_value in year_items:
             month_items = self._sorted_by_year[y_name].items()
-            self._move_by_month(y_value, month_items)
+            self._move_by_month(y_name, month_items)
