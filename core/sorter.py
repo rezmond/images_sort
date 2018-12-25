@@ -97,8 +97,6 @@ class Sorter:
             if value[0] <= month <= value[1]:
                 return key
 
-        raise IndexError('Not found blocks name for month "{0}"'.format(month))
-
     @staticmethod
     def _get_datetime(src):
         return datetime.strptime(src, '%Y:%m:%d %H:%M:%S')
