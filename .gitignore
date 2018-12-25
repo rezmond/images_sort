@@ -104,3 +104,5 @@ ENV/
 /src_images/
 /result/
 /backup_images/
+
+.idea
