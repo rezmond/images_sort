@@ -27,7 +27,8 @@ class TestSorter:
         assert 'test_1' in str(exc_info.value), \
             'Should catch not existed folder'
 
-    def test_move(self):
+    @patch('os.makedirs')
+    def test_move(self, patched_makedirs):
         sorter = Sorter('tests/data', 'tests/out')
         sorter.scan()
 
