@@ -164,14 +164,18 @@ class Sorter:
         for m_name, m_value in month_items:
             dst_dir_path = (
                 os.path.join(self._dst_folder, year_name, m_name))
+
             self.__make_dir_if_not_exists(dst_dir_path)
+
             for file_dict in m_value:
                 result_type, result_path = (
                     self._cmp_files(dst_dir_path, file_dict))
+
                 if result_type == 'moved':
                     shutil.copy2(file_dict['path'], result_path)
                 elif result_type != 'already_exists':
                     raise Exception('No result')
+
                 self._structed_files_data[result_type]\
                     .append(file_dict['path'])
 
@@ -179,5 +183,5 @@ class Sorter:
         # перемещение файлов
         year_items = self._sorted_by_year.items()
         for y_name, y_value in year_items:
-            month_items = self._sorted_by_year[y_name].items()
+            month_items = y_value.items()
             self._move_by_month(y_name, month_items)
