@@ -24,7 +24,7 @@ class Sorter:
     IMAGES_PATH = os.path.join(ROOT_PATH, IMAGES_FOLDER_NAME)
 
     BLOCKS = {
-        'winter (begining)': (1, 2),
+        'winter (begin)': (1, 2),
         'spring': (3, 5),
         'summer': (6, 8),
         'autumn': (9, 11),
