@@ -34,14 +34,18 @@ class Sorter:
     def __init__(self, source_folder, dst_folder):
         super(Sorter, self).__init__()
         self._source_folder = source_folder
-        self._dst_folder = dst_folder
         self._sorted_by_year = {}
-        self._check_folders_exists()
         self._structed_files_data = {
             'already_exists': [],
             'moved': [],
             'no_exif': []
         }
+        if dst_folder and not dst_folder.startswith('/'):
+            self._dst_folder = os.path.join(os.getcwd(), dst_folder)
+        else:
+            self._dst_folder = dst_folder
+
+        self._check_folders_exists()
 
     def _check_folders_exists(self):
         if not self._source_folder:
