@@ -22,7 +22,6 @@ class Sorter:
 
     ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     IMAGES_PATH = os.path.join(ROOT_PATH, IMAGES_FOLDER_NAME)
-    RESULT_FOLDER_PATH = os.path.join(ROOT_PATH, RESULT_FOLDER_NAME)
 
     BLOCKS = {
         'winter (begining)': (1, 2),
@@ -160,7 +159,7 @@ class Sorter:
     def _move_by_month(self, year_name, month_items):
         for m_name, m_value in month_items:
             dst_dir_path = (
-                os.path.join(self.RESULT_FOLDER_PATH, year_name, m_name))
+                os.path.join(self._dst_folder, year_name, m_name))
             self.__make_dir_if_not_exists(dst_dir_path)
             for file_dict in m_value:
                 result_type, result_path = (
