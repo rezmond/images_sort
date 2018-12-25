@@ -27,11 +27,11 @@ class Sorter:
     RESULT_FOLDER_PATH = os.path.join(ROOT_PATH, RESULT_FOLDER_NAME)
 
     BLOCKS = {
-        'Зима (начало)': (1, 2),
-        'Весна': (3, 5),
-        'Лето': (6, 8),
-        'Осень': (9, 11),
-        'Зима (конец)': (12, 12),
+        'winter (begining)': (1, 2),
+        'spring': (3, 5),
+        'summer': (6, 8),
+        'autumn': (9, 11),
+        'winter (end)': (12, 12),
     }
 
     def __init__(self, source_folder, dst_folder):
