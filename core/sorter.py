@@ -7,8 +7,6 @@ from datetime import datetime
 
 import exifread
 
-from .console import ResolverConsole
-
 
 class Sorter:
 
@@ -45,9 +43,6 @@ class Sorter:
             'moved': [],
             'no_exif': []
         }
-
-        self.resolution_getter = ResolverConsole(
-            true_commands=('yes',), false_commands=('no',))
 
     def _check_folders_exists(self):
         if not self._source_folder:
