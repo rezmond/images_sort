@@ -3,7 +3,7 @@
 import getopt
 import sys
 
-from .sorter import Sorter
+from .model.sorter import Sorter
 
 
 def main(argv):

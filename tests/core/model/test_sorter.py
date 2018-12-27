@@ -4,7 +4,7 @@ from unittest.mock import patch, call
 
 import pytest
 
-from ...core.sorter import Sorter
+from ....core.model.sorter import Sorter
 
 
 class TestSorter:
@@ -41,4 +41,5 @@ class TestSorter:
             call('tests/data/3.jpg', 'tests/out/2017/summer/3.jpg'),
             call('tests/data/4.jpg', 'tests/out/2017/winter (end)/4.jpg'),
         ]
+        print(patched_copy.call_args_list)
         patched_copy.assert_has_calls(calls, any_order=True)
