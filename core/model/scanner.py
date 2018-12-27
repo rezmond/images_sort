@@ -35,12 +35,10 @@ class Scanner:
         super(Scanner, self).__init__()
         self._source_folder = source_folder
         self._dst_folder = dst_folder
-        self._sorted_by_year = {}
         self._check_folders_exists()
         self._structed_files_data = {
             'already_exists': [],
             'moved': [],
-            'no_exif': []
         }
 
     def _check_folders_exists(self):
@@ -134,25 +132,30 @@ class Scanner:
 
     def scan(self):
         # формирование структуры по exif
+        no_exif = []
+        move_map = {}
         files_info = self._get_images_list(self._source_folder)
+
         for file_dict in files_info:
             with open(file_dict['path'], 'rb') as current_file:
                 tags = exifread.process_file(current_file)
             exif_data = tags.get('EXIF DateTimeOriginal', None)
             if not exif_data:
-                self._structed_files_data['no_exif'].append(file_dict['path'])
+                no_exif.append(file_dict['path'])
                 continue
             date = self._get_datetime(exif_data.values)
             # years
             year_in_string = str(date.year)
-            if year_in_string not in set(self._sorted_by_year.keys()):
-                self._sorted_by_year[year_in_string] = {}
+            if year_in_string not in set(move_map.keys()):
+                move_map[year_in_string] = {}
             # month
             month_in_string = self._get_block_name(date.month)
-            if month_in_string not in set(self._sorted_by_year[year_in_string].keys()):
-                self._sorted_by_year[year_in_string][month_in_string] = []
-            self._sorted_by_year[year_in_string][month_in_string]\
+            if month_in_string not in set(move_map.keys()):
+                move_map[year_in_string][month_in_string] = []
+            move_map[year_in_string][month_in_string]\
                 .append(file_dict)
+
+        return move_map, no_exif
 
     def _move_by_month(self, year_name, month_items):
         for m_name, m_value in month_items:

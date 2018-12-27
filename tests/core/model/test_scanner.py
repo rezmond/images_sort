@@ -30,7 +30,32 @@ class TestScanner:
     @patch('os.makedirs')
     def test_move(self, patched_makedirs):
         sorter = Scanner('tests/data', 'tests/out')
-        sorter.scan()
+        move_map, no_exif = sorter.scan()
+
+        expected_move_map = {
+            '2017': {
+                'spring': [{
+                    'path': 'tests/data/2.jpg',
+                    'name': '2.jpg'
+                }],
+                'winter (begin)': [{
+                    'path': 'tests/data/1.jpg',
+                    'name': '1.jpg'
+                }],
+                'summer': [{
+                    'path': 'tests/data/3.jpg',
+                    'name': '3.jpg'
+                }],
+                'winter (end)': [{
+                    'path': 'tests/data/4.jpg',
+                    'name': '4.jpg'
+                }]
+            }
+        }
+        assert move_map == expected_move_map, 'Should return correct move_map'
+
+        expected_no_exif = ['tests/data/folder-1/1-1.jpg']
+        assert no_exif == expected_no_exif, 'Should return correct no_exif'
 
         with patch('shutil.copy2') as patched_copy:
             sorter.move()
