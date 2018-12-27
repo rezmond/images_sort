@@ -8,7 +8,7 @@ from datetime import datetime
 import exifread
 
 
-class Sorter:
+class Scanner:
 
     ALLOWED_EXTENSIONS = (
         '.jpg',
@@ -32,7 +32,7 @@ class Sorter:
     }
 
     def __init__(self, source_folder, dst_folder):
-        super(Sorter, self).__init__()
+        super(Scanner, self).__init__()
         self._source_folder = source_folder
         self._dst_folder = dst_folder
         self._sorted_by_year = {}

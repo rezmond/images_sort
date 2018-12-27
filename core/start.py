@@ -3,7 +3,7 @@
 import getopt
 import sys
 
-from .model.sorter import Sorter
+from .model.scanner import Scanner
 
 
 def main(argv):
@@ -26,8 +26,8 @@ def main(argv):
         elif opt in ("-o", "--ofolder"):
             dst_folder = arg
 
-    sorter = Sorter(source_folder, dst_folder)
-    sorter.sort()
+    scanner = Scanner(source_folder, dst_folder)
+    scanner.sort()
 
 
 if __name__ == "__main__":

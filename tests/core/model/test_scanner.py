@@ -4,32 +4,32 @@ from unittest.mock import patch, call
 
 import pytest
 
-from ....core.model.sorter import Sorter
+from ....core.model.scanner import Scanner
 
 
-class TestSorter:
+class TestScanner:
 
     def test_init(self):
         with pytest.raises(ValueError) as exc_info:
-            Sorter(None, None)
+            Scanner(None, None)
         assert 'source' in str(exc_info.value), \
             'Should catch not passed source folder'
 
         with pytest.raises(ValueError) as exc_info:
-            Sorter('tests/data', None)
+            Scanner('tests/data', None)
         assert 'destination' in str(exc_info.value), \
             'Should catch not passed destination folder'
 
-        assert Sorter('tests/data', 'tests/out'), 'Should be silent'
+        assert Scanner('tests/data', 'tests/out'), 'Should be silent'
 
         with pytest.raises(ValueError) as exc_info:
-            Sorter('test_1', 'test_2')
+            Scanner('test_1', 'test_2')
         assert 'test_1' in str(exc_info.value), \
             'Should catch not existed folder'
 
     @patch('os.makedirs')
     def test_move(self, patched_makedirs):
-        sorter = Sorter('tests/data', 'tests/out')
+        sorter = Scanner('tests/data', 'tests/out')
         sorter.scan()
 
         with patch('shutil.copy2') as patched_copy:
