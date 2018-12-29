@@ -35,3 +35,9 @@ class TestScanner:
 
         expected_no_exif = ['tests/data/folder-1/1-1.jpg']
         assert no_exif == expected_no_exif, 'Should return correct no_exif'
+
+    def test_props(self):
+        sorter = Scanner('tests/data', 'tests/out')
+
+        assert sorter.dst_folder == 'tests/out', \
+            'Should return correct dst_folder'
