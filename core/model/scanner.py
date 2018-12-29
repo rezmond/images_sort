@@ -15,12 +15,6 @@ class Scanner:
         '.png'
     )
 
-    IMAGES_FOLDER_NAME = 'src_images'
-    RESULT_FOLDER_NAME = 'result'
-
-    ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    IMAGES_PATH = os.path.join(ROOT_PATH, IMAGES_FOLDER_NAME)
-
     BLOCKS = {
         'winter (begin)': (1, 2),
         'spring': (3, 5),
