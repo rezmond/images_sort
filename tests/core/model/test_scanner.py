@@ -26,7 +26,7 @@ class TestScanner:
         assert 'test_1' in str(exc_info.value), \
             'Should catch not existed folder'
 
-    def test_move(self):
+    def test_scan(self):
         sorter = Scanner('tests/data', 'tests/out')
         move_map, no_exif = sorter.scan()
 
