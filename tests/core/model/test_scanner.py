@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
-
 import pytest
 
 from ....utils import full_path
@@ -15,24 +13,19 @@ class TestScanner:
 
     def test_init(self):
         with pytest.raises(ValueError) as exc_info:
-            Scanner(None, None)
+            Scanner(None)
         assert 'source' in str(exc_info.value), \
             'Should catch not passed source folder'
 
-        with pytest.raises(ValueError) as exc_info:
-            Scanner(PATH_TO_TEST_DATA, None)
-        assert 'destination' in str(exc_info.value), \
-            'Should catch not passed destination folder'
-
-        assert Scanner(PATH_TO_TEST_DATA, 'tests/out'), 'Should be silent'
+        assert Scanner(PATH_TO_TEST_DATA), 'Should be silent'
 
         with pytest.raises(ValueError) as exc_info:
-            Scanner('test_1', 'test_2')
+            Scanner('test_1')
         assert 'test_1' in str(exc_info.value), \
             'Should catch not existed folder'
 
     def test_scan(self):
-        sorter = Scanner(PATH_TO_TEST_DATA, 'tests/out')
+        sorter = Scanner(PATH_TO_TEST_DATA)
         move_map, no_exif = sorter.scan()
 
         expected_move_map = get_move_map()
@@ -40,9 +33,3 @@ class TestScanner:
 
         expected_no_exif = [full_path('tests/data/folder-1/1-1.jpg')]
         assert no_exif == expected_no_exif, 'Should return correct no_exif'
-
-    def test_props(self):
-        sorter = Scanner(PATH_TO_TEST_DATA, 'tests/out')
-
-        assert sorter.dst_folder == full_path('tests/out'), \
-            'Should return correct dst_folder'

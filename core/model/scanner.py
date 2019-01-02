@@ -25,25 +25,16 @@ class Scanner:
         'winter (end)': (12, 12),
     }
 
-    def __init__(self, source_folder, dst_folder):
+    def __init__(self, source_folder):
         super(Scanner, self).__init__()
-        self._check_folders_exists(source_folder, dst_folder)
-        self._source_folder = source_folder
-        self._dst_folder = full_path(dst_folder)
-
-    def _check_folders_exists(self, source_folder, dst_folder):
         if not source_folder:
             raise ValueError('The source folder was not passed')
+
         if not os.path.isdir(source_folder):
             raise ValueError(
                 'The folder "{0}" not found'.format(source_folder))
 
-        if not dst_folder:
-            raise ValueError('The destination folder was not passed')
-
-    @property
-    def dst_folder(self):
-        return self._dst_folder
+        self._source_folder = source_folder
 
     def _get_block_name(self, month):
         """

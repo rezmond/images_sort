@@ -10,8 +10,8 @@ from ..utils.move_result import MoveResult
 
 class Mover:
 
-    def __init__(self, scanner):
-        self._dst_folder = scanner.dst_folder
+    def __init__(self, scanner, dst_folder):
+        self._dst_folder = dst_folder
         self._move_map, self._no_exif_list = scanner.scan()
         self._move_result = MoveResult([], [])
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os
-from unittest.mock import patch, call, Mock, PropertyMock
+from unittest.mock import patch, call, Mock
 
 from ....utils import full_path
 from ....core.model.mover import Mover
@@ -16,9 +15,7 @@ class TestMover:
             'scan.return_value': (get_move_map(), []),
         }
         scanner_mock = Mock(**attrs)
-        type(scanner_mock).dst_folder = PropertyMock(
-            return_value=full_path('tests/out'))
-        mover = Mover(scanner_mock)
+        mover = Mover(scanner_mock, full_path('tests/out'))
 
         with patch('shutil.copy2') as patched_copy:
             move_result = mover.move()
