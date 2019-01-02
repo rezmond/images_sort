@@ -21,6 +21,11 @@ class TestScanner:
 
         with pytest.raises(ValueError) as exc_info:
             Scanner('test_1')
+        assert 'absolute' in str(exc_info.value), \
+            'Should catch not absolute the source folder path'
+
+        with pytest.raises(ValueError) as exc_info:
+            Scanner(full_path('test_1'))
         assert 'test_1' in str(exc_info.value), \
             'Should catch not existed folder'
 
