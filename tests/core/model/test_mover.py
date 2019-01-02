@@ -26,8 +26,6 @@ class TestMover:
             move_result = mover.move()
 
         calls = [
-            call(os.path.join(ROOT_DIR, 'tests/data/1.jpg'),
-                 'tests/out/2017/winter (begin)/1.jpg'),
             call(os.path.join(ROOT_DIR, 'tests/data/2.jpg'),
                  'tests/out/2017/spring/2.jpg'),
             call(os.path.join(ROOT_DIR, 'tests/data/3.jpg'),
@@ -37,9 +35,10 @@ class TestMover:
         ]
         patched_copy.assert_has_calls(calls, any_order=True)
 
-        assert move_result == ([], [
-            os.path.join(ROOT_DIR, 'tests/data/2.jpg'),
+        assert move_result == ([
             os.path.join(ROOT_DIR, 'tests/data/1.jpg'),
+        ], [
+            os.path.join(ROOT_DIR, 'tests/data/2.jpg'),
             os.path.join(ROOT_DIR, 'tests/data/3.jpg'),
             os.path.join(ROOT_DIR, 'tests/data/4.jpg')
         ]), 'Should return correct MoveResult'
