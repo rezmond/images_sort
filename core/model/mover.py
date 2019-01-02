@@ -82,8 +82,6 @@ class Mover:
 
                 if result_type == 'moved':
                     shutil.copy2(file_dict['path'], result_path)
-                elif result_type != 'already_exists':
-                    raise Exception('No result')
 
                 getattr(self._move_result, result_type)\
                     .append(file_dict['path'])
