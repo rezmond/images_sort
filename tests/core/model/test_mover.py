@@ -3,8 +3,6 @@
 import os
 from unittest.mock import patch, call, Mock, PropertyMock
 
-import pytest
-
 from ....utils import full_path
 from ....core.model.mover import Mover
 from .fixtures import get_move_map
