@@ -37,10 +37,7 @@ class Mover:
         """
         num = 1
         curr_file_name = os.path.split(file_dict['path'])[1]
-        try:
-            dst_file_path = os.path.join(dst_dir, curr_file_name)
-        except UnicodeDecodeError:
-            return 'errors', file_dict['path']
+        dst_file_path = os.path.join(dst_dir, curr_file_name)
 
         if not os.path.isfile(dst_file_path):
             return 'moved', dst_file_path
