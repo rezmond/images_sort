@@ -28,7 +28,7 @@ class TestMover:
         calls = [
             call(
                 full_path('tests/data/2.jpg'),
-                full_path('tests/out/2017/spring/2.jpg')
+                full_path('tests/out/2017/spring/2_1.jpg')
             ),
             call(
                 full_path('tests/data/3.jpg'),
