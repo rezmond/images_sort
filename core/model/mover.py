@@ -39,10 +39,17 @@ class Mover:
         except UnicodeDecodeError:
             return 'errors', file_dict['path']
 
+        if not os.path.isfile(dst_file_path):
+            return 'moved', dst_file_path
+
+        base_file_name, extension = os.path.splitext(curr_file_name)
+
         while os.path.isfile(dst_file_path):
             if filecmp.cmp(file_dict['path'], dst_file_path):
                 return 'already_exists', dst_file_path
-            curr_file_name = '{0}_{1}'.format(file_dict['name'], num)
+
+            curr_file_name = '{}_{}{}'.format(
+                base_file_name, num, extension)
             dst_file_path = os.path.join(dst_dir, curr_file_name)
             num += 1
         return 'moved', dst_file_path
