@@ -4,11 +4,11 @@ import os
 
 import pytest
 
+from ....utils import full_path
 from ....core.model.scanner import Scanner
 from .fixtures import get_move_map
 
-ROOT_DIR = os.path.abspath(__file__ + '../../../../../')
-PATH_TO_TEST_DATA = os.path.join(ROOT_DIR, 'tests/data')
+PATH_TO_TEST_DATA = full_path('tests/data')
 
 
 class TestScanner:
@@ -38,12 +38,11 @@ class TestScanner:
         expected_move_map = get_move_map()
         assert move_map == expected_move_map, 'Should return correct move_map'
 
-        expected_no_exif = [os.path.join(
-            ROOT_DIR, 'tests/data/folder-1/1-1.jpg')]
+        expected_no_exif = [full_path('tests/data/folder-1/1-1.jpg')]
         assert no_exif == expected_no_exif, 'Should return correct no_exif'
 
     def test_props(self):
         sorter = Scanner(PATH_TO_TEST_DATA, 'tests/out')
 
-        assert sorter.dst_folder == 'tests/out', \
+        assert sorter.dst_folder == full_path('tests/out'), \
             'Should return correct dst_folder'

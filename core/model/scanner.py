@@ -5,6 +5,8 @@ from datetime import datetime
 
 import exifread
 
+from ...utils import full_path
+
 
 class Scanner:
 
@@ -25,18 +27,18 @@ class Scanner:
 
     def __init__(self, source_folder, dst_folder):
         super(Scanner, self).__init__()
+        self._check_folders_exists(source_folder, dst_folder)
         self._source_folder = source_folder
-        self._dst_folder = dst_folder
-        self._check_folders_exists()
+        self._dst_folder = full_path(dst_folder)
 
-    def _check_folders_exists(self):
-        if not self._source_folder:
+    def _check_folders_exists(self, source_folder, dst_folder):
+        if not source_folder:
             raise ValueError('The source folder was not passed')
-        if not os.path.isdir(self._source_folder):
+        if not os.path.isdir(source_folder):
             raise ValueError(
-                'The folder "{0}" not found'.format(self._source_folder))
+                'The folder "{0}" not found'.format(source_folder))
 
-        if not self._dst_folder:
+        if not dst_folder:
             raise ValueError('The destination folder was not passed')
 
     @property
@@ -74,7 +76,7 @@ class Scanner:
 
             if self._is_allowed_extension(node_path):
                 result.append({
-                    'path': node_path,
+                    'path': full_path(node_path),
                     'name': node_name
                 })
         return result

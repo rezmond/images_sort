@@ -33,11 +33,12 @@ class Mover:
         :rtype: typle(str, str)
         """
         num = 1
-        curr_file_name = file_dict['name']
+        curr_file_name = os.path.split(file_dict['path'])[1]
         try:
             dst_file_path = os.path.join(dst_dir, curr_file_name)
         except UnicodeDecodeError:
-            return 'errors', curr_file_name
+            return 'errors', file_dict['path']
+
         while os.path.isfile(dst_file_path):
             if filecmp.cmp(file_dict['path'], dst_file_path):
                 return 'already_exists', dst_file_path
