@@ -2,12 +2,27 @@
 
 from unittest.mock import patch, call, Mock
 
+import pytest
+
 from ....utils import full_path
 from ....core.model.mover import Mover
 from .fixtures import get_move_map
 
 
 class TestMover:
+
+    def test_init(self):
+        attrs = {
+            'scan.return_value': (get_move_map(), []),
+        }
+        scanner_mock = Mock(**attrs)
+        with pytest.raises(ValueError) as exc_info:
+            Mover(scanner_mock, 'test-1')
+
+        assert 'absolute' in str(exc_info.value), \
+            'Should catch not absolute the destination folder path'
+
+        assert Mover(scanner_mock, full_path('test-1')), 'Should be silent'
 
     @patch('os.makedirs')
     def test_move(self, _not_used, ):

@@ -11,6 +11,9 @@ from ..utils.move_result import MoveResult
 class Mover:
 
     def __init__(self, scanner, dst_folder):
+        if not os.path.isabs(dst_folder):
+            raise ValueError('The destination folder path should be absolute')
+
         self._dst_folder = dst_folder
         self._move_map, self._no_exif_list = scanner.scan()
         self._move_result = MoveResult([], [])
