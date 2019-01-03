@@ -25,8 +25,10 @@ class TestMover:
         assert Mover(scanner_mock, full_path('test-1')), 'Should be silent'
 
     @patch('os.makedirs')
-    def test_move(self, _not_used, ):
+    def test_move(self, _not_used):
         mover = Mover(get_move_map(), full_path('tests/out'))
+        on_item_moved_handler_mock = Mock()
+        mover.on_image_moved += on_item_moved_handler_mock
 
         with patch('shutil.copy2') as patched_copy:
             move_result = mover.move()
@@ -46,6 +48,14 @@ class TestMover:
             ),
         ]
         patched_copy.assert_has_calls(calls, any_order=True)
+
+        calls = [
+            call(full_path('tests/out/2017/spring/2_1.jpg')),
+            call(full_path('tests/out/2017/summer/3.jpg')),
+            call(full_path('tests/out/2017/winter (end)/4.jpg')),
+        ]
+        on_item_moved_handler_mock.handle_image_moved\
+            .assert_has_calls(calls, any_order=True)
 
         assert move_result == ([
             full_path('tests/data/1.jpg'),
