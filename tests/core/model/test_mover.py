@@ -26,11 +26,7 @@ class TestMover:
 
     @patch('os.makedirs')
     def test_move(self, _not_used, ):
-        attrs = {
-            'scan.return_value': (get_move_map(), []),
-        }
-        scanner_mock = Mock(**attrs)
-        mover = Mover(scanner_mock, full_path('tests/out'))
+        mover = Mover(get_move_map(), full_path('tests/out'))
 
         with patch('shutil.copy2') as patched_copy:
             move_result = mover.move()
