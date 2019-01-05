@@ -2,10 +2,15 @@
 
 import os
 from datetime import datetime
+from typing import Dict, Tuple, List
 
 import exifread
 
 from ...utils import full_path
+
+BlocksType = List[Dict[str, str]]
+YearType = Dict[str, BlocksType]
+MoveMap = Dict[str, YearType]
 
 
 class Scanner:
@@ -24,20 +29,6 @@ class Scanner:
         'autumn': (9, 11),
         'winter (end)': (12, 12),
     }
-
-    def __init__(self, source_folder):
-        super(Scanner, self).__init__()
-        if not source_folder:
-            raise ValueError('The source folder was not passed')
-
-        if not os.path.isabs(source_folder):
-            raise ValueError('The source folder path should be absolute')
-
-        if not os.path.isdir(source_folder):
-            raise ValueError(
-                'The folder "{0}" not found'.format(source_folder))
-
-        self._source_folder = source_folder
 
     def _get_block_name(self, month):
         """
@@ -81,11 +72,12 @@ class Scanner:
         """
         return os.path.splitext(node_path)[1] in self.ALLOWED_EXTENSIONS
 
-    def scan(self):
+    def scan(self, src_folder_path: str) -> Tuple[MoveMap, List[str]]:
+        self._validate_source_folder(src_folder_path)
         # формирование структуры по exif
         no_exif = []
         move_map = {}
-        files_info = self._get_images_list(self._source_folder)
+        files_info = self._get_images_list(src_folder_path)
 
         for file_dict in files_info:
             with open(file_dict['path'], 'rb') as current_file:
@@ -107,3 +99,15 @@ class Scanner:
                 .append(file_dict)
 
         return move_map, no_exif
+
+    def _validate_source_folder(self, source_folder):
+        super(Scanner, self).__init__()
+        if not source_folder:
+            raise ValueError('The source folder was not passed')
+
+        if not os.path.isabs(source_folder):
+            raise ValueError('The source folder path should be absolute')
+
+        if not os.path.isdir(source_folder):
+            raise ValueError(
+                'The folder "{0}" not found'.format(source_folder))

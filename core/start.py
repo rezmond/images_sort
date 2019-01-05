@@ -26,8 +26,8 @@ def main(argv):
         elif opt in ("-o", "--ofolder"):
             dst_folder = arg
 
-    scanner = Scanner(source_folder)
-    scanner.scan()
+    scanner = Scanner()
+    scanner.scan(source_folder)
 
 
 if __name__ == "__main__":
