@@ -7,7 +7,7 @@ from ...core.start import main
 
 class TestStart:
 
-    def test_command_without_params(self):
+    def test_command_with_not_correct_params(self):
         with pytest.raises(ValueError) as exc_info:
             main('test')
 
