@@ -16,22 +16,24 @@ class TestMover:
             'scan.return_value': (get_move_map(), []),
         }
         scanner_mock = Mock(**attrs)
+        mover = Mover(scanner_mock)
         with pytest.raises(ValueError) as exc_info:
-            Mover(scanner_mock, 'test-1')
+            mover.move('test-1')
 
         assert 'absolute' in str(exc_info.value), \
             'Should catch not absolute the destination folder path'
 
-        assert Mover(scanner_mock, full_path('test-1')), 'Should be silent'
+        mover = Mover(scanner_mock)
+        assert mover.move(full_path('test-1')), 'Should be silent'
 
     @patch('os.makedirs')
     def test_move(self, _not_used):
-        mover = Mover(get_move_map(), full_path('tests/out'))
+        mover = Mover(get_move_map())
         on_item_moved_handler_mock = Mock()
         mover.on_image_moved += on_item_moved_handler_mock
 
         with patch('shutil.copy2') as patched_copy:
-            move_result = mover.move()
+            move_result = mover.move(full_path('tests/out'))
 
         calls = [
             call(

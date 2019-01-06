@@ -10,11 +10,7 @@ from ..utils import MoveResult, Observable
 
 class Mover:
 
-    def __init__(self, move_map, dst_folder):
-        if not os.path.isabs(dst_folder):
-            raise ValueError('The destination folder path should be absolute')
-
-        self._dst_folder = dst_folder
+    def __init__(self, move_map):
         self._move_map = move_map
         self._move_result = MoveResult([], [])
         self._moved_image_event_listeners = Observable()
@@ -61,19 +57,26 @@ class Mover:
         if not os.path.exists(path):
             os.makedirs(path)
 
-    def move(self) -> MoveResult:
+    def move(self, dst_folder: str) -> MoveResult:
+        if not os.path.isabs(dst_folder):
+            raise ValueError('The destination folder path should be absolute')
         # перемещение файлов
         year_items = self._move_map.items()
         for y_name, y_value in year_items:
             month_items = y_value.items()
-            self._move_by_month(y_name, month_items)
+            self._move_by_month(dst_folder, y_name, month_items)
 
         return self._move_result
 
-    def _move_by_month(self, year_name, month_items):
+    def _move_by_month(
+        self,
+        dst_folder: str,
+        year_name: str,
+        month_items: YearType,
+    ):
         for m_name, m_value in month_items:
             dst_dir_path = (
-                os.path.join(self._dst_folder, year_name, m_name))
+                os.path.join(dst_folder, year_name, m_name))
 
             self.__make_dir_if_not_exists(dst_dir_path)
 
