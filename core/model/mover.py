@@ -2,17 +2,18 @@
 
 import os
 import shutil
+from typing import Tuple
 
 import filecmp
 
+from .scanner import Scanner, YearType
 from ..utils import MoveResult, Observable
 
 
 class Mover:
 
-    def __init__(self, move_map):
-        self._move_map = move_map
-        self._move_result = MoveResult([], [])
+    def __init__(self):
+        self._move_result = None
         self._moved_image_event_listeners = Observable()
 
     @staticmethod
@@ -57,11 +58,16 @@ class Mover:
         if not os.path.exists(path):
             os.makedirs(path)
 
-    def move(self, dst_folder: str) -> MoveResult:
+    def move(self, src_folder: str, dst_folder: str) -> MoveResult:
         if not os.path.isabs(dst_folder):
             raise ValueError('The destination folder path should be absolute')
+
+        scanner = Scanner()
+        move_map, no_exif = scanner.scan(src_folder)
+        self._move_result = MoveResult([], [], no_exif)
+
         # перемещение файлов
-        year_items = self._move_map.items()
+        year_items = move_map.items()
         for y_name, y_value in year_items:
             month_items = y_value.items()
             self._move_by_month(dst_folder, y_name, month_items)

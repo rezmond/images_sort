@@ -2,4 +2,8 @@
 
 from collections import namedtuple
 
-MoveResult = namedtuple('MoveResult', ('already_exists', 'moved'))
+MoveResult = namedtuple('MoveResult', (
+    'moved',
+    'already_exists',
+    'no_exif',
+))
