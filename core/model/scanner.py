@@ -101,7 +101,6 @@ class Scanner:
         return move_map, no_exif
 
     def _validate_source_folder(self, source_folder):
-        super(Scanner, self).__init__()
         if not source_folder:
             raise ValueError('The source folder was not passed')
 
