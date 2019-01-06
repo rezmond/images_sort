@@ -5,7 +5,7 @@ import shutil
 
 import filecmp
 
-from ..utils import MoveResult, ObservableViews
+from ..utils import MoveResult, Observable
 
 
 class Mover:
@@ -17,7 +17,7 @@ class Mover:
         self._dst_folder = dst_folder
         self._move_map = move_map
         self._move_result = MoveResult([], [])
-        self._moved_image_event_listeners = ObservableViews()
+        self._moved_image_event_listeners = Observable()
 
     @staticmethod
     def _cmp_files(dst_dir, file_dict):
@@ -83,8 +83,7 @@ class Mover:
 
                 if result_type == 'moved':
                     shutil.copy2(file_dict['path'], result_path)
-                    self._moved_image_event_listeners\
-                        .notify_image_moved(result_path)
+                    self._moved_image_event_listeners.update(result_path)
 
                 getattr(self._move_result, result_type)\
                     .append(file_dict['path'])
