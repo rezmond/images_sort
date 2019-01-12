@@ -4,7 +4,7 @@ from .mover import Mover
 from ..utils import MoveResult
 
 
-class Model:
+class MoverModel:
 
     def __init__(self):
         self._mover = Mover()
