@@ -12,8 +12,6 @@ class MoverModel:
         self._dst_folder = None
 
     def move(self) -> MoveResult:
-        assert self._src_folder and self._dst_folder, \
-            'You should set src and dst folder pathes before'
         move_result = self._mover.move(self._src_folder, self._dst_folder)
         return move_result
 

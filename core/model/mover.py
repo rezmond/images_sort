@@ -59,8 +59,7 @@ class Mover:
             os.makedirs(path)
 
     def move(self, src_folder: str, dst_folder: str) -> MoveResult:
-        if not os.path.isabs(dst_folder):
-            raise ValueError('The destination folder path should be absolute')
+        self._validate_src_dst(src_folder, dst_folder)
 
         scanner = Scanner()
         move_map, no_exif = scanner.scan(src_folder)
@@ -104,3 +103,20 @@ class Mover:
     @on_image_moved.setter
     def on_image_moved(self, value):
         pass
+
+    def _validate_src_dst(self, src, dst):
+        params_check_list = (
+            (src, 'source'),
+            (dst, 'destination'),
+        )
+        for param_value, param_humanize in params_check_list:
+            if not param_value:
+                raise ValueError(
+                    'The {0} folder\'s path did not set.'
+                    ' Please set the {0} folder path and try again.'
+                    .format(param_humanize))
+
+            if not os.path.isabs(param_value):
+                raise ValueError(
+                    'The {} folder path should be absolute, but got "{}"'
+                    .format(param_humanize, param_value))
