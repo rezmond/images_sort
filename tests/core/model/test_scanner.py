@@ -13,9 +13,10 @@ class TestScanner:
 
     def test_scan(self):
         scanner = Scanner()
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(TypeError) as exc_info:
             scanner.scan(None)
-        assert 'source' in str(exc_info.value), \
+        assert str(exc_info.value) == 'type of argument "src_folder_path" '\
+            'must be str; got NoneType instead', \
             'Should catch not passed source folder'
 
         with pytest.raises(ValueError) as exc_info:
