@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 from typing import Dict, Tuple, List
 
+from typeguard import typechecked
 import exifread
 
 from ...utils import full_path
@@ -72,6 +73,7 @@ class Scanner:
         """
         return os.path.splitext(node_path)[1] in self.ALLOWED_EXTENSIONS
 
+    @typechecked
     def scan(self, src_folder_path: str) -> Tuple[MoveMap, List[str]]:
         self._validate_source_folder(src_folder_path)
         # формирование структуры по exif
