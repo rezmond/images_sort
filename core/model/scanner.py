@@ -103,6 +103,13 @@ class Scanner:
         return move_map, no_exif
 
     def _validate_source_folder(self, source_folder):
+
+        if not os.path.isabs(source_folder):
+            raise ValueError(
+                f'The source folder path should be absolute, but got'
+                ' "{source_folder}"'
+            )
+
         if not os.path.isdir(source_folder):
             raise ValueError(
                 'The folder "{0}" not found'.format(source_folder))
