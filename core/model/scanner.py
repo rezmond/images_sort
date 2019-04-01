@@ -112,4 +112,4 @@ class Scanner:
 
         if not os.path.isdir(source_folder):
             raise ValueError(
-                'The folder "{0}" not found'.format(source_folder))
+                f'The folder "{source_folder}" not found')

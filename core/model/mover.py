@@ -104,7 +104,10 @@ class Mover:
     def on_image_moved(self, value):
         pass
 
-    def _validate_src_dst(self, src, dst):
+    def _validate_src_dst(self, src: str, dst: str) -> None:
+        '''
+        Without typechecked becouse it will check arguments manually
+        '''
         params_check_list = (
             (src, 'source'),
             (dst, 'destination'),
