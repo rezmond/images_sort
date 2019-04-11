@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 from ....core.views.console import ConsoleView
 
@@ -14,5 +14,14 @@ class TestConsole:
                 as patched_controller:
             view = ConsoleView(patched_controller(), patched_model())
 
-        with patch('sys.argv', [None, '-i', 'src', '-o', 'dst']):
+        with patch('sys.argv', [None, '-i', '/src/folder', '-o', '/dst/folder']):
             view.show()
+
+        patched_controller.assert_has_calls([
+            call.set_src_folder('/src/folder'),
+            call.set_dst_folder('/dst/folder'),
+        ])
+
+        patched_model.assert_has_calls([
+            call.move(),
+        ])
