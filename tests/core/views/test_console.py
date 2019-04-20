@@ -2,10 +2,10 @@
 
 import io
 import contextlib
-
-import pytest
 from unittest import TestCase
 from unittest.mock import patch, call
+
+import pytest
 
 from ....core.views.console import ConsoleView
 
