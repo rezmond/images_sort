@@ -7,7 +7,7 @@ from unittest.mock import patch, call
 
 import pytest
 
-from ....core.views.console import ConsoleView
+from ....core.views.console import ConsoleView, MAIN_PROGRAMM
 
 
 class TestConsole(TestCase):
@@ -54,3 +54,18 @@ class TestConsole(TestCase):
         printed_help = file_.getvalue()
         for x in (' -i ', ' -o '):
             assert x in printed_help, 'Incorrect printed the help message'
+
+    def test_incorrect_param(self):
+        file_ = io.StringIO()
+        with contextlib.redirect_stdout(file_),\
+                pytest.raises(SystemExit) as exc_info,\
+                patch('sys.argv', [None, '--incorrect-parameter']):
+            self._view.show()
+        assert exc_info.value.code == 2, 'Incorrect exit status'
+
+        assert (not self._patched_controller.mock_calls) \
+            and (not self._patched_model.mock_calls), \
+            'Nothing should be called when the help instruction was calling'
+
+        printed_help = file_.getvalue()
+        assert printed_help.startswith(MAIN_PROGRAMM)
