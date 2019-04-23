@@ -20,4 +20,4 @@ class ViewBase(metaclass=ABCMeta):
 
     @abstractmethod
     def show(self):
-        pass
+        '''Shows the app view'''

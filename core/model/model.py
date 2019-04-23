@@ -21,7 +21,9 @@ class MoverModel:
 
     @on_image_moved.setter
     def on_image_moved(self, value):
-        pass
+        '''
+        It was created for the "+=" operator could work with that property
+        '''
 
     def set_dst_folder(self, value: str) -> None:
         self._dst_folder = value
