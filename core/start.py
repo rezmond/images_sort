@@ -8,5 +8,6 @@ def main():
     model = MoverModel()
     controller = ConsoleViewController(model)
 
+
 if __name__ == "__main__":
     main()
