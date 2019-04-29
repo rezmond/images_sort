@@ -7,6 +7,7 @@ from .controllers import ConsoleViewController
 def main():
     model = MoverModel()
     controller = ConsoleViewController(model)
+    controller.move()
 
 
 if __name__ == "__main__":

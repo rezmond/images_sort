@@ -18,3 +18,6 @@ class ControllerBase(metaclass=ABCMeta):
 
     def set_src_folder(self, *args):
         self._model.set_src_folder(*args)
+
+    def move(self):
+        '''TODO: implement me'''
