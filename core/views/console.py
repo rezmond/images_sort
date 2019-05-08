@@ -27,5 +27,3 @@ class ConsoleView(ViewBase):
                 self._controller.set_src_folder(arg)
             elif opt in ("-o", "--ofolder"):
                 self._controller.set_dst_folder(arg)
-
-        self._model.move()
