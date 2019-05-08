@@ -34,10 +34,6 @@ class TestConsole(TestCase):
             call.set_dst_folder('/dst/folder'),
         ])
 
-        self._patched_model.assert_has_calls([
-            call.move(),
-        ])
-
     def test_help_param(self):
         file_ = io.StringIO()
         with contextlib.redirect_stdout(file_),\
