@@ -13,6 +13,9 @@
             "name": "3.jpg"
         }],
         "winter (end)": [{
+            "path": "tests/data/5.jpg",
+            "name": "5.jpg"
+        }, {
             "path": "tests/data/4.jpg",
             "name": "4.jpg"
         }]

@@ -45,6 +45,10 @@ class TestMover:
                 full_path('tests/out/2017/spring/2_1.jpg')
             ),
             call(
+                full_path('tests/data/5.jpg'),
+                full_path('tests/out/2017/winter (end)/5.jpg')
+            ),
+            call(
                 full_path('tests/data/3.jpg'),
                 full_path('tests/out/2017/summer/3.jpg')
             ),
@@ -59,6 +63,7 @@ class TestMover:
             call(full_path('tests/out/2017/spring/2_1.jpg')),
             call(full_path('tests/out/2017/summer/3.jpg')),
             call(full_path('tests/out/2017/winter (end)/4.jpg')),
+            call(full_path('tests/out/2017/winter (end)/5.jpg')),
         ]
         on_item_moved_handler_mock\
             .assert_has_calls(calls, any_order=True)
@@ -66,7 +71,8 @@ class TestMover:
         assert move_result == ([
             full_path('tests/data/2.jpg'),
             full_path('tests/data/3.jpg'),
-            full_path('tests/data/4.jpg')
+            full_path('tests/data/5.jpg'),
+            full_path('tests/data/4.jpg'),
         ], [
             full_path('tests/data/1.jpg'),
         ], []), 'Should return correct MoveResult'
