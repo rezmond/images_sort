@@ -95,7 +95,7 @@ class Scanner:
                 move_map[year_in_string] = {}
             # month
             month_in_string = self._get_block_name(date.month)
-            if month_in_string not in set(move_map.keys()):
+            if month_in_string not in set(move_map[year_in_string].keys()):
                 move_map[year_in_string][month_in_string] = []
             move_map[year_in_string][month_in_string]\
                 .append(file_dict)
