@@ -12,6 +12,14 @@ from .fixtures import get_move_map
 
 class TestMover:
 
+    def test_move_by_without_a_param(self):
+        mover = Mover()
+        with pytest.raises(ValueError) as exc_info:
+            mover.move('/src_folder', None)
+
+        assert 'path did not set' in str(exc_info.value), \
+            'Should catch not set the src or the dst folder path'
+
     def test_move_by_relative_path(self):
         mover = Mover()
         with pytest.raises(ValueError) as exc_info:
