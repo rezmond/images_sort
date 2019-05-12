@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from typing import Tuple
+
+from typeguard import typechecked
+
 from ..views import ConsoleView
 from .base import ControllerBase
 
@@ -10,3 +14,12 @@ class ConsoleViewController(ControllerBase):
     def __init__(self, *args):
         super(ConsoleViewController, self).__init__(*args)
         self._view.show()
+
+    @typechecked
+    def enable_moved_images_log(self, enable: bool = True):
+        if enable:
+            self._model.on_image_moved += self._handle_image_moved
+
+    @typechecked
+    def _handle_image_moved(self, move_pair: Tuple[str, str]) -> None:
+        self._view.handle_image_moved(move_pair)

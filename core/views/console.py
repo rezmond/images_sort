@@ -2,6 +2,7 @@
 
 import getopt
 import sys
+from typing import Tuple
 
 from .base import ViewBase
 from ..constants import COMMAND_LINE_SYNTAX_ERROR, SUCCESSFUL_TERMINATION
@@ -10,6 +11,10 @@ MAIN_PROGRAMM = 'sorter.py'
 
 
 class ConsoleView(ViewBase):
+
+    def handle_image_moved(self, move_pair: Tuple[str, str]):
+        from_, to_ = move_pair
+        print(f'{from_} --> {to_}')
 
     def show(self):
         argv = sys.argv[1:]
