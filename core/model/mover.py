@@ -91,7 +91,8 @@ class Mover:
 
                 if result_type == 'moved':
                     shutil.copy2(file_dict['path'], result_path)
-                    self._moved_image_event_listeners.update(result_path)
+                    self._moved_image_event_listeners.update(
+                        (file_dict['path'], result_path))
 
                 getattr(self._move_result, result_type)\
                     .append(file_dict['path'])
