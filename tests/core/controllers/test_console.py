@@ -27,3 +27,19 @@ class TestConsole(TestCase):
     def test_move(self):
         self._controller.move()
         self._model.move.assert_called_once()
+
+    def test_enable_moved_images_log(self):
+        iadd_mock = Mock()
+        self._model.on_image_moved.__iadd__ = iadd_mock
+        self._controller.enable_moved_images_log()
+        iadd_mock.assert_called_once()
+
+    def test_handle_image_moved(self):
+        def mock_of_handler(handler):
+            handler(('a', 'b'))
+
+        self._model.on_image_moved.__iadd__ = Mock(side_effect=mock_of_handler)
+        self._controller.enable_moved_images_log()
+
+        self._patched_controller_view.return_value.handle_image_moved\
+            .assert_called_once_with(('a', 'b'))
