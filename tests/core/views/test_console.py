@@ -34,6 +34,14 @@ class TestConsole(TestCase):
             call.set_dst_folder('/dst/folder'),
         ])
 
+    def test_with_list_param(self):
+
+        with patch('sys.argv', ['-l', '/src/folder', '/dst/folder']):
+            self._view.show()
+
+        self._patched_controller.enable_moved_images_log\
+            .assert_called_once_with(True)
+
     def test_help_param(self):
         file_ = io.StringIO()
         with contextlib.redirect_stdout(file_),\
