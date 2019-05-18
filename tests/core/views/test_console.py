@@ -34,13 +34,20 @@ class TestConsole(TestCase):
             call.set_dst_folder('/dst/folder'),
         ])
 
-    def test_with_list_param(self):
+    def test_param_list_items_true(self):
 
         with patch('sys.argv', [None, '-l', '/src/folder', '/dst/folder']):
             self._view.show()
 
         self._patched_controller.enable_moved_images_log\
             .assert_called_once_with(True)
+
+    def test_param_list_items_false(self):
+        with patch('sys.argv', [None, '/src/folder', '/dst/folder']):
+            self._view.show()
+
+        self._patched_controller.enable_moved_images_log\
+            .assert_called_once_with(False)
 
     def test_help_param(self):
         file_ = io.StringIO()
