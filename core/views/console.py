@@ -17,6 +17,10 @@ parser.add_argument(
 parser.add_argument(
     'dst', type=str,
     help='the destination folder full path.')
+parser.add_argument(
+    '-l', '--list-items',
+    default=False, action='store_true',
+    help='the destination folder full path.')
 
 
 class ConsoleView(ViewBase):
@@ -30,3 +34,4 @@ class ConsoleView(ViewBase):
 
         self._controller.set_src_folder(args.src)
         self._controller.set_dst_folder(args.dst)
+        self._controller.enable_moved_images_log(args.list_items)
