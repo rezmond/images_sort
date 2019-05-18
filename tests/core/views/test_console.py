@@ -7,7 +7,7 @@ from unittest.mock import patch, call
 
 import pytest
 
-from ....core.views.console import ConsoleView, MAIN_PROGRAMM
+from ....core.views.console import ConsoleView
 
 
 class TestConsole(TestCase):
@@ -26,7 +26,7 @@ class TestConsole(TestCase):
 
     def test_filled_params(self):
 
-        with patch('sys.argv', [None, '-i', '/src/folder', '-o', '/dst/folder']):
+        with patch('sys.argv', [None, '/src/folder', '/dst/folder']):
             self._view.show()
 
         self._patched_controller.assert_has_calls([
@@ -48,12 +48,12 @@ class TestConsole(TestCase):
             'Nothing should be called when the help instruction was calling'
 
         printed_help = file_.getvalue()
-        for x in (' -i ', ' -o '):
+        for x in (' src ', ' dst '):
             assert x in printed_help, 'Incorrect printed the help message'
 
     def test_incorrect_param(self):
         file_ = io.StringIO()
-        with contextlib.redirect_stdout(file_),\
+        with contextlib.redirect_stderr(file_),\
                 pytest.raises(SystemExit) as exc_info,\
                 patch('sys.argv', [None, '--incorrect-parameter']):
             self._view.show()
@@ -64,4 +64,4 @@ class TestConsole(TestCase):
             'Nothing should be called when the help instruction was calling'
 
         printed_help = file_.getvalue()
-        assert printed_help.startswith(MAIN_PROGRAMM)
+        assert str(printed_help).startswith('usage')
