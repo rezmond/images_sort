@@ -36,7 +36,7 @@ class TestConsole(TestCase):
 
     def test_with_list_param(self):
 
-        with patch('sys.argv', ['-l', '/src/folder', '/dst/folder']):
+        with patch('sys.argv', [None, '-l', '/src/folder', '/dst/folder']):
             self._view.show()
 
         self._patched_controller.enable_moved_images_log\
