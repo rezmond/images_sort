@@ -62,8 +62,8 @@ class Mover:
         self._validate_src_dst(src_folder, dst_folder)
 
         scanner = Scanner()
-        move_map, no_exif = scanner.scan(src_folder)
-        self._move_result = MoveResult([], [], no_exif)
+        move_map, no_exif, not_images = scanner.scan(src_folder)
+        self._move_result = MoveResult([], [], no_exif, not_images)
 
         # перемещение файлов
         year_items = move_map.items()

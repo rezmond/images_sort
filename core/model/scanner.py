@@ -50,22 +50,29 @@ class Scanner:
 
     def _get_images_list(self, current_dir_path):
         """
-        It returns all suitable by extension files taking into account nesting
+        It returns all suitable by extension files taking into account nesting.
+        Plus the path list of not images.
         """
 
-        result = []
+        images = []
+        not_images = []
         for node_name in os.listdir(current_dir_path):
             node_path = os.path.join(current_dir_path, node_name)
             if not os.path.isfile(node_path):
-                result.extend(self._get_images_list(node_path))
+                sub_images, sub_not_images = self._get_images_list(node_path)
+                images.extend(sub_images)
+                not_images.extend(sub_not_images)
                 continue
 
             if self._is_allowed_extension(node_path):
-                result.append({
+                images.append({
                     'path': full_path(node_path),
                     'name': node_name
                 })
-        return result
+                continue
+
+            not_images.append(node_path)
+        return images, not_images
 
     def _is_allowed_extension(self, node_path):
         """
@@ -74,14 +81,17 @@ class Scanner:
         return os.path.splitext(node_path)[1] in self.ALLOWED_EXTENSIONS
 
     @typechecked
-    def scan(self, src_folder_path: str) -> Tuple[MoveMap, List[str]]:
+    def scan(
+        self, src_folder_path: str
+    ) -> Tuple[MoveMap, List[str], List[str]]:
         self._validate_source_folder(src_folder_path)
         # формирование структуры по exif
         no_exif = []
         move_map = {}
-        files_info = self._get_images_list(src_folder_path)
+        img_files_info, not_img_file_path = self\
+            ._get_images_list(src_folder_path)
 
-        for file_dict in files_info:
+        for file_dict in img_files_info:
             with open(file_dict['path'], 'rb') as current_file:
                 tags = exifread.process_file(current_file)
             exif_data = tags.get('EXIF DateTimeOriginal', None)
@@ -100,7 +110,7 @@ class Scanner:
             move_map[year_in_string][month_in_string]\
                 .append(file_dict)
 
-        return move_map, no_exif
+        return move_map, no_exif, not_img_file_path
 
     def _validate_source_folder(self, source_folder):
 
