@@ -48,7 +48,9 @@ class Scanner:
     def _get_datetime(src):
         return datetime.strptime(src, '%Y:%m:%d %H:%M:%S')
 
-    def _get_images_list(self, current_dir_path):
+    @typechecked
+    def _get_images_list(
+            self, current_dir_path: str) -> Tuple[List[dict], List[str]]:
         """
         It returns all suitable by extension files taking into account nesting.
         Plus the path list of not images.
