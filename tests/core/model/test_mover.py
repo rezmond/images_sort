@@ -29,7 +29,7 @@ class TestMover:
             'Should catch not absolute the destination folder path'
 
     @patch('os.makedirs')
-    @patch.object(Scanner, 'scan', return_value=(get_move_map(), []))
+    @patch.object(Scanner, 'scan', return_value=(get_move_map(), [], []))
     def test_move_by_absolute_path(self, patched_scanner, _not_used):
 
         mover = Mover()
@@ -87,4 +87,4 @@ class TestMover:
             full_path('tests/data/4.jpg'),
         ], [
             full_path('tests/data/1.jpg'),
-        ], []), 'Should return correct MoveResult'
+        ], [], []), 'Should return correct MoveResult'

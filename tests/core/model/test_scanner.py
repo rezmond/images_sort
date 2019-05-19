@@ -29,10 +29,14 @@ class TestScanner:
         assert 'test_1' in str(exc_info.value), \
             'Should catch not existed folder'
 
-        move_map, no_exif = scanner.scan(PATH_TO_TEST_DATA)
+        move_map, no_exif, not_images = scanner.scan(PATH_TO_TEST_DATA)
 
         expected_move_map = get_move_map()
         assert move_map == expected_move_map, 'Should return correct move_map'
 
         expected_no_exif = [full_path('tests/data/folder-1/1-1.jpg')]
         assert no_exif == expected_no_exif, 'Should return correct no_exif'
+
+        expected_not_images = [full_path('tests/data/video1.mp4')]
+        assert not_images == expected_not_images, \
+            'Should return correct not_images'
