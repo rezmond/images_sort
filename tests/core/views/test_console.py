@@ -80,3 +80,15 @@ class TestConsole(TestCase):
 
         printed_help = file_.getvalue()
         assert str(printed_help).startswith('usage')
+
+    def test_show_list_of_moved(self):
+        file_ = io.StringIO()
+        with contextlib.redirect_stdout(file_),\
+                patch('sys.argv', [None, '/src/folder', '/dst/folder', '-l']):
+            self._view.handle_image_moved(('test-src', 'test-dst'))
+        printed_list = file_.getvalue()
+
+        assert 'test-src' in printed_list, \
+            'Not showed just moved image src path'
+        assert 'test-dst' in printed_list, \
+            'Not showed just moved image dst path'
