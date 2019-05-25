@@ -24,3 +24,11 @@ class TestModel:
             patched_prop.__get__.assert_not_called()
             model.on_image_moved
             patched_prop.__get__.assert_called_once()
+
+    def test_on_move_finish_report_subscribe(self):
+        iadd_mock = Mock()
+        with patch('images_sort.core.model.mover.Observable') as patched_observable:
+            patched_observable.__iadd__ = iadd_mock
+            model = MoverModel()
+            model.on_move_finished += Mock()
+        patched_observable.return_value.__iadd__.assert_called_once()
