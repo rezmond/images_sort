@@ -15,6 +15,7 @@ class Mover:
     def __init__(self):
         self._move_result = None
         self._moved_image_event_listeners = Observable()
+        self._move_finish_event_listeners = Observable()
 
     @staticmethod
     def _cmp_files(dst_dir, file_dict):
@@ -71,6 +72,7 @@ class Mover:
             month_items = y_value.items()
             self._move_by_month(dst_folder, y_name, month_items)
 
+        self._move_finish_event_listeners.update(self._move_result)
         return self._move_result
 
     def _move_by_month(
@@ -104,6 +106,16 @@ class Mover:
     @on_image_moved.setter
     def on_image_moved(self, value):
         pass
+
+    @property
+    def on_move_finished(self):
+        return self._move_finish_event_listeners
+
+    @on_move_finished.setter
+    def on_move_finished(self, value):
+        '''
+        It was created for the "+=" operator could work with that property
+        '''
 
     def _validate_src_dst(self, src: str, dst: str) -> None:
         '''
