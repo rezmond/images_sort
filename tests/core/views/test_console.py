@@ -3,11 +3,12 @@
 import io
 import contextlib
 from unittest import TestCase
-from unittest.mock import patch, call
+from unittest.mock import patch, call, Mock
 
 import pytest
 
 from ....core.views.console import ConsoleView
+from ....core.utils import MoveResult
 
 
 class TestConsole(TestCase):
@@ -92,3 +93,19 @@ class TestConsole(TestCase):
             'Not showed just moved image src path'
         assert 'test-dst' in printed_list, \
             'Not showed just moved image dst path'
+
+    def test_show_report(self):
+        file_ = io.StringIO()
+
+        def mock_of_handler(handler):
+            handler(MoveResult([], [1], [2, 2], [3, 3, 3]))
+
+        self._patched_model.on_move_finished.__iadd__ = Mock(
+            side_effect=mock_of_handler)
+        with contextlib.redirect_stdout(file_),\
+                patch('sys.argv', [None, '/src/folder', '/dst/folder', '-l']):
+            self._view.show()
+        printed_list = file_.getvalue()
+
+        for i in range(4):
+            assert str(i) in printed_list, 'Incorrect move report'
