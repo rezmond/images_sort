@@ -1,0 +1,4 @@
+exifread==2.1.2
+pytest==4.0.2
+pytest-cov==2.6.0
+typeguard==2.2.2
