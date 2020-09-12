@@ -3,6 +3,7 @@
 import os
 from datetime import datetime
 from typing import Dict, Tuple, List
+from dateutil.parser import isoparse
 
 from typeguard import typechecked
 import exifread
@@ -12,6 +13,8 @@ from ...utils import full_path
 BlocksType = List[Dict[str, str]]
 YearType = Dict[str, BlocksType]
 MoveMap = Dict[str, YearType]
+
+MAX_TIME_STRING_LENGTH = 19
 
 
 class Scanner:
@@ -46,7 +49,11 @@ class Scanner:
 
     @staticmethod
     def _get_datetime(src):
-        return datetime.strptime(src, '%Y:%m:%d %H:%M:%S')
+        try:
+            return isoparse(src)
+        except ValueError:
+            cropped = src[:MAX_TIME_STRING_LENGTH]
+            return datetime.strptime(cropped, '%Y:%m:%d %H:%M:%S')
 
     @typechecked
     def _get_images_list(
