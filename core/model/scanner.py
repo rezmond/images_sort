@@ -70,7 +70,9 @@ class Scanner(ScannerBase):
         for node_name in os.listdir(current_dir_path):
             node_path = os.path.join(current_dir_path, node_name)
             if not os.path.isfile(node_path):
-                sub_images, sub_not_images = self._get_images_list(node_path)
+                sub_scanner = type(self)()
+                sub_images, sub_not_images = sub_scanner\
+                    ._get_images_list(node_path)
                 images.extend(sub_images)
                 not_images.extend(sub_not_images)
                 continue
