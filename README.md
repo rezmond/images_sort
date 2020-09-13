@@ -14,7 +14,7 @@ Run tests:
     pytest
 `
 
-Run tests with coverages:
+Run tests with the coverage:
 
 `
     pytest --cov="./core" --cov-report=html
