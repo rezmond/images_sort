@@ -7,15 +7,16 @@ import pytest
 from ....utils import full_path
 from ....core.model.mover import Mover
 from ....core.model.scanner import Scanner
+from ....core.model.types import ScanResult
 from .fixtures import get_move_map
 
 
 class TestMover:
 
-    def test_move_by_without_a_param(self):
+    def test_move_without_dst_param(self):
         mover = Mover()
         with pytest.raises(ValueError) as exc_info:
-            mover.move('/src_folder', None)
+            mover.move(ScanResult(None, None, None), None)
 
         assert 'path did not set' in str(exc_info.value), \
             'Should catch not set the src or the dst folder path'
@@ -23,7 +24,7 @@ class TestMover:
     def test_move_by_relative_path(self):
         mover = Mover()
         with pytest.raises(ValueError) as exc_info:
-            mover.move('/src_folder', 'test-1')
+            mover.move(ScanResult(None, None, None), 'test-1')
 
         assert 'absolute' in str(exc_info.value), \
             'Should catch not absolute the destination folder path'
@@ -37,7 +38,22 @@ class TestMover:
         mover.on_image_moved += on_item_moved_handler_mock
 
         with patch('shutil.copy2') as patched_copy:
-            move_result = mover.move('/src_folder', full_path('tests/out'))
+            move_result = mover.move(
+                ScanResult({
+                    '2017': {
+                        'spring': [{'path': full_path('tests/data/2.jpg')}],
+                        'summer': [{'path': full_path('tests/data/3.jpg')}],
+                        'winter (end)': [{
+                            'path': full_path('tests/data/5.jpg')
+                        }, {
+                            'path': full_path('tests/data/4.jpg')
+                        }],
+                        'winter (begin)': [{
+                            'path': full_path('tests/data/1.jpg')
+                        }],
+                        'summer': [{'path': full_path('tests/data/3.jpg')}],
+                    }
+                }, [], []), full_path('tests/out'))
 
         calls = [
             call(

@@ -1,18 +1,25 @@
 # -*- coding: utf-8 -*-
 
-from .mover import Mover
+from typeguard import typechecked
+
 from ..utils import MoveResult
+from .mover import Mover
+from .scanner_base import ScannerBase
 
 
 class MoverModel:
 
-    def __init__(self):
+    @typechecked
+    def __init__(self, scanner: ScannerBase):
         self._mover = Mover()
+        self._scanner = scanner
         self._src_folder = None
         self._dst_folder = None
 
     def move(self) -> MoveResult:
-        move_result = self._mover.move(self._src_folder, self._dst_folder)
+        self._scanner.scan(self._src_folder)
+        scanned = self._scanner.get_data()
+        move_result = self._mover.move(scanned, self._dst_folder)
         return move_result
 
     @property

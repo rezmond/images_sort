@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from .model import MoverModel
+from .model import MoverModel, Scanner
 from .controllers import ConsoleViewController
 
 
 def main():
-    model = MoverModel()
+    scanner = Scanner()
+    model = MoverModel(scanner)
     controller = ConsoleViewController(model)
     controller.move()
 

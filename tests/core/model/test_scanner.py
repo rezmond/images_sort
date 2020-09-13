@@ -29,7 +29,8 @@ class TestScanner:
         assert 'test_1' in str(exc_info.value), \
             'Should catch not existed folder'
 
-        move_map, no_exif, not_images = scanner.scan(PATH_TO_TEST_DATA)
+        scanner.scan(PATH_TO_TEST_DATA)
+        move_map, no_exif, not_images = scanner.get_data()
 
         expected_move_map = get_move_map()
         assert move_map == expected_move_map, 'Should return correct move_map'

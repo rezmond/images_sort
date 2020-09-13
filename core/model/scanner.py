@@ -2,22 +2,21 @@
 
 import os
 from datetime import datetime
-from typing import Dict, Tuple, List
+from typing import Tuple, List
 from dateutil.parser import isoparse
 
 from typeguard import typechecked
 import exifread
 
 from ...utils import full_path
-
-BlocksType = List[Dict[str, str]]
-YearType = Dict[str, BlocksType]
-MoveMap = Dict[str, YearType]
+from .validator import Validator
+from .types import ScanResult
+from .scanner_base import ScannerBase
 
 MAX_TIME_STRING_LENGTH = 19
 
 
-class Scanner:
+class Scanner(ScannerBase):
 
     ALLOWED_EXTENSIONS = (
         '.jpg',
@@ -33,6 +32,9 @@ class Scanner:
         'autumn': (9, 11),
         'winter (end)': (12, 12),
     }
+
+    def __init__(self):
+        self._scanned = None
 
     def _get_block_name(self, month):
         """
@@ -92,8 +94,8 @@ class Scanner:
     @typechecked
     def scan(
         self, src_folder_path: str
-    ) -> Tuple[MoveMap, List[str], List[str]]:
-        self._validate_source_folder(src_folder_path)
+    ) -> None:
+        self._validate_src(src_folder_path)
         # формирование структуры по exif
         no_exif = []
         move_map = {}
@@ -119,16 +121,15 @@ class Scanner:
             move_map[year_in_string][month_in_string]\
                 .append(file_dict)
 
-        return move_map, no_exif, not_img_file_path
+        self._scanned = ScanResult(
+            move_map,
+            no_exif,
+            not_img_file_path,
+        )
 
-    def _validate_source_folder(self, source_folder):
+    @typechecked
+    def get_data(self) -> ScanResult:
+        return self._scanned
 
-        if not os.path.isabs(source_folder):
-            raise ValueError(
-                f'The source folder path should be absolute, but got'
-                ' "{source_folder}"'
-            )
-
-        if not os.path.isdir(source_folder):
-            raise ValueError(
-                f'The folder "{source_folder}" not found')
+    def _validate_src(self, source_folder):
+        Validator.validate_folder_path(source_folder, 'source')

@@ -2,11 +2,13 @@
 
 import os
 import shutil
-
 import filecmp
 
-from .scanner import Scanner, YearType
+from typeguard import typechecked
+
 from ..utils import MoveResult, Observable
+from .validator import Validator
+from .types import ScanResult, YearType
 
 
 class Mover:
@@ -26,7 +28,7 @@ class Mover:
         will return fully path to target folder with the "already_exists"
         result type.
 
-        If a file with that name exists but it is not identical, then the 
+        If a file with that name exists but it is not identical, then the
         current method will rename the target file name added a number til
         the name will unique.
 
@@ -58,15 +60,14 @@ class Mover:
         if not os.path.exists(path):
             os.makedirs(path)
 
-    def move(self, src_folder: str, dst_folder: str) -> MoveResult:
-        self._validate_src_dst(src_folder, dst_folder)
+    def move(self, scanned: ScanResult, dst_folder: str) -> MoveResult:
+        self._validate_dst(dst_folder)
 
-        scanner = Scanner()
-        move_map, no_exif, not_images = scanner.scan(src_folder)
-        self._move_result = MoveResult([], [], no_exif, not_images)
+        self._move_result = MoveResult(
+            [], [], scanned.no_exif, scanned.not_images)
 
         # перемещение файлов
-        year_items = move_map.items()
+        year_items = scanned.move_map.items()
         for y_name, y_value in year_items:
             month_items = y_value.items()
             self._move_by_month(dst_folder, y_name, month_items)
@@ -116,22 +117,8 @@ class Mover:
         It was created for the "+=" operator could work with that property
         '''
 
-    def _validate_src_dst(self, src: str, dst: str) -> None:
+    def _validate_dst(self, dst: str) -> None:
         '''
         Without typechecked because it will check arguments manually
         '''
-        params_check_list = (
-            (src, 'source'),
-            (dst, 'destination'),
-        )
-        for param_value, param_humanize in params_check_list:
-            if not param_value:
-                raise ValueError(
-                    'The {0} folder\'s path did not set.'
-                    ' Please set the {0} folder path and try again.'
-                    .format(param_humanize))
-
-            if not os.path.isabs(param_value):
-                raise ValueError(
-                    'The {} folder path should be absolute, but got "{}"'
-                    .format(param_humanize, param_value))
+        Validator.validate_folder_path(dst, 'destination')
