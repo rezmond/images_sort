@@ -77,6 +77,8 @@ class Scanner(ScannerBase):
                 not_images.extend(sub_not_images)
                 continue
 
+            # TODO: add the event emitting about found a file
+
             if self._is_allowed_extension(node_path):
                 images.append({
                     'path': full_path(node_path),
