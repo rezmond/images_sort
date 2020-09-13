@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod, abstractstaticmethod
 
 from .types import ScanResult
 
+
 class ScannerBase(metaclass=ABCMeta):
 
     @abstractmethod
