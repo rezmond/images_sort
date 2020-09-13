@@ -2,7 +2,6 @@
 
 import os
 import shutil
-from typing import Tuple
 
 import filecmp
 
@@ -119,7 +118,7 @@ class Mover:
 
     def _validate_src_dst(self, src: str, dst: str) -> None:
         '''
-        Without typechecked becouse it will check arguments manually
+        Without typechecked because it will check arguments manually
         '''
         params_check_list = (
             (src, 'source'),
