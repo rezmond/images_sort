@@ -33,8 +33,20 @@ class Scanner(ScannerBase):
         'winter (end)': (12, 12),
     }
 
-    def __init__(self):
+    def __init__(self, ioc):
         self._scanned = None
+        self._ioc = ioc
+        self._scanning_observable = ioc.get('observable')()
+
+    @property
+    def on_image_found(self):
+        return self._scanning_observable
+
+    @on_image_found.setter
+    def on_image_found(self, value):
+        '''
+        It was created for the "+=" operator could work with that property
+        '''
 
     def _get_block_name(self, month):
         """
@@ -70,14 +82,15 @@ class Scanner(ScannerBase):
         for node_name in os.listdir(current_dir_path):
             node_path = os.path.join(current_dir_path, node_name)
             if not os.path.isfile(node_path):
-                sub_scanner = type(self)()
+                sub_scanner = type(self)(self._ioc)
+                sub_scanner.on_image_found += self._scanning_observable.update
                 sub_images, sub_not_images = sub_scanner\
                     ._get_images_list(node_path)
                 images.extend(sub_images)
                 not_images.extend(sub_not_images)
                 continue
 
-            # TODO: add the event emitting about found a file
+            self._scanning_observable.update(node_path)
 
             if self._is_allowed_extension(node_path):
                 images.append({
