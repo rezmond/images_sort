@@ -106,3 +106,5 @@ ENV/
 /backup_images/
 
 .idea
+
+*.sublime-*
