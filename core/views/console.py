@@ -25,10 +25,21 @@ parser.add_argument(
 
 
 class ConsoleView(ViewBase):
+    def __init__(self, *args, **kwargs):
+        ViewBase.__init__(self, *args, **kwargs)
+        self._moved_item_info_show_started = False
+
+    def _finish_show_scanning_status(self):
+        self._moved_item_info_show_started = True
 
     def handle_image_moved(self, move_pair: Tuple[str, str]):
         from_, to_ = move_pair
-        print(f'{from_} --> {to_}')
+
+        if not self._moved_item_info_show_started:
+            print('\n')
+
+        print(f'{from_} -> {to_}')
+        self._finish_show_scanning_status()
 
     def show(self):
         args = parser.parse_args()
@@ -37,8 +48,15 @@ class ConsoleView(ViewBase):
         self._controller.set_dst_folder(args.dst)
         self._controller.enable_moved_images_log(args.list_items)
         self._model.on_move_finished += self._show_move_report
+        self._model.on_file_found += self._show_scanned_file
+
+    def _show_scanned_file(self, scanned_file_name: str) -> None:
+        print(f'found: {scanned_file_name}', end='\r')
 
     def _show_move_report(self, move_result: MoveResult) -> None:
+        if not self._moved_item_info_show_started:
+            print('\n')
+        self._finish_show_scanning_status()
         print(
             f'Moved: {len(move_result.moved)}\n'
             f'Already exists: {len(move_result.already_exists)}\n'

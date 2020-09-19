@@ -33,6 +33,16 @@ class MoverModel:
         '''
 
     @property
+    def on_file_found(self):
+        return self._scanner.on_file_found
+
+    @on_file_found.setter
+    def on_file_found(self, value):
+        '''
+        It was created for the "+=" operator could work with that property
+        '''
+
+    @property
     def on_move_finished(self):
         return self._mover.on_move_finished
 
