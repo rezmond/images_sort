@@ -39,11 +39,11 @@ class Scanner(ScannerBase):
         self._scanning_observable = ioc.get('observable')()
 
     @property
-    def on_image_found(self):
+    def on_file_found(self):
         return self._scanning_observable
 
-    @on_image_found.setter
-    def on_image_found(self, value):
+    @on_file_found.setter
+    def on_file_found(self, value):
         '''
         It was created for the "+=" operator could work with that property
         '''
@@ -83,7 +83,7 @@ class Scanner(ScannerBase):
             node_path = os.path.join(current_dir_path, node_name)
             if not os.path.isfile(node_path):
                 sub_scanner = type(self)(self._ioc)
-                sub_scanner.on_image_found += self._scanning_observable.update
+                sub_scanner.on_file_found += self._scanning_observable.update
                 sub_images, sub_not_images = sub_scanner\
                     ._get_images_list(node_path)
                 images.extend(sub_images)

@@ -57,7 +57,7 @@ class TestScanner:
         ioc = clreate_ioc()
         scanner = Scanner(ioc)
         handler_mock = Mock()
-        scanner.on_image_found += handler_mock
+        scanner.on_file_found += handler_mock
         scanner.scan(PATH_TO_TEST_DATA)
 
         expected_calls = [
