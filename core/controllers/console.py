@@ -15,6 +15,9 @@ class ConsoleViewController(ControllerBase):
         super(ConsoleViewController, self).__init__(*args)
         self._view.show()
 
+    def clean_mode(self, *args):
+        self._model.clean_mode(*args)
+
     @typechecked
     def enable_moved_images_log(self, enable: bool = True):
         if enable:

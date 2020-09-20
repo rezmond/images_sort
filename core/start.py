@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import filecmp
 import os
 import shutil
 
@@ -16,6 +17,7 @@ def main():
     ioc.add('copy', shutil.copy2)
     ioc.add('delete', os.remove)
     ioc.add('makedirs', os.makedirs)
+    ioc.add('compare', filecmp.cmp)
     scanner = Scanner(ioc)
     model = MoverModel(ioc, scanner)
     controller = ConsoleViewController(model)

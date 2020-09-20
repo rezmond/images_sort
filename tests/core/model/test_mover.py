@@ -35,6 +35,7 @@ class TestMover:
     @patch.object(Scanner, 'scan', return_value=(get_move_map(), [], []))
     def test_move_by_absolute_path(self, patched_scanner):
         ioc = create_ioc()
+        ioc.add('compare', lambda x, _: x.endswith('1.jpg'))
         mover = Mover(ioc)
         on_item_moved_handler_mock = Mock()
         mover.on_image_moved += on_item_moved_handler_mock

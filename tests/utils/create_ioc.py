@@ -18,4 +18,5 @@ def create_ioc():
     ioc.add('copy', Mock())
     ioc.add('delete', Mock())
     ioc.add('makedirs', Mock())
+    ioc.add('compare', Mock())
     return ioc

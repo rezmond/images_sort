@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import filecmp
 
 from typeguard import typechecked
 
@@ -16,13 +15,24 @@ class Mover:
     def __init__(self, ioc: InverseOfControlContainer) -> None:
         self._ioc = ioc
         self._move_result = None
-        self._move_function = self._ioc.get('copy')
+        self._move_function = None
+        self._delete_function = None
+        self._cmp_func = self._ioc.get('compare')
         self._makedirs_function = self._ioc.get('makedirs')
         self._moved_image_event_listeners = Observable()
         self._move_finish_event_listeners = Observable()
 
-    @staticmethod
-    def _cmp_files(dst_dir, file_dict):
+    @typechecked
+    def _set_move_mode(self, enable: bool) -> None:
+        self._move_function = self._ioc.get('move') \
+            if enable else self._ioc.get('copy')
+
+    @typechecked
+    def _set_delete_mode(self, enable: bool) -> None:
+        self._delete_function = self._ioc.get('delete') \
+            if enable else lambda *args: None
+
+    def _cmp_files(self, dst_dir, file_dict):
         """
         Check the destination folder for already existed files with the
         same names.
@@ -48,7 +58,7 @@ class Mover:
         base_file_name, extension = os.path.splitext(curr_file_name)
 
         while os.path.isfile(dst_file_path):
-            if filecmp.cmp(file_dict['path'], dst_file_path):
+            if self._cmp_func(file_dict['path'], dst_file_path):
                 return 'already_exists', dst_file_path
 
             curr_file_name = '{}_{}{}'.format(
@@ -62,8 +72,13 @@ class Mover:
         if not os.path.exists(path):
             self._makedirs_function(path)
 
-    def move(self, scanned: ScanResult, dst_folder: str) -> MoveResult:
+    def move(self,
+             scanned: ScanResult,
+             dst_folder: str,
+             move_mode: bool = False) -> MoveResult:
         self._validate_dst(dst_folder)
+        self._set_move_mode(move_mode)
+        self._set_delete_mode(move_mode)
 
         self._move_result = MoveResult(
             [], [], scanned.no_exif, scanned.not_images)
@@ -97,6 +112,8 @@ class Mover:
                     self._move_function(file_dict['path'], result_path)
                     self._moved_image_event_listeners.update(
                         (file_dict['path'], result_path))
+                elif result_type == 'already_exists':
+                    self._delete_function(file_dict['path'])
 
                 getattr(self._move_result, result_type)\
                     .append(file_dict['path'])

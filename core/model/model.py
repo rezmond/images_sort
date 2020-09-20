@@ -15,11 +15,17 @@ class MoverModel:
         self._scanner = scanner
         self._src_folder = None
         self._dst_folder = None
+        self._clean_mode = False
+
+    @typechecked
+    def clean_mode(self, enable: bool):
+        self._clean_mode = enable
 
     def move(self) -> MoveResult:
         self._scanner.scan(self._src_folder)
         scanned = self._scanner.get_data()
-        move_result = self._mover.move(scanned, self._dst_folder)
+        move_result = self._mover.move(
+            scanned, self._dst_folder, self._clean_mode)
         return move_result
 
     @property

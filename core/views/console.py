@@ -21,8 +21,14 @@ parser.add_argument(
     help='the destination folder full path.')
 parser.add_argument(
     '-l', '--list-items',
-    default=False, action='store_true',
+    default=False,
+    action='store_true',
     help='the destination folder full path.')
+parser.add_argument(
+    '-c', '--clean',
+    default=False,
+    action='store_true',
+    help='remove the duplicates and actually move the files')
 
 
 def after_scanning(func):
@@ -55,6 +61,7 @@ class ConsoleView(ViewBase):
         self._controller.set_src_folder(args.src)
         self._controller.set_dst_folder(args.dst)
         self._controller.enable_moved_images_log(args.list_items)
+        self._controller.clean_mode(args.clean)
         self._model.on_move_finished += self._show_move_report
         self._model.on_file_found += self._show_scanned_file
 
