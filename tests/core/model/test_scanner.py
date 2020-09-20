@@ -5,23 +5,16 @@ from unittest.mock import call, Mock
 
 from ....utils import full_path
 from ....core.model.scanner import Scanner
-from ....core.utils.ioc import InverseOfControlContainer
-from ....core.utils.base import Observable
+from ...utils.create_ioc import create_ioc
 from .fixtures import get_move_map
 
 PATH_TO_TEST_DATA = full_path('tests/data')
 
 
-def clreate_ioc():
-    ioc = InverseOfControlContainer()
-    ioc.add('observable', Observable)
-    return ioc
-
-
 class TestScanner:
 
     def test_scan(self):
-        ioc = clreate_ioc()
+        ioc = create_ioc()
         scanner = Scanner(ioc)
 
         with pytest.raises(TypeError) as exc_info:
@@ -54,7 +47,7 @@ class TestScanner:
             'Should return correct not_images'
 
     def test_found_items(self):
-        ioc = clreate_ioc()
+        ioc = create_ioc()
         scanner = Scanner(ioc)
         handler_mock = Mock()
         scanner.on_file_found += handler_mock

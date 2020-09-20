@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
 
 import os
-import shutil
 import filecmp
 
 from typeguard import typechecked
 
-from ..utils import MoveResult, Observable
+from ..utils import InverseOfControlContainer, MoveResult, Observable
 from .validator import Validator
 from .types import ScanResult, YearType
 
 
 class Mover:
 
-    def __init__(self):
+    @typechecked
+    def __init__(self, ioc: InverseOfControlContainer) -> None:
+        self._ioc = ioc
         self._move_result = None
+        self._move_function = self._ioc.get('copy')
+        self._makedirs_function = self._ioc.get('makedirs')
         self._moved_image_event_listeners = Observable()
         self._move_finish_event_listeners = Observable()
 
@@ -54,11 +57,10 @@ class Mover:
             num += 1
         return 'moved', dst_file_path
 
-    @staticmethod
-    def __make_dir_if_not_exists(path):
+    def __make_dir_if_not_exists(self, path):
         """Если целевой папки не было создано"""
         if not os.path.exists(path):
-            os.makedirs(path)
+            self._makedirs_function(path)
 
     def move(self, scanned: ScanResult, dst_folder: str) -> MoveResult:
         self._validate_dst(dst_folder)
@@ -92,7 +94,7 @@ class Mover:
                     self._cmp_files(dst_dir_path, file_dict))
 
                 if result_type == 'moved':
-                    shutil.copy2(file_dict['path'], result_path)
+                    self._move_function(file_dict['path'], result_path)
                     self._moved_image_event_listeners.update(
                         (file_dict['path'], result_path))
 

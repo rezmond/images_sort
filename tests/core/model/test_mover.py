@@ -8,13 +8,15 @@ from ....utils import full_path
 from ....core.model.mover import Mover
 from ....core.model.scanner import Scanner
 from ....core.model.types import ScanResult
+from ...utils import create_ioc
 from .fixtures import get_move_map
 
 
 class TestMover:
 
     def test_move_without_dst_param(self):
-        mover = Mover()
+        ioc = create_ioc()
+        mover = Mover(ioc)
         with pytest.raises(ValueError) as exc_info:
             mover.move(ScanResult(None, None, None), None)
 
@@ -22,38 +24,37 @@ class TestMover:
             'Should catch not set the src or the dst folder path'
 
     def test_move_by_relative_path(self):
-        mover = Mover()
+        ioc = create_ioc()
+        mover = Mover(ioc)
         with pytest.raises(ValueError) as exc_info:
             mover.move(ScanResult(None, None, None), 'test-1')
 
         assert 'absolute' in str(exc_info.value), \
             'Should catch not absolute the destination folder path'
 
-    @patch('os.makedirs')
     @patch.object(Scanner, 'scan', return_value=(get_move_map(), [], []))
-    def test_move_by_absolute_path(self, patched_scanner, _not_used):
-
-        mover = Mover()
+    def test_move_by_absolute_path(self, patched_scanner):
+        ioc = create_ioc()
+        mover = Mover(ioc)
         on_item_moved_handler_mock = Mock()
         mover.on_image_moved += on_item_moved_handler_mock
 
-        with patch('shutil.copy2') as patched_copy:
-            move_result = mover.move(
-                ScanResult({
-                    '2017': {
-                        'spring': [{'path': full_path('tests/data/2.jpg')}],
-                        'summer': [{'path': full_path('tests/data/3.jpg')}],
-                        'winter (end)': [{
-                            'path': full_path('tests/data/5.jpg')
-                        }, {
-                            'path': full_path('tests/data/4.jpg')
-                        }],
-                        'winter (begin)': [{
-                            'path': full_path('tests/data/1.jpg')
-                        }],
-                        'summer': [{'path': full_path('tests/data/3.jpg')}],
-                    }
-                }, [], []), full_path('tests/out'))
+        move_result = mover.move(
+            ScanResult({
+                '2017': {
+                    'spring': [{'path': full_path('tests/data/2.jpg')}],
+                    'summer': [{'path': full_path('tests/data/3.jpg')}],
+                    'winter (end)': [{
+                        'path': full_path('tests/data/5.jpg')
+                    }, {
+                        'path': full_path('tests/data/4.jpg')
+                    }],
+                    'winter (begin)': [{
+                        'path': full_path('tests/data/1.jpg')
+                    }],
+                    'summer': [{'path': full_path('tests/data/3.jpg')}],
+                }
+            }, [], []), full_path('tests/out'))
 
         calls = [
             call(
@@ -73,7 +74,9 @@ class TestMover:
                 full_path('tests/out/2017/winter (end)/4.jpg')
             ),
         ]
-        patched_copy.assert_has_calls(calls, any_order=True)
+
+        copy_mock = ioc.get('copy')
+        copy_mock.assert_has_calls(calls, any_order=True)
 
         calls = [
             call((

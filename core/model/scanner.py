@@ -9,6 +9,7 @@ from typeguard import typechecked
 import exifread
 
 from ...utils import full_path
+from ..utils import InverseOfControlContainer
 from .validator import Validator
 from .types import ScanResult
 from .scanner_base import ScannerBase
@@ -33,7 +34,8 @@ class Scanner(ScannerBase):
         'winter (end)': (12, 12),
     }
 
-    def __init__(self, ioc):
+    @typechecked
+    def __init__(self, ioc: InverseOfControlContainer) -> None:
         self._scanned = None
         self._ioc = ioc
         self._scanning_observable = ioc.get('observable')()
