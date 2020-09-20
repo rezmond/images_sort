@@ -2,6 +2,7 @@
 
 import argparse
 from typing import Tuple
+from functools import wraps
 
 from .base import ViewBase
 from ..utils import MoveResult
@@ -24,22 +25,29 @@ parser.add_argument(
     help='the destination folder full path.')
 
 
+def after_scanning(func):
+    @wraps(func)
+    def wrapper(instance, *args, **kwargs):
+        if not instance._has_scanned:
+            print('\n')
+            instance._finish_show_scanning_status()
+        return func(instance, *args, **kwargs)
+
+    return wrapper
+
+
 class ConsoleView(ViewBase):
     def __init__(self, *args, **kwargs):
         ViewBase.__init__(self, *args, **kwargs)
-        self._moved_item_info_show_started = False
+        self._has_scanned = False
 
     def _finish_show_scanning_status(self):
-        self._moved_item_info_show_started = True
+        self._has_scanned = True
 
+    @after_scanning
     def handle_image_moved(self, move_pair: Tuple[str, str]):
         from_, to_ = move_pair
-
-        if not self._moved_item_info_show_started:
-            print('\n')
-
         print(f'{from_} -> {to_}')
-        self._finish_show_scanning_status()
 
     def show(self):
         args = parser.parse_args()
@@ -53,10 +61,8 @@ class ConsoleView(ViewBase):
     def _show_scanned_file(self, scanned_file_name: str) -> None:
         print(f'found: {scanned_file_name}', end='\r')
 
+    @after_scanning
     def _show_move_report(self, move_result: MoveResult) -> None:
-        if not self._moved_item_info_show_started:
-            print('\n')
-        self._finish_show_scanning_status()
         print(
             f'Moved: {len(move_result.moved)}\n'
             f'Already exists: {len(move_result.already_exists)}\n'
