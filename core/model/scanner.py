@@ -8,7 +8,7 @@ from dateutil.parser import isoparse
 from typeguard import typechecked
 import exifread
 
-from ...utils import full_path
+from utils import full_path
 from ..utils import InverseOfControlContainer
 from .validator import Validator
 from .types import ScanResult

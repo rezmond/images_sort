@@ -3,8 +3,8 @@
 from unittest.mock import patch, Mock
 from unittest import TestCase
 
-from ....core.model import MoverModel
-from ....core.controllers.console import ConsoleViewController
+from core.model import MoverModel
+from core.controllers.console import ConsoleViewController
 
 
 class TestConsole(TestCase):

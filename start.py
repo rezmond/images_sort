@@ -3,10 +3,10 @@ import filecmp
 import os
 import shutil
 
-from .model import MoverModel, Scanner, Mover
-from .controllers import ConsoleViewController
-from .utils.ioc import InverseOfControlContainer
-from .utils.base import Observable
+from core.model import MoverModel, Scanner, Mover
+from core.controllers import ConsoleViewController
+from core.utils.ioc import InverseOfControlContainer
+from core.utils.base import Observable
 
 
 def main():

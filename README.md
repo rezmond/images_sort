@@ -5,7 +5,7 @@ Sort images by year and season.
 from the project folder directory run
 
 `
-    python3 -m images_sort.core.start <src> <dst>
+    python3 start <src> <dst>
 `
 
 Run tests:

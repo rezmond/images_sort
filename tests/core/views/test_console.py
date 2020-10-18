@@ -7,8 +7,8 @@ from unittest.mock import patch, call, Mock
 
 import pytest
 
-from ....core.views.console import ConsoleView
-from ....core.utils import MoveResult
+from core.views.console import ConsoleView
+from core.utils import MoveResult
 
 
 class TestConsole(TestCase):
