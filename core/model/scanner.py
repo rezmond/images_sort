@@ -121,7 +121,10 @@ class Scanner(ScannerBase):
         img_files_info, not_img_file_path = self\
             ._get_images_list(src_folder_path)
 
-        for file_dict in img_files_info:
+        sorted_files_info = sorted(
+            img_files_info, key=lambda x: x['name'], reverse=True)
+
+        for file_dict in sorted_files_info:
             with open(file_dict['path'], 'rb') as current_file:
                 tags = exifread.process_file(current_file)
             exif_data = tags.get('EXIF DateTimeOriginal', None)

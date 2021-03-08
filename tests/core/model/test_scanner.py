@@ -5,7 +5,7 @@ from unittest.mock import call, Mock
 
 from ....utils import full_path
 from ....core.model.scanner import Scanner
-from ...utils.create_ioc import create_ioc
+from ...utils import create_ioc, assert_dict_equal
 from .fixtures import get_move_map
 
 PATH_TO_TEST_DATA = full_path('tests/data')
@@ -37,7 +37,8 @@ class TestScanner:
         move_map, no_exif, not_images = scanner.get_data()
 
         expected_move_map = get_move_map()
-        assert move_map == expected_move_map, 'Should return correct move_map'
+        assert_dict_equal(move_map, expected_move_map,
+                          'Should return correct move_map')
 
         expected_no_exif = [full_path('tests/data/folder-1/1-1.jpg')]
         assert no_exif == expected_no_exif, 'Should return correct no_exif'
