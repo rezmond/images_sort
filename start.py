@@ -3,7 +3,8 @@ import filecmp
 import os
 import shutil
 
-from core.model import MoverModel, Scanner, Mover
+from core.model import MoverModel
+from core.entities import Scanner, Mover
 from core.controllers import ConsoleViewController
 from core.utils.ioc import InverseOfControlContainer
 from core.utils.base import Observable

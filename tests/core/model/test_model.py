@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from unittest.mock import call, patch, Mock
+from unittest.mock import call, patch, Mock, MagicMock
 
-from ....core.model.model import MoverModel
-from ....core.model.mover import Mover
-from ....core.model.scanner_base import ScannerBase
-from ....core.model.types import ScanResult
-from ....utils import full_path
-from ...utils import create_ioc
+from core.entities.scanner.base import ScannerBase
+from core.entities.mover import Mover
+from core.model.model import MoverModel
+from core.types import ScanResult
+from core.utils.base import Observable
+from tests.utils import create_ioc
+from utils import full_path
 from .fixtures import get_move_map
 
 
@@ -47,12 +48,13 @@ class TestModel:
 
     def test_on_move_finish_report_subscribe(self):
         ioc = create_ioc()
-        iadd_mock = Mock()
-        with patch('images_sort.core.model.mover.Observable') as patched_observable:
-            patched_observable.__iadd__ = iadd_mock
-            model = MoverModel(ioc, ScannerMock())
-            model.on_move_finished += Mock()
-        patched_observable.return_value.__iadd__.assert_called_once()
+        observable = MagicMock(spec=Observable)
+        ioc.add('observable', observable)
+        model = MoverModel(ioc, ScannerMock())
+
+        model.on_move_finished += Mock()
+
+        observable.return_value.__iadd__.assert_called_once()
 
     def test_delete_duplicates(self):
         ioc = create_ioc()

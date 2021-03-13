@@ -4,12 +4,13 @@ import os
 
 from typeguard import typechecked
 
-from ..utils import InverseOfControlContainer, MoveResult, Observable
-from .validator import Validator
-from .types import ScanResult, YearType
+from core.types import ScanResult, YearType
+from core.utils import InverseOfControlContainer, MoveResult
+from ..utils import validate_folder_path
+from .base import MoverBase
 
 
-class Mover:
+class Mover(MoverBase):
 
     @typechecked
     def __init__(self, ioc: InverseOfControlContainer) -> None:
@@ -19,6 +20,7 @@ class Mover:
         self._delete_function = None
         self._cmp_func = self._ioc.get('compare')
         self._makedirs_function = self._ioc.get('makedirs')
+        Observable = self._ioc.get('observable')
         self._moved_image_event_listeners = Observable()
         self._move_finish_event_listeners = Observable()
 
@@ -140,4 +142,4 @@ class Mover:
         '''
         Without typechecked because it will check arguments manually
         '''
-        Validator.validate_folder_path(dst, 'destination')
+        validate_folder_path(dst, 'destination')

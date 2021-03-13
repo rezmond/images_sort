@@ -2,10 +2,10 @@
 
 from unittest.mock import Mock
 
-from ...utils import full_path
-from ...core.utils.ioc import InverseOfControlContainer
-from ...core.utils.base import Observable
-from ...core.model.mover import Mover
+from utils import full_path
+from core.entities.mover import Mover
+from core.utils.ioc import InverseOfControlContainer
+from core.utils.base import Observable
 
 PATH_TO_TEST_DATA = full_path('tests/data')
 

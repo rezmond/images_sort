@@ -2,7 +2,7 @@
 
 from abc import ABCMeta, abstractmethod, abstractstaticmethod
 
-from .types import ScanResult
+from core.types import ScanResult
 
 
 class ScannerBase(metaclass=ABCMeta):

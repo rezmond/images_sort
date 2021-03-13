@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import call, Mock
 
 from ....utils import full_path
-from ....core.model.scanner import Scanner
+from ....core.entities.scanner import Scanner
 from ...utils import create_ioc, assert_dict_equal
 from .fixtures import get_move_map
 

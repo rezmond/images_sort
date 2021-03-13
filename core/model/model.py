@@ -2,8 +2,8 @@
 
 from typeguard import typechecked
 
-from ..utils import InverseOfControlContainer, MoveResult
-from .scanner_base import ScannerBase
+from core.entities.scanner import ScannerBase
+from core.utils import InverseOfControlContainer, MoveResult
 
 
 class MoverModel:

@@ -9,10 +9,10 @@ from typeguard import typechecked
 import exifread
 
 from utils import full_path
-from ..utils import InverseOfControlContainer
-from .validator import Validator
-from .types import ScanResult
-from .scanner_base import ScannerBase
+from core.types import ScanResult
+from core.utils import InverseOfControlContainer
+from ..utils import validate_folder_path
+from .base import ScannerBase
 
 MAX_TIME_STRING_LENGTH = 19
 
@@ -154,4 +154,4 @@ class Scanner(ScannerBase):
         return self._scanned
 
     def _validate_src(self, source_folder):
-        Validator.validate_folder_path(source_folder, 'source')
+        validate_folder_path(source_folder, 'source')

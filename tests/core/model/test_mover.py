@@ -4,11 +4,11 @@ from unittest.mock import patch, call, Mock
 
 import pytest
 
-from ....utils import full_path
-from ....core.model.mover import Mover
-from ....core.model.scanner import Scanner
-from ....core.model.types import ScanResult
-from ...utils import create_ioc
+from core.types import ScanResult
+from core.entities.mover import Mover
+from core.entities.scanner import Scanner
+from tests.utils import create_ioc
+from utils import full_path
 from .fixtures import get_move_map
 
 
