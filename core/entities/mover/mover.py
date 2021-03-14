@@ -120,23 +120,13 @@ class Mover(MoverBase):
                 getattr(self._move_result, result_type)\
                     .append(file_dict['path'])
 
-    @property
+    @MoverBase.on_image_moved.getter
     def on_image_moved(self):
         return self._moved_image_event_listeners
 
-    @on_image_moved.setter
-    def on_image_moved(self, value):
-        pass
-
-    @property
+    @MoverBase.on_move_finished.getter
     def on_move_finished(self):
         return self._move_finish_event_listeners
-
-    @on_move_finished.setter
-    def on_move_finished(self, value):
-        '''
-        It was created for the "+=" operator could work with that property
-        '''
 
     def _validate_dst(self, dst: str) -> None:
         '''

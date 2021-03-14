@@ -21,6 +21,18 @@ class MoverBase(metaclass=ABCMeta):
         '''Calls when an image have moved.'''
 
     @on_image_moved.setter
-    @abstractmethod
     def on_image_moved(self, val):
-        '''For register a listener'''
+        '''
+        It was created for the "+=" operator could work with that property
+        '''
+
+    @property
+    @abstractmethod
+    def on_move_finished(self):
+        '''Calls when the moving has finished.'''
+
+    @on_move_finished.setter
+    def on_move_finished(self, val):
+        '''
+        It was created for the "+=" operator could work with that property
+        '''

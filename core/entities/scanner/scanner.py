@@ -50,11 +50,9 @@ class Scanner(ScannerBase):
         It was created for the "+=" operator could work with that property
         '''
 
-    def _get_block_name(self, month):
+    def _get_block_name(self, month: int) -> str:
         """
         Return month name in human readable format
-        :param month: month number(from 1 to 12)
-        :rtype: str
         """
         assert month in range(1, 13), \
             'Month number must be from 1 to 12. Not "{0}"'.format(month)
