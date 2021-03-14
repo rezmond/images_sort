@@ -11,8 +11,11 @@ class ScannerBase(metaclass=ABCMeta):
     def scan(
         self, src_folder_path: str
     ) -> None:
-        pass
+        '''
+            It creates the dictionary with output structure in an internal
+            variable
+        '''
 
     @abstractstaticmethod
     def get_data() -> ScanResult:
-        pass
+        '''It returns prepared the output structure'''
