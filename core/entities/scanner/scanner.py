@@ -2,7 +2,7 @@
 
 import os
 from datetime import datetime
-from typing import Tuple, List
+from typing import Tuple, List, Union
 from dateutil.parser import isoparse
 
 from typeguard import typechecked
@@ -15,6 +15,13 @@ from ..utils import validate_folder_path
 from .base import ScannerBase
 
 MAX_TIME_STRING_LENGTH = 19
+
+
+def get_exif_data(path: str) -> Union[exifread.classes.IfdTag, None]:
+    with open(path, 'rb') as current_file:
+        tags = exifread.process_file(current_file)
+    exif_data = tags.get('EXIF DateTimeOriginal', None)
+    return exif_data
 
 
 class Scanner(ScannerBase):
@@ -123,21 +130,24 @@ class Scanner(ScannerBase):
             img_files_info, key=lambda x: x['name'], reverse=True)
 
         for file_dict in sorted_files_info:
-            with open(file_dict['path'], 'rb') as current_file:
-                tags = exifread.process_file(current_file)
-            exif_data = tags.get('EXIF DateTimeOriginal', None)
+            exif_data = get_exif_data(file_dict['path'])
+
             if not exif_data:
                 no_exif.append(file_dict['path'])
                 continue
+
             date = self._get_datetime(exif_data.values)
+
             # years
             year_in_string = str(date.year)
             if year_in_string not in set(move_map.keys()):
                 move_map[year_in_string] = {}
+
             # month
             month_in_string = self._get_block_name(date.month)
             if month_in_string not in set(move_map[year_in_string].keys()):
                 move_map[year_in_string][month_in_string] = []
+
             move_map[year_in_string][month_in_string]\
                 .append(file_dict)
 
