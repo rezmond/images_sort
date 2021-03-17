@@ -12,6 +12,7 @@ from utils import full_path
 from core.types import ScanResult
 from core.utils import InverseOfControlContainer
 from ..utils import validate_folder_path
+from ..move_map import MoveMap
 from .base import ScannerBase
 
 MAX_TIME_STRING_LENGTH = 19
@@ -33,14 +34,6 @@ class Scanner(ScannerBase):
         '.png'
     )
 
-    BLOCKS = {
-        'winter (begin)': (1, 2),
-        'spring': (3, 5),
-        'summer': (6, 8),
-        'autumn': (9, 11),
-        'winter (end)': (12, 12),
-    }
-
     @typechecked
     def __init__(self, ioc: InverseOfControlContainer) -> None:
         self._scanned = None
@@ -56,17 +49,6 @@ class Scanner(ScannerBase):
         '''
         It was created for the "+=" operator could work with that property
         '''
-
-    def _get_block_name(self, month: int) -> str:
-        """
-        Return month name in human readable format
-        """
-        assert month in range(1, 13), \
-            'Month number must be from 1 to 12. Not "{0}"'.format(month)
-
-        for key, value in self.BLOCKS.items():
-            if value[0] <= month <= value[1]:
-                return key
 
     @staticmethod
     def _get_datetime(src):
@@ -122,7 +104,7 @@ class Scanner(ScannerBase):
         self._validate_src(src_folder_path)
         # формирование структуры по exif
         no_exif = []
-        move_map = {}
+        move_map = MoveMap()
         img_files_info, not_img_file_path = self\
             ._get_images_list(src_folder_path)
 
@@ -137,22 +119,12 @@ class Scanner(ScannerBase):
                 continue
 
             date = self._get_datetime(exif_data.values)
+            move_map.add_data(date, file_dict)
 
-            # years
-            year_in_string = str(date.year)
-            if year_in_string not in set(move_map.keys()):
-                move_map[year_in_string] = {}
-
-            # month
-            month_in_string = self._get_block_name(date.month)
-            if month_in_string not in set(move_map[year_in_string].keys()):
-                move_map[year_in_string][month_in_string] = []
-
-            move_map[year_in_string][month_in_string]\
-                .append(file_dict)
-
+        data = move_map.get_map()
+        print("data", data)
         self._scanned = ScanResult(
-            move_map,
+            move_map.get_map(),
             no_exif,
             not_img_file_path,
         )
