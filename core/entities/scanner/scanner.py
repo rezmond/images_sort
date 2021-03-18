@@ -15,6 +15,9 @@ from ..utils import validate_folder_path
 from ..move_map import MoveMap
 from .base import ScannerBase
 
+# TODO: create a class instead that
+ImagesSeparated = Tuple[List[dict], List[str]]
+
 MAX_TIME_STRING_LENGTH = 19
 
 
@@ -59,8 +62,13 @@ class Scanner(ScannerBase):
             return datetime.strptime(cropped, '%Y:%m:%d %H:%M:%S')
 
     @typechecked
-    def _get_images_list(
-            self, current_dir_path: str) -> Tuple[List[dict], List[str]]:
+    def _scan_folder(self, node_path: str) -> ImagesSeparated:
+        scanner = Scanner(self._ioc)
+        scanner.on_file_found += self._scanning_observable.update
+        return scanner._get_images_list(node_path)
+
+    @typechecked
+    def _get_images_list(self, current_dir_path: str) -> ImagesSeparated:
         """
         It returns all suitable by extension files taking into account nesting.
         Plus the path list of not images.
@@ -71,10 +79,7 @@ class Scanner(ScannerBase):
         for node_name in os.listdir(current_dir_path):
             node_path = os.path.join(current_dir_path, node_name)
             if not os.path.isfile(node_path):
-                sub_scanner = type(self)(self._ioc)
-                sub_scanner.on_file_found += self._scanning_observable.update
-                sub_images, sub_not_images = sub_scanner\
-                    ._get_images_list(node_path)
+                sub_images, sub_not_images = self._scan_folder(node_path)
                 images.extend(sub_images)
                 not_images.extend(sub_not_images)
                 continue
