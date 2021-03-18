@@ -102,7 +102,7 @@ class Scanner(ScannerBase):
         self, src_folder_path: str
     ) -> None:
         self._validate_src(src_folder_path)
-        # формирование структуры по exif
+
         no_exif = []
         move_map = MoveMap()
         img_files_info, not_img_file_path = self\
@@ -121,8 +121,6 @@ class Scanner(ScannerBase):
             date = self._get_datetime(exif_data.values)
             move_map.add_data(date, file_dict)
 
-        data = move_map.get_map()
-        print("data", data)
         self._scanned = ScanResult(
             move_map.get_map(),
             no_exif,
