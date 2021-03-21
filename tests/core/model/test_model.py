@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from unittest.mock import call, patch, Mock, MagicMock
+from unittest.mock import call, Mock, MagicMock, PropertyMock
 
 import pytest
 
 from containers import Container
 from core.entities.fs import FsManipulatorBase
 from core.entities.scanner.base import ScannerBase
-from core.entities.mover import Mover, MoverBase
-from core.model.model import MoverModel
+from core.entities.mover import MoverBase
 from core.types import ScanResult
 from core.utils.base import Observable
-from tests.utils import create_ioc
 from utils import full_path
 from .fixtures import get_move_map
 
@@ -52,24 +50,30 @@ class TestModel:
 
         mover_mock.move.assert_called_with(scanner_result, 'dst', False)
 
-    def test_on_image_move_prop(self):
-        ioc = create_ioc()
-        model = MoverModel(ioc, ScannerMock())
-        with patch.object(Mover, 'on_image_moved') as patched_prop:
-            patched_prop.__get__ = Mock(return_value='')
-            patched_prop.__get__.assert_not_called()
+    def test_on_image_move_prop(self, container):
+        fs_manipulator_mock = Mock(spec=FsManipulatorBase)
+        prop_mock = PropertyMock(return_value='')
+        mover_mock = MagicMock(spec=MoverBase)
+        type(mover_mock).on_image_moved = prop_mock
+
+        with container.mover.override(mover_mock),\
+                container.fs_manipulator.override(fs_manipulator_mock),\
+                container.comparator.override(Mock(return_value=True)):
+            model = container.model()
+            prop_mock.assert_not_called()
             model.on_image_moved
-            patched_prop.__get__.assert_called_once()
+            prop_mock.assert_called_once()
 
-    def test_on_move_finish_report_subscribe(self):
-        ioc = create_ioc()
-        observable = MagicMock(spec=Observable)
-        ioc.add('observable', observable)
-        model = MoverModel(ioc, ScannerMock())
+    def test_on_move_finish_report_subscribe(self, container):
+        observable_mock = MagicMock(spec=Observable)
+        fs_manipulator_mock = Mock(spec=FsManipulatorBase)
+        with container.fs_manipulator.override(fs_manipulator_mock),\
+            container.comparator.override(Mock(return_value=True)),\
+                container.observable.override(observable_mock):
+            model = container.model()
+            model.on_move_finished += Mock()
 
-        model.on_move_finished += Mock()
-
-        observable.return_value.__iadd__.assert_called_once()
+        observable_mock.__iadd__.assert_called_once()
 
     def test_delete_duplicates(self, container):
         fs_manipulator_mock = Mock(spec=FsManipulatorBase)

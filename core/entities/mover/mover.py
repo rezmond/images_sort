@@ -29,8 +29,6 @@ class Mover(MoverBase):
         self._move_function = None
         self._moved_image_event_listeners = observable_factory()
         self._move_finish_event_listeners = observable_factory()
-        print("self._move_finish_event_listeners",
-              self._move_finish_event_listeners)
 
     def _cmp_files(self, dst_dir, file_dict):
         """

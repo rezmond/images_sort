@@ -11,6 +11,9 @@ class Observable:
     def __add__(self, observer: Callable) -> None:
         self._observers.append(observer)
 
+    def __iadd__(self, observer: Callable) -> None:
+        self._observers.append(observer)
+
     def update(self, data: Any) -> None:
         for observer in self._observers:
             observer(data)
