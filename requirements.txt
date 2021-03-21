@@ -3,3 +3,4 @@ pytest==6.0.2
 pytest-cov==2.10.1
 typeguard==2.2.2
 python-dateutil==2.8.1
+dependency-injector==4.31.0
