@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import namedtuple
-from typing import Dict, List
+from typing import Dict, List, Callable
 
 ScanResult = namedtuple('ScanResult', (
     'move_map',
@@ -11,3 +11,5 @@ ScanResult = namedtuple('ScanResult', (
 
 BlocksType = List[Dict[str, str]]
 YearType = Dict[str, BlocksType]
+
+Comparator = Callable[[str, str], bool]

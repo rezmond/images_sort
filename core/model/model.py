@@ -3,15 +3,15 @@
 from typeguard import typechecked
 
 from core.entities.scanner import ScannerBase
-from core.utils import InverseOfControlContainer, MoveResult
+from core.entities.mover import MoverBase
+from core.utils import MoveResult
 
 
 class MoverModel:
 
     @typechecked
-    def __init__(self, ioc: InverseOfControlContainer, scanner: ScannerBase):
-        self._ioc = ioc
-        self._mover = ioc.get('mover')(self._ioc)
+    def __init__(self, mover: MoverBase, scanner: ScannerBase):
+        self._mover = mover
         self._scanner = scanner
         self._src_folder = None
         self._dst_folder = None

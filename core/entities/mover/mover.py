@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import os
+from typing import Callable
 
 from typeguard import typechecked
 
-from core.types import ScanResult, YearType
-from core.utils import InverseOfControlContainer, MoveResult
+from core.utils.base import Observable
+from core.types import Comparator, ScanResult, YearType
+from core.utils import MoveResult
+from ..fs import FsManipulatorBase, FsActions
 from ..utils import validate_folder_path
 from .base import MoverBase
 
@@ -13,26 +16,21 @@ from .base import MoverBase
 class Mover(MoverBase):
 
     @typechecked
-    def __init__(self, ioc: InverseOfControlContainer) -> None:
-        self._ioc = ioc
+    def __init__(
+            self,
+            observable_factory: Callable[[], Observable],
+            fs_manipulator: FsManipulatorBase,
+            comparator: Comparator
+    ) -> None:
+        self._fs_manipulator = fs_manipulator
+        self._fs_actions = None
+        self._comparator = comparator
         self._move_result = None
         self._move_function = None
-        self._delete_function = None
-        self._cmp_func = self._ioc.get('compare')
-        self._makedirs_function = self._ioc.get('makedirs')
-        Observable = self._ioc.get('observable')
-        self._moved_image_event_listeners = Observable()
-        self._move_finish_event_listeners = Observable()
-
-    @typechecked
-    def _set_move_mode(self, enable: bool) -> None:
-        self._move_function = self._ioc.get('move') \
-            if enable else self._ioc.get('copy')
-
-    @typechecked
-    def _set_delete_mode(self, enable: bool) -> None:
-        self._delete_function = self._ioc.get('delete') \
-            if enable else lambda *args: None
+        self._moved_image_event_listeners = observable_factory()
+        self._move_finish_event_listeners = observable_factory()
+        print("self._move_finish_event_listeners",
+              self._move_finish_event_listeners)
 
     def _cmp_files(self, dst_dir, file_dict):
         """
@@ -60,7 +58,7 @@ class Mover(MoverBase):
         base_file_name, extension = os.path.splitext(curr_file_name)
 
         while os.path.isfile(dst_file_path):
-            if self._cmp_func(file_dict['path'], dst_file_path):
+            if self._fs_actions.compare(file_dict['path'], dst_file_path):
                 return 'already_exists', dst_file_path
 
             curr_file_name = '{}_{}{}'.format(
@@ -72,15 +70,15 @@ class Mover(MoverBase):
     def __make_dir_if_not_exists(self, path):
         """Если целевой папки не было создано"""
         if not os.path.exists(path):
-            self._makedirs_function(path)
+            self._fs_manipulator.makedirs(path)
 
     def move(self,
              scanned: ScanResult,
              dst_folder: str,
              move_mode: bool = False) -> MoveResult:
         self._validate_dst(dst_folder)
-        self._set_move_mode(move_mode)
-        self._set_delete_mode(move_mode)
+        self._fs_actions = FsActions(
+            self._fs_manipulator, self._comparator, move_mode, move_mode)
 
         self._move_result = MoveResult(
             [], [], scanned.no_exif, scanned.not_images)
@@ -111,11 +109,11 @@ class Mover(MoverBase):
                     self._cmp_files(dst_dir_path, file_dict))
 
                 if result_type == 'moved':
-                    self._move_function(file_dict['path'], result_path)
+                    self._fs_actions.move(file_dict['path'], result_path)
                     self._moved_image_event_listeners.update(
                         (file_dict['path'], result_path))
                 elif result_type == 'already_exists':
-                    self._delete_function(file_dict['path'])
+                    self._fs_actions.delete(file_dict['path'])
 
                 getattr(self._move_result, result_type)\
                     .append(file_dict['path'])
