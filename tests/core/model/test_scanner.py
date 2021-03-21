@@ -3,19 +3,24 @@
 import pytest
 from unittest.mock import call, Mock
 
+from containers import Container
 from ....utils import full_path
-from ....core.entities.scanner import Scanner
-from ...utils import create_ioc, assert_dict_equal
+from ...utils import assert_dict_equal
 from .fixtures import get_move_map
 
 PATH_TO_TEST_DATA = full_path('tests/data')
 
 
+@pytest.fixture
+def container():
+    ioc = Container()
+    yield ioc
+
+
 class TestScanner:
 
-    def test_scan(self):
-        ioc = create_ioc()
-        scanner = Scanner(ioc)
+    def test_scan(self, container):
+        scanner = container.scanner()
 
         with pytest.raises(TypeError) as exc_info:
             scanner.scan(None)
@@ -47,9 +52,8 @@ class TestScanner:
         assert not_images == expected_not_images, \
             'Should return correct not_images'
 
-    def test_found_items(self):
-        ioc = create_ioc()
-        scanner = Scanner(ioc)
+    def test_found_items(self, container):
+        scanner = container.scanner()
         handler_mock = Mock()
         scanner.on_file_found += handler_mock
         scanner.scan(PATH_TO_TEST_DATA)

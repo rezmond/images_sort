@@ -10,7 +10,7 @@ import exifread
 
 from utils import full_path
 from core.types import ScanResult
-from core.utils import InverseOfControlContainer
+from core.utils.base import Observable
 from ..utils import validate_folder_path
 from ..move_map import MoveMap
 from .base import ScannerBase
@@ -38,10 +38,9 @@ class Scanner(ScannerBase):
     )
 
     @typechecked
-    def __init__(self, ioc: InverseOfControlContainer) -> None:
+    def __init__(self, observable: Observable) -> None:
         self._scanned = None
-        self._ioc = ioc
-        self._scanning_observable = ioc.get('observable')()
+        self._scanning_observable = observable
 
     @property
     def on_file_found(self):
@@ -53,6 +52,10 @@ class Scanner(ScannerBase):
         It was created for the "+=" operator could work with that property
         '''
 
+    def subscanner(self):
+        '''It is a stub for future overriding by ioc'''
+        return self
+
     @staticmethod
     def _get_datetime(src):
         try:
@@ -63,7 +66,7 @@ class Scanner(ScannerBase):
 
     @typechecked
     def _scan_folder(self, node_path: str) -> ImagesSeparated:
-        scanner = Scanner(self._ioc)
+        scanner = self.subscanner()
         scanner.on_file_found += self._scanning_observable.update
         return scanner._get_images_list(node_path)
 
