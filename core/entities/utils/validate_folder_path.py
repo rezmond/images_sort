@@ -14,12 +14,6 @@ def validate_folder_path(param_value, param_humanize):
             f'The {param_humanize} folder path should be absolute,'
             f' but got "{param_value}"')
 
-    if not os.path.isabs(param_value):
-        raise ValueError(
-            f'The {param_humanize} path should be absolute, but got'
-            f' "{param_value}"'
-        )
-
     if not os.path.isdir(param_value):
         raise ValueError(
             f'The folder "{param_value}" not found')

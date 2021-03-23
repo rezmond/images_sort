@@ -8,9 +8,6 @@ class Observable:
     def __init__(self) -> None:
         self._observers = []
 
-    def __add__(self, observer: Callable) -> None:
-        self._observers.append(observer)
-
     def __iadd__(self, observer: Callable) -> None:
         self._observers.append(observer)
 
