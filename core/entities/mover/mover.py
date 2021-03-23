@@ -6,7 +6,7 @@ from typing import Callable
 from typeguard import typechecked
 
 from core.utils.base import Observable
-from core.types import Comparator, ScanResult, YearType
+from core.types import BlocksType, Comparator, ScanResult, YearType
 from core.utils import MoveResult
 from ..fs import FsManipulatorBase, FsActions
 from ..utils import validate_folder_path
@@ -101,20 +101,23 @@ class Mover(MoverBase):
                 os.path.join(dst_folder, year_name, m_name))
 
             self.__make_dir_if_not_exists(dst_dir_path)
+            self._move_by_cmp(m_value, dst_dir_path)
 
-            for file_dict in m_value:
-                result_type, result_path = (
-                    self._cmp_files(dst_dir_path, file_dict))
+    @typechecked
+    def _move_by_cmp(self, m_value: BlocksType, dst_dir_path: str) -> None:
+        for file_dict in m_value:
+            result_type, result_path = (
+                self._cmp_files(dst_dir_path, file_dict))
 
-                if result_type == 'moved':
-                    self._fs_actions.move(file_dict['path'], result_path)
-                    self._moved_image_event_listeners.update(
-                        (file_dict['path'], result_path))
-                elif result_type == 'already_exists':
-                    self._fs_actions.delete(file_dict['path'])
+            if result_type == 'moved':
+                self._fs_actions.move(file_dict['path'], result_path)
+                self._moved_image_event_listeners.update(
+                    (file_dict['path'], result_path))
+            elif result_type == 'already_exists':
+                self._fs_actions.delete(file_dict['path'])
 
-                getattr(self._move_result, result_type)\
-                    .append(file_dict['path'])
+            getattr(self._move_result, result_type)\
+                .append(file_dict['path'])
 
     @MoverBase.on_image_moved.getter
     def on_image_moved(self):
