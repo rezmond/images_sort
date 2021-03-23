@@ -65,7 +65,7 @@ class Mover(MoverBase):
             num += 1
         return 'moved', dst_file_path
 
-    def __make_dir_if_not_exists(self, path):
+    def _make_dir_if_not_exists(self, path):
         """Если целевой папки не было создано"""
         if not os.path.exists(path):
             self._fs_manipulator.makedirs(path)
@@ -100,7 +100,7 @@ class Mover(MoverBase):
             dst_dir_path = (
                 os.path.join(dst_folder, year_name, m_name))
 
-            self.__make_dir_if_not_exists(dst_dir_path)
+            self._make_dir_if_not_exists(dst_dir_path)
             self._move_by_cmp(m_value, dst_dir_path)
 
     @typechecked
