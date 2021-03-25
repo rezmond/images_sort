@@ -5,7 +5,7 @@ from unittest.mock import call, Mock
 import pytest
 
 from containers import Container
-from core.types import ScanResult
+from core.types import ScanResult, FileDescriptor
 from core.entities.fs import FsManipulatorBase
 from utils import full_path
 
@@ -56,17 +56,22 @@ class TestMover:
             move_result = mover.move(
                 ScanResult({
                     '2017': {
-                        'spring': [{'path': full_path('tests/data/2.jpg')}],
-                        'summer': [{'path': full_path('tests/data/3.jpg')}],
-                        'winter (end)': [{
-                            'path': full_path('tests/data/5.jpg')
-                        }, {
-                            'path': full_path('tests/data/4.jpg')
-                        }],
-                        'winter (begin)': [{
-                            'path': full_path('tests/data/1.jpg')
-                        }],
-                        'summer': [{'path': full_path('tests/data/3.jpg')}],
+                        'spring': [
+                            FileDescriptor(full_path('tests/data/2.jpg'), '')
+                        ],
+                        'summer': [
+                            FileDescriptor(full_path('tests/data/3.jpg'), '')
+                        ],
+                        'winter (end)': [
+                            FileDescriptor(full_path('tests/data/5.jpg'), ''),
+                            FileDescriptor(full_path('tests/data/4.jpg'), '')
+                        ],
+                        'winter (begin)': [
+                            FileDescriptor(full_path('tests/data/1.jpg'), '')
+                        ],
+                        'summer': [
+                            FileDescriptor(full_path('tests/data/3.jpg'), '')
+                        ],
                     }
                 }, [], []), full_path('tests/out'))
 

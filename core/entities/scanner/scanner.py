@@ -9,14 +9,13 @@ from typeguard import typechecked
 import exifread
 
 from utils import full_path
-from core.types import ScanResult
+from core.types import ScanResult, FileDescriptor
 from core.utils.base import Observable
 from ..utils import validate_folder_path
 from ..move_map import MoveMap
 from .base import ScannerBase
 
-# TODO: create a class instead that
-ImagesSeparated = Tuple[List[dict], List[str]]
+ImagesSeparated = Tuple[List[FileDescriptor], List[str]]
 
 MAX_TIME_STRING_LENGTH = 19
 
@@ -90,10 +89,11 @@ class Scanner(ScannerBase):
             self._scanning_observable.update(node_path)
 
             if self._is_allowed_extension(node_path):
-                images.append({
-                    'path': full_path(node_path),
-                    'name': node_name
-                })
+                file_descriptor = FileDescriptor(
+                    full_path(node_path),
+                    node_name
+                )
+                images.append(file_descriptor)
                 continue
 
             not_images.append(node_path)
@@ -117,17 +117,17 @@ class Scanner(ScannerBase):
             ._get_images_list(src_folder_path)
 
         sorted_files_info = sorted(
-            img_files_info, key=lambda x: x['name'], reverse=True)
+            img_files_info, key=lambda x: x.name, reverse=True)
 
-        for file_dict in sorted_files_info:
-            exif_data = get_exif_data(file_dict['path'])
+        for file_descriptor in sorted_files_info:
+            exif_data = get_exif_data(file_descriptor.path)
 
             if not exif_data:
-                no_exif.append(file_dict['path'])
+                no_exif.append(file_descriptor.path)
                 continue
 
             date = self._get_datetime(exif_data.values)
-            move_map.add_data(date, file_dict)
+            move_map.add_data(date, file_descriptor)
 
         self._scanned = ScanResult(
             move_map.get_map(),

@@ -7,7 +7,7 @@ from typing import Callable, Dict, Tuple
 from typeguard import typechecked
 
 from core.utils.base import Observable
-from core.types import BlocksType, Comparator, ScanResult, YearType
+from core.types import BlocksType, Comparator, FileDescriptor, ScanResult, YearType
 from core.utils import MoveResult
 from ..fs import FsManipulatorBase, FsActions
 from ..utils import validate_folder_path
@@ -35,7 +35,7 @@ class Mover(MoverBase):
     def _cmp_files(
         self,
         dst_dir: str,
-        file_dict: Dict[str, str]
+        file_descriptor: FileDescriptor
     ) -> Tuple[bool, str]:
         """
         Check the destination folder for already existed files with the
@@ -49,7 +49,7 @@ class Mover(MoverBase):
         current method will rename the target file name added a number til
         the name will unique.
         """
-        curr_file_name = os.path.split(file_dict['path'])[1]
+        curr_file_name = os.path.split(file_descriptor.path)[1]
         dst_file_path = os.path.join(dst_dir, curr_file_name)
 
         if not os.path.isfile(dst_file_path):
@@ -60,7 +60,7 @@ class Mover(MoverBase):
 
         num = 1
         while os.path.isfile(dst_file_path):
-            if compare(file_dict['path']):
+            if compare(file_descriptor.path):
                 return False, dst_file_path
 
             curr_file_name = f'{base_file_name}_{num}{extension}'
@@ -109,14 +109,15 @@ class Mover(MoverBase):
 
     @typechecked
     def _move_by_cmp(self, m_value: BlocksType, dst_dir_path: str) -> None:
-        for file_dict in m_value:
-            to_move, result_path = self._cmp_files(dst_dir_path, file_dict)
+        for file_descriptor in m_value:
+            to_move, result_path = self._cmp_files(
+                dst_dir_path, file_descriptor)
 
             if to_move:
-                self._physical_move(file_dict['path'], result_path)
+                self._physical_move(file_descriptor.path, result_path)
                 continue
 
-            self._resolve_conflict(file_dict['path'])
+            self._resolve_conflict(file_descriptor.path)
 
     @typechecked
     def _physical_move(self, path: str, result_path: str) -> None:

@@ -9,7 +9,12 @@ ScanResult = namedtuple('ScanResult', (
     'not_images',
 ))
 
-BlocksType = List[Dict[str, str]]
+FileDescriptor = namedtuple('FileDescriptor', (
+    'path',
+    'name',
+))
+
+BlocksType = List[FileDescriptor]
 YearType = Dict[str, BlocksType]
 
 Comparator = Callable[[str, str], bool]

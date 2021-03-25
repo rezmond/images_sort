@@ -3,7 +3,8 @@
 import json
 import os
 
-from .....utils import full_path
+from core.types import FileDescriptor
+from utils import full_path
 
 
 def get_move_map():
@@ -13,8 +14,12 @@ def get_move_map():
         move_map = json.load(file_)
 
     for year_values in move_map.values():
-        for period_values in year_values.values():
-            for value in period_values:
-                value['path'] = full_path(value['path'])
+        for preiod_name, period_values in year_values.items():
+            year_values[preiod_name] = [
+                FileDescriptor(
+                    full_path(value['path']),
+                    value['name']
+                ) for value in period_values
+            ]
 
     return move_map
