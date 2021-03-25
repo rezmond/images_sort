@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
-from datetime import datetime
-from typing import Tuple, List, Union
-from dateutil.parser import isoparse
+from typing import Tuple, List
 
 from typeguard import typechecked
-import exifread
 
 from utils import full_path
 from core.types import ScanResult, FileDescriptor
@@ -14,32 +11,18 @@ from core.utils.base import Observable
 from ..utils import validate_folder_path
 from ..move_map import MoveMap
 from .base import ScannerBase
+from .indentifier_base import IdentifierBase
 
 ImagesSeparated = Tuple[List[FileDescriptor], List[str]]
-
-MAX_TIME_STRING_LENGTH = 19
-
-
-def get_exif_data(path: str) -> Union[exifread.classes.IfdTag, None]:
-    with open(path, 'rb') as current_file:
-        tags = exifread.process_file(current_file)
-    exif_data = tags.get('EXIF DateTimeOriginal', None)
-    return exif_data
 
 
 class Scanner(ScannerBase):
 
-    ALLOWED_EXTENSIONS = (
-        '.jpg',
-        '.JPG',
-        '.jpeg',
-        '.png'
-    )
-
     @typechecked
-    def __init__(self, observable: Observable) -> None:
+    def __init__(self, observable: Observable, identifier: IdentifierBase) -> None:
         self._scanned = None
         self._scanning_observable = observable
+        self._identifier = identifier
 
     @property
     def on_file_found(self):
@@ -54,14 +37,6 @@ class Scanner(ScannerBase):
     def subscanner(self):
         '''It is a stub for future overriding by ioc'''
         return self
-
-    @staticmethod
-    def _get_datetime(src):
-        try:
-            return isoparse(src)
-        except ValueError:
-            cropped = src[:MAX_TIME_STRING_LENGTH]
-            return datetime.strptime(cropped, '%Y:%m:%d %H:%M:%S')
 
     @typechecked
     def _scan_folder(self, node_path: str) -> ImagesSeparated:
@@ -88,7 +63,7 @@ class Scanner(ScannerBase):
 
             self._scanning_observable.update(node_path)
 
-            if self._is_allowed_extension(node_path):
+            if self._identifier.is_allowed_extension(node_path):
                 file_descriptor = FileDescriptor(
                     full_path(node_path),
                     node_name
@@ -98,12 +73,6 @@ class Scanner(ScannerBase):
 
             not_images.append(node_path)
         return images, not_images
-
-    def _is_allowed_extension(self, node_path):
-        """
-        Is the file name extension allowed
-        """
-        return os.path.splitext(node_path)[1] in self.ALLOWED_EXTENSIONS
 
     @typechecked
     def scan(
@@ -120,13 +89,12 @@ class Scanner(ScannerBase):
             img_files_info, key=lambda x: x.name, reverse=True)
 
         for file_descriptor in sorted_files_info:
-            exif_data = get_exif_data(file_descriptor.path)
+            date = self._identifier.get_date(file_descriptor.path)
 
-            if not exif_data:
+            if not date:
                 no_exif.append(file_descriptor.path)
                 continue
 
-            date = self._get_datetime(exif_data.values)
             move_map.add_data(date, file_descriptor)
 
         self._scanned = ScanResult(

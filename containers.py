@@ -7,6 +7,9 @@ from dependency_injector import containers, providers
 from core.entities import Mover, Scanner
 from core.model import MoverModel
 from core.utils.base import Observable
+from core.applied.identifiers import ImagesIdentifier
+
+print("ImagesIdentifier", ImagesIdentifier)
 
 
 class FsManipulator:
@@ -24,9 +27,14 @@ class Container(containers.DeclarativeContainer):
         Observable,
     )
 
+    identifier = providers.Factory(
+        ImagesIdentifier,
+    )
+
     scanner = providers.Factory(
         Scanner,
         observable=observable,
+        identifier=identifier,
     )
     scanner.add_attributes(subscanner=scanner.provider)
 
