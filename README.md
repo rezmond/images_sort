@@ -19,3 +19,7 @@ Run tests with the coverage:
 `
     pytest --cov="./core" --cov-report=html
 `
+
+Roadmap:
+    [] - write tests for getting date from \*.mp4
+    [] - replace real files in tests to mocks
