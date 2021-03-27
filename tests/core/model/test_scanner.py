@@ -39,18 +39,22 @@ class TestScanner:
             'Should catch not existed folder'
 
         scanner.scan(PATH_TO_TEST_DATA)
-        move_map, no_exif, not_images = scanner.get_data()
+        move_map, no_data, not_images = scanner.get_data()
+        print("move_map, no_data, not_images", move_map, no_data, not_images)
 
         expected_move_map = get_move_map()
         assert_dict_equal(move_map, expected_move_map,
                           'Should return correct move_map')
 
-        expected_no_exif = [full_path('tests/data/folder-1/1-1.jpg')]
-        assert no_exif == expected_no_exif, 'Should return correct no_exif'
+        expected_no_exif = [
+            full_path('tests/data/video1.mp4'),
+            full_path('tests/data/folder-1/1-1.jpg'),
+        ]
+        assert no_data == expected_no_exif, 'Should return correct no_data'
 
-        expected_not_images = [full_path('tests/data/video1.mp4')]
-        assert not_images == expected_not_images, \
-            'Should return correct not_images'
+        expected_not_media = []
+        assert not_images == expected_not_media, \
+            'Should return correct not_media'
 
     def test_found_items(self, container):
         scanner = container.scanner()

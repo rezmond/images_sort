@@ -5,6 +5,6 @@ from collections import namedtuple
 MoveResult = namedtuple('MoveResult', (
     'moved',
     'already_exists',
-    'no_exif',
-    'not_images',
+    'no_data',
+    'not_media',
 ))

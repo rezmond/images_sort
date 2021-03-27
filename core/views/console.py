@@ -73,6 +73,6 @@ class ConsoleView(ViewBase):
         print(
             f'Moved: {len(move_result.moved)}\n'
             f'Already exists: {len(move_result.already_exists)}\n'
-            f'Has no EXIF: {len(move_result.no_exif)}\n'
-            f'Not images: {len(move_result.not_images)}\n'
+            f'Has no a date data: {len(move_result.no_data)}\n'
+            f'Not media: {len(move_result.not_media)}\n'
         )

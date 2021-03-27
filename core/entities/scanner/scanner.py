@@ -19,7 +19,11 @@ ImagesSeparated = Tuple[List[FileDescriptor], List[str]]
 class Scanner(ScannerBase):
 
     @typechecked
-    def __init__(self, observable: Observable, identifier: IdentifierBase) -> None:
+    def __init__(
+        self,
+        observable: Observable,
+        identifier: IdentifierBase
+    ) -> None:
         self._scanned = None
         self._scanning_observable = observable
         self._identifier = identifier
@@ -52,13 +56,13 @@ class Scanner(ScannerBase):
         """
 
         images = []
-        not_images = []
+        not_media = []
         for node_name in os.listdir(current_dir_path):
             node_path = os.path.join(current_dir_path, node_name)
             if not os.path.isfile(node_path):
                 sub_images, sub_not_images = self._scan_folder(node_path)
                 images.extend(sub_images)
-                not_images.extend(sub_not_images)
+                not_media.extend(sub_not_images)
                 continue
 
             self._scanning_observable.update(node_path)
@@ -71,8 +75,8 @@ class Scanner(ScannerBase):
                 images.append(file_descriptor)
                 continue
 
-            not_images.append(node_path)
-        return images, not_images
+            not_media.append(node_path)
+        return images, not_media
 
     @typechecked
     def scan(
@@ -80,7 +84,7 @@ class Scanner(ScannerBase):
     ) -> None:
         self._validate_src(src_folder_path)
 
-        no_exif = []
+        no_data = []
         move_map = MoveMap()
         img_files_info, not_img_file_path = self\
             ._get_images_list(src_folder_path)
@@ -92,14 +96,14 @@ class Scanner(ScannerBase):
             date = self._identifier.get_date(file_descriptor.path)
 
             if not date:
-                no_exif.append(file_descriptor.path)
+                no_data.append(file_descriptor.path)
                 continue
 
             move_map.add_data(date, file_descriptor)
 
         self._scanned = ScanResult(
             move_map.get_map(),
-            no_exif,
+            no_data,
             not_img_file_path,
         )
 

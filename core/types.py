@@ -5,8 +5,8 @@ from typing import Dict, List, Callable
 
 ScanResult = namedtuple('ScanResult', (
     'move_map',
-    'no_exif',
-    'not_images',
+    'no_data',
+    'not_media',
 ))
 
 FileDescriptor = namedtuple('FileDescriptor', (

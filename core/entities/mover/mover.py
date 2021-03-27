@@ -83,7 +83,7 @@ class Mover(MoverBase):
             self._fs_manipulator, self._comparator, move_mode, move_mode)
 
         self._move_result = MoveResult(
-            [], [], scanned.no_exif, scanned.not_images)
+            [], [], scanned.no_data, scanned.not_media)
 
         # перемещение файлов
         year_items = scanned.move_map.items()
