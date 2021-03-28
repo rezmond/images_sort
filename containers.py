@@ -1,6 +1,4 @@
 import filecmp
-import os
-import shutil
 
 from dependency_injector import containers, providers
 
@@ -9,13 +7,7 @@ from core.model import MoverModel
 from core.utils.base import Observable
 from core.entities.date_extractor import DateExtractor
 from core.use_cases.media_presenters import VideoPresenter, ImagePresenter
-
-
-class FsManipulator:
-    move = shutil.move
-    copy = shutil.copy2
-    delete = os.remove
-    makedirs = os.makedirs
+from core.system_interfaces import FsManipulator
 
 
 class Container(containers.DeclarativeContainer):
