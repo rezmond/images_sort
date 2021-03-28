@@ -2,12 +2,18 @@
 
 import os
 from functools import partial
-from typing import Callable, Dict, Tuple
+from typing import Callable, Tuple
 
 from typeguard import typechecked
 
 from core.utils.base import Observable
-from core.types import BlocksType, Comparator, FileDescriptor, ScanResult, YearType
+from core.types import (
+    BlocksType,
+    Comparator,
+    FileDescriptor,
+    ScanResult,
+    YearType,
+)
 from core.utils import MoveResult
 from ..fs import FsManipulatorBase, FsActions
 from ..utils import validate_folder_path
