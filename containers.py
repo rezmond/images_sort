@@ -9,8 +9,6 @@ from core.model import MoverModel
 from core.utils.base import Observable
 from core.use_cases.identifiers import ImagesIdentifier
 
-print("ImagesIdentifier", ImagesIdentifier)
-
 
 class FsManipulator:
     move = shutil.move

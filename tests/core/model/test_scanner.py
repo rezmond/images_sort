@@ -40,7 +40,6 @@ class TestScanner:
 
         scanner.scan(PATH_TO_TEST_DATA)
         move_map, no_data, not_images = scanner.get_data()
-        print("move_map, no_data, not_images", move_map, no_data, not_images)
 
         expected_move_map = get_move_map()
         assert_dict_equal(move_map, expected_move_map,
