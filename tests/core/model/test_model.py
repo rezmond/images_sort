@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import contextlib
 from unittest.mock import call, Mock, MagicMock, PropertyMock
 
 import pytest
@@ -23,14 +24,26 @@ def container():
     yield ioc
 
 
-class ScannerMock(ScannerBase):
+@pytest.fixture
+def subscription_context(container):
+    @contextlib.contextmanager
+    def setup_subscription_test(prop_name, for_class):
+        prop_mock = PropertyMock()
+        mover_mock = MagicMock(spec=MoverBase)
+        scanner_mock = Mock(spec=ScannerBase)
+        target_class = mover_mock \
+            if for_class == 'mover_mock' else scanner_mock
+        setattr(type(target_class), prop_name, prop_mock)
+        handler_mock = Mock()
 
-    def scan(self, set_src_folder):
-        pass
+        with container.mover.override(mover_mock),\
+                container.scanner.override(scanner_mock):
+            model = container.model()
 
-    @staticmethod
-    def get_data():
-        return scanner_result
+        prop_mock.assert_not_called()
+        yield model, handler_mock
+        prop_mock.assert_called_once()
+    yield setup_subscription_test
 
 
 def test_move_call(container):
@@ -49,49 +62,22 @@ def test_move_call(container):
     mover_mock.move.assert_called_with(scanner_result, 'dst', False)
 
 
-def test_on_image_move_subscribe(container):
-    prop_mock = PropertyMock()
-    mover_mock = MagicMock(spec=MoverBase)
-    scanner_mock = Mock(spec=ScannerBase)
-    type(mover_mock).on_image_moved = prop_mock
-    handler_mock = Mock()
-
-    with container.mover.override(mover_mock),\
-            container.scanner.override(scanner_mock):
-        model = container.model()
-    prop_mock.assert_not_called()
-    model.on_image_moved += handler_mock
-    prop_mock.assert_called_once()
+def test_on_image_move_subscribe(subscription_context):
+    with subscription_context('on_image_moved', 'mover_mock') \
+            as (model, handler_mock):
+        model.on_image_moved += handler_mock
 
 
-def test_on_file_found_subscribe(container):
-    prop_mock = PropertyMock()
-    mover_mock = MagicMock(spec=MoverBase)
-    scanner_mock = Mock(spec=ScannerBase)
-    type(scanner_mock).on_file_found = prop_mock
-    handler_mock = Mock()
-
-    with container.mover.override(mover_mock),\
-            container.scanner.override(scanner_mock):
-        model = container.model()
-    prop_mock.assert_not_called()
-    model.on_file_found += handler_mock
-    prop_mock.assert_called_once()
+def test_on_file_found_subscribe(subscription_context):
+    with subscription_context('on_file_found', 'scanner_mock') \
+            as (model, handler_mock):
+        model.on_file_found += handler_mock
 
 
-def test_on_move_finish_subscribe(container):
-    prop_mock = PropertyMock()
-    mover_mock = MagicMock(spec=MoverBase)
-    scanner_mock = Mock(spec=ScannerBase)
-    type(mover_mock).on_move_finished = prop_mock
-    handler_mock = Mock()
-
-    with container.mover.override(mover_mock),\
-            container.scanner.override(scanner_mock):
-        model = container.model()
-    prop_mock.assert_not_called()
-    model.on_move_finished += handler_mock
-    prop_mock.assert_called_once()
+def test_on_move_finish_subscribe(subscription_context):
+    with subscription_context('on_move_finished', 'mover_mock') \
+            as (model, handler_mock):
+        model.on_move_finished += handler_mock
 
 
 def test_delete_duplicates(container):
