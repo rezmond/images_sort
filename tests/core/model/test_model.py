@@ -50,18 +50,33 @@ def test_move_call(container):
 
 
 def test_on_image_move_prop(container):
-    fs_manipulator_mock = Mock(spec=FsManipulatorBase)
-    prop_mock = PropertyMock(return_value='')
+    prop_mock = PropertyMock()
     mover_mock = MagicMock(spec=MoverBase)
+    scanner_mock = Mock(spec=ScannerBase)
     type(mover_mock).on_image_moved = prop_mock
+    handler_mock = Mock()
 
     with container.mover.override(mover_mock),\
-            container.fs_manipulator.override(fs_manipulator_mock),\
-            container.comparator.override(Mock(return_value=True)):
+            container.scanner.override(scanner_mock):
         model = container.model()
-        prop_mock.assert_not_called()
-        model.on_image_moved
-        prop_mock.assert_called_once()
+    prop_mock.assert_not_called()
+    model.on_image_moved += handler_mock
+    prop_mock.assert_called_once()
+
+
+def test_on_file_found_handler_forwarding(container):
+    prop_mock = PropertyMock()
+    mover_mock = MagicMock(spec=MoverBase)
+    scanner_mock = Mock(spec=ScannerBase)
+    type(scanner_mock).on_file_found = prop_mock
+    handler_mock = Mock()
+
+    with container.mover.override(mover_mock),\
+            container.scanner.override(scanner_mock):
+        model = container.model()
+    prop_mock.assert_not_called()
+    model.on_file_found += handler_mock
+    prop_mock.assert_called_once()
 
 
 def test_on_move_finish_report_subscribe(container):
