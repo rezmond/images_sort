@@ -1,7 +1,7 @@
 import os
 import operator
 from datetime import datetime
-from typing import Union
+from typing import Union, Iterable
 
 from dateutil.parser import isoparse
 from typeguard import typechecked
@@ -18,11 +18,9 @@ MAX_TIME_STRING_LENGTH = 19
 class CheckerBase:
     ALLOWED_EXTENSIONS = tuple()
 
-    def is_allowed_extension(self, path: str) -> bool:
-        """
-        Is the file name extension allowed
-        """
-        return os.path.splitext(path)[1] in self.ALLOWED_EXTENSIONS
+    @classmethod
+    def get_extensions(cls):
+        return cls.ALLOWED_EXTENSIONS
 
     @staticmethod
     def _get_clean_file_name(path):
@@ -81,14 +79,31 @@ class VideoChecker(CheckerBase):
 class ImagesIdentifier(IdentifierBase):
 
     def __init__(self):
-        self._checkers = (
-            ImagesChecker(),
-            VideoChecker(),
-        )
+        self._ext_to_checker_map = {}
+        self._register_checkers((
+            ImagesChecker,
+            VideoChecker,
+        ))
+
+    @typechecked
+    def _register_checkers(self, checkers: Iterable[CheckerBase]) -> None:
+        for checker in checkers:
+            for ext in checker.get_extensions():
+                self._ext_to_checker_map[ext] = checker()
+
+    @typechecked
+    def is_allowed_extension(self, path: str) -> bool:
+        return self._get_ext(path) in self._ext_to_checker_map
 
     def get_date(self, path: str) -> datetime.date:
-        for checker in self._checkers:
-            if not checker.is_allowed_extension(path):
-                continue
+        if not self.is_allowed_extension(path):
+            return
 
-            return checker.get_date(path)
+        ext = self._get_ext(path)
+        checker = self._ext_to_checker_map[ext]
+        return checker.get_date(path)
+
+    @staticmethod
+    @typechecked
+    def _get_ext(path: str) -> str:
+        return os.path.splitext(path)[1]
