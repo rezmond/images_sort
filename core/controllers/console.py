@@ -4,15 +4,12 @@ from typing import Tuple
 
 from typeguard import typechecked
 
-from ..views import ConsoleView
 from .base import ControllerBase
 
 
 class ConsoleViewController(ControllerBase):
-    view_class = ConsoleView
-
-    def __init__(self, *args):
-        super(ConsoleViewController, self).__init__(*args)
+    def __init__(self, *args, **kwars):
+        super(ConsoleViewController, self).__init__(*args, **kwars)
         self._view.show()
 
     def clean_mode(self, *args):

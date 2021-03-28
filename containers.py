@@ -8,6 +8,8 @@ from core.utils.base import Observable
 from core.entities.date_extractor import DateExtractor
 from core.use_cases.media_presenters import VideoPresenter, ImagePresenter
 from core.system_interfaces import FsManipulator
+from core.controllers import ConsoleViewController
+from core.views import ConsoleView
 
 
 class Container(containers.DeclarativeContainer):
@@ -46,8 +48,18 @@ class Container(containers.DeclarativeContainer):
         comparator=comparator,
     )
 
-    model = providers.Factory(
+    model = providers.Singleton(
         MoverModel,
         mover=mover,
         scanner=scanner,
+    )
+
+    view_class = providers.Object(
+        ConsoleView,
+    )
+
+    controller = providers.Factory(
+        ConsoleViewController,
+        model=model,
+        view_class=view_class,
     )
