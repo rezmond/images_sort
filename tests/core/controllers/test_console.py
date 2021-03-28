@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 import pytest
 
@@ -59,3 +59,14 @@ def test_handle_image_moved(model, view_class, container):
 
     view_class.return_value.handle_image_moved\
         .assert_called_once_with(('a', 'b'))
+
+
+def test_clean_mode_is_passing_value_down(model, view_class, container):
+    controller = container.controller()
+
+    controller.clean_mode(True)
+    controller.clean_mode(False)
+    model.clean_mode.assert_has_calls([
+        call(True),
+        call(False),
+    ])
