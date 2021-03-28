@@ -11,7 +11,7 @@ from core.utils.base import Observable
 from ..utils import validate_folder_path
 from ..move_map import MoveMap
 from .base import ScannerBase
-from .indentifier_base import IdentifierBase
+from .date_extractor_base import DateExtractorBase
 
 ImagesSeparated = Tuple[List[FileDescriptor], List[str]]
 
@@ -22,11 +22,11 @@ class Scanner(ScannerBase):
     def __init__(
         self,
         observable: Observable,
-        identifier: IdentifierBase
+        date_extractor: DateExtractorBase
     ) -> None:
         self._scanned = None
         self._scanning_observable = observable
-        self._identifier = identifier
+        self._date_extractor = date_extractor
 
     @property
     def on_file_found(self):
@@ -67,7 +67,7 @@ class Scanner(ScannerBase):
 
             self._scanning_observable.update(node_path)
 
-            if self._identifier.is_allowed_extension(node_path):
+            if self._date_extractor.is_allowed_extension(node_path):
                 file_descriptor = FileDescriptor(
                     full_path(node_path),
                     node_name
@@ -93,7 +93,7 @@ class Scanner(ScannerBase):
             img_files_info, key=lambda x: x.name, reverse=True)
 
         for file_descriptor in sorted_files_info:
-            date = self._identifier.get_date(file_descriptor.path)
+            date = self._date_extractor.get_date(file_descriptor.path)
 
             if not date:
                 no_data.append(file_descriptor.path)
