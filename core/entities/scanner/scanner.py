@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-
-import os
 from typing import Tuple, List
 
 from typeguard import typechecked
 
-from utils import full_path
 from core.types import ScanResult, FileDescriptor
 from core.utils.base import Observable
+from ..fs import FolderExtractorBase
 from ..utils import validate_folder_path
 from ..move_map import MoveMap
 from .base import ScannerBase
@@ -20,13 +17,14 @@ class Scanner(ScannerBase):
 
     @typechecked
     def __init__(
-        self,
-        observable: Observable,
-        date_extractor: DateExtractorBase
-    ) -> None:
+            self,
+            observable: Observable,
+            date_extractor: DateExtractorBase,
+            folder_extractor: FolderExtractorBase) -> None:
         self._scanned = None
         self._scanning_observable = observable
         self._date_extractor = date_extractor
+        self._folder_extractor = folder_extractor
 
     @property
     def on_file_found(self):
@@ -38,45 +36,27 @@ class Scanner(ScannerBase):
         It was created for the "+=" operator could work with that property
         '''
 
-    def subscanner(self):
-        '''It is a stub for future overriding by ioc'''
-        return self
-
-    @typechecked
-    def _scan_folder(self, node_path: str) -> ImagesSeparated:
-        scanner = self.subscanner()
-        scanner.on_file_found += self._scanning_observable.update
-        return scanner._get_images_list(node_path)
-
     @typechecked
     def _get_images_list(self, current_dir_path: str) -> ImagesSeparated:
         """
         It returns all suitable by extension files taking into account nesting.
-        Plus the path list of not images.
+        Plus the path list of not medias.
         """
 
-        images = []
+        medias = []
         not_media = []
-        for node_name in os.listdir(current_dir_path):
-            node_path = os.path.join(current_dir_path, node_name)
-            if not os.path.isfile(node_path):
-                sub_images, sub_not_images = self._scan_folder(node_path)
-                images.extend(sub_images)
-                not_media.extend(sub_not_images)
-                continue
-
+        files_with_names = self._folder_extractor\
+            .folder_to_file_pathes(current_dir_path)
+        for node_name, node_path in files_with_names:
             self._scanning_observable.update(node_path)
 
             if self._date_extractor.is_allowed_extension(node_path):
-                file_descriptor = FileDescriptor(
-                    full_path(node_path),
-                    node_name
-                )
-                images.append(file_descriptor)
+                medias.append(FileDescriptor(node_path, node_name))
                 continue
 
             not_media.append(node_path)
-        return images, not_media
+
+        return medias, not_media
 
     @typechecked
     def scan(

@@ -30,14 +30,14 @@ class Container(containers.DeclarativeContainer):
         media_presenters=media_presenters
     )
 
+    fs_manipulator = providers.Factory(FsManipulator)
+
     scanner = providers.Factory(
         Scanner,
         observable=observable,
         date_extractor=date_extractor,
+        folder_extractor=fs_manipulator,
     )
-    scanner.add_attributes(subscanner=scanner.provider)
-
-    fs_manipulator = providers.Factory(FsManipulator)
 
     comparator = providers.Singleton(filecmp.cmp)
 

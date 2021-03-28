@@ -49,7 +49,7 @@ def test_move_call(container):
     mover_mock.move.assert_called_with(scanner_result, 'dst', False)
 
 
-def test_on_image_move_prop(container):
+def test_on_image_move_subscribe(container):
     prop_mock = PropertyMock()
     mover_mock = MagicMock(spec=MoverBase)
     scanner_mock = Mock(spec=ScannerBase)
@@ -64,7 +64,7 @@ def test_on_image_move_prop(container):
     prop_mock.assert_called_once()
 
 
-def test_on_file_found_handler_forwarding(container):
+def test_on_file_found_subscribe(container):
     prop_mock = PropertyMock()
     mover_mock = MagicMock(spec=MoverBase)
     scanner_mock = Mock(spec=ScannerBase)
@@ -79,16 +79,19 @@ def test_on_file_found_handler_forwarding(container):
     prop_mock.assert_called_once()
 
 
-def test_on_move_finish_report_subscribe(container):
-    observable_mock = MagicMock(spec=Observable)
-    fs_manipulator_mock = Mock(spec=FsManipulatorBase)
-    with container.fs_manipulator.override(fs_manipulator_mock),\
-        container.comparator.override(Mock(return_value=True)),\
-            container.observable.override(observable_mock):
-        model = container.model()
-        model.on_move_finished += Mock()
+def test_on_move_finish_subscribe(container):
+    prop_mock = PropertyMock()
+    mover_mock = MagicMock(spec=MoverBase)
+    scanner_mock = Mock(spec=ScannerBase)
+    type(mover_mock).on_move_finished = prop_mock
+    handler_mock = Mock()
 
-    observable_mock.__iadd__.assert_called_once()
+    with container.mover.override(mover_mock),\
+            container.scanner.override(scanner_mock):
+        model = container.model()
+    prop_mock.assert_not_called()
+    model.on_move_finished += handler_mock
+    prop_mock.assert_called_once()
 
 
 def test_delete_duplicates(container):
