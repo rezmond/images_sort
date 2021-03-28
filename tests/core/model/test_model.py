@@ -103,3 +103,28 @@ def test_delete_duplicates(container):
 
     copy_mock = fs_manipulator_mock.copy
     copy_mock.assert_not_called()
+
+
+def test_clean_mode_safe(container):
+    scanner_mock = Mock(spec=ScannerBase)
+    mover_mock = Mock(spec=MoverBase)
+    with container.mover.override(mover_mock),\
+            container.scanner.override(scanner_mock):
+        model = container.model()
+        model.move()
+
+    mover_mock.move.assert_called_once_with(
+        scanner_mock.get_data.return_value, None, False)
+
+
+def test_clean_mode_dangerously(container):
+    scanner_mock = Mock(spec=ScannerBase)
+    mover_mock = Mock(spec=MoverBase)
+    with container.mover.override(mover_mock),\
+            container.scanner.override(scanner_mock):
+        model = container.model()
+        model.clean_mode(True)
+        model.move()
+
+    mover_mock.move.assert_called_once_with(
+        scanner_mock.get_data.return_value, None, True)
