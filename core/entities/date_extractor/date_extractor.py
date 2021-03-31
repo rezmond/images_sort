@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from operator import itemgetter
-from typing import Iterable
+from typing import Iterable, Optional
 
 from typeguard import typechecked
 
@@ -31,7 +31,7 @@ class DateExtractor(DateExtractorBase):
         return self._get_ext(path) in self._ext_to_presenter_map
 
     @typechecked
-    def get_date(self, path: str) -> datetime.date:
+    def get_date(self, path: str) -> Optional[datetime.date]:
         if not self.is_allowed_extension(path):
             return
 
