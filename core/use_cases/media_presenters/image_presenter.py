@@ -1,11 +1,12 @@
 from datetime import datetime
-from typing import Union
+from typing import Optional, Callable
 
 from dateutil.parser import isoparse
 from typeguard import typechecked
-import exifread
 
 from core.entities import MediaPresenterBase
+
+ExifDataGetter = Callable[[str], Optional[str]]
 
 
 class ImagePresenter(MediaPresenterBase):
@@ -16,24 +17,19 @@ class ImagePresenter(MediaPresenterBase):
     )
     MAX_TIME_STRING_LENGTH = 19
 
-    @staticmethod
-    def _get_exif_data(path: str) -> Union[exifread.classes.IfdTag, None]:
-        with open(path, 'rb') as current_file:
-            tags = exifread.process_file(current_file)
-        exif_data = tags.get('EXIF DateTimeOriginal', None)
-        return exif_data
-
-    @classmethod
     @typechecked
-    def get_date(cls, path: str) -> datetime.date:
-        exif_data = cls._get_exif_data(path)
+    def __init__(self, get_exif_data: ExifDataGetter) -> None:
+        self._get_exif_data = get_exif_data
+
+    @typechecked
+    def get_date(self, path: str) -> datetime.date:
+        exif_data = self._get_exif_data(path)
 
         if not exif_data:
             return
 
-        src = exif_data.values
         try:
-            return isoparse(src)
+            return isoparse(exif_data)
         except ValueError:
-            cropped = src[:cls.MAX_TIME_STRING_LENGTH]
+            cropped = exif_data[:self.MAX_TIME_STRING_LENGTH]
             return datetime.strptime(cropped, '%Y:%m:%d %H:%M:%S')

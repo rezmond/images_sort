@@ -10,6 +10,7 @@ from core.use_cases.media_presenters import VideoPresenter, ImagePresenter
 from core.system_interfaces import FsManipulator
 from core.controllers import ConsoleViewController
 from core.views import ConsoleView
+from libs import get_exif_data
 
 
 class Container(containers.DeclarativeContainer):
@@ -20,9 +21,16 @@ class Container(containers.DeclarativeContainer):
         Observable,
     )
 
+    exif_data_getter = providers.Object(get_exif_data)
+
+    image_presenter = providers.Factory(
+        ImagePresenter,
+        get_exif_data=exif_data_getter,
+    )
+
     media_presenters = providers.List(
         providers.Singleton(VideoPresenter),
-        providers.Singleton(ImagePresenter),
+        providers.Singleton(image_presenter),
     )
 
     date_extractor = providers.Factory(

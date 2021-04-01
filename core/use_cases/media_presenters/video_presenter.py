@@ -8,6 +8,7 @@ class VideoPresenter(MediaPresenterBase):
         '.mp4',
     )
 
+    @classmethod
     def get_date(cls, path: str) -> datetime.date:
         file_name = cls._get_clean_file_name(path)
         try:
