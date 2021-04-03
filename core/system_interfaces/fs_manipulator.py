@@ -8,10 +8,21 @@ from core.entities import FsManipulatorBase, FolderExtractorBase
 
 
 class FsManipulator(FsManipulatorBase, FolderExtractorBase):
-    move = shutil.move
-    copy = shutil.copy2
-    delete = os.remove
-    makedirs = os.makedirs
+    @staticmethod
+    def move(src: str, dst: str) -> None:
+        shutil.move(src, dst)
+
+    @staticmethod
+    def copy(src: str, dst: str) -> None:
+        shutil.copy2(src, dst)
+
+    @staticmethod
+    def delete(path: str) -> None:
+        os.remove(path)
+
+    @staticmethod
+    def makedirs(path: str) -> None:
+        os.makedirs(path, exist_ok=True)
 
     @staticmethod
     @typechecked

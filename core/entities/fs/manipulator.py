@@ -1,20 +1,20 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractstaticmethod
 
 
 class FsManipulatorBase(metaclass=ABCMeta):
 
-    @abstractmethod
+    @abstractstaticmethod
     def move(self, src: str, dst: str) -> None:
         '''Moves a fs node'''
 
-    @abstractmethod
+    @abstractstaticmethod
     def copy(self, src: str, dst: str) -> None:
         '''Copies a fs node'''
 
-    @abstractmethod
+    @abstractstaticmethod
     def delete(self, path: str) -> None:
         '''Deletes a fs node'''
 
-    @abstractmethod
+    @abstractstaticmethod
     def makedirs(self, path: str) -> None:
         '''Makes dirs by provided path'''

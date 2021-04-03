@@ -54,7 +54,7 @@ class Container(containers.DeclarativeContainer):
         move_map=move_map,
     )
 
-    comparator = providers.Singleton(filecmp.cmp)
+    comparator = providers.Object(filecmp.cmp)
 
     mover = providers.Factory(
         Mover,

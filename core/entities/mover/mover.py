@@ -76,7 +76,8 @@ class Mover(MoverBase):
 
         return True, dst_file_path
 
-    def _make_dir_if_not_exists(self, path):
+    @typechecked
+    def _make_dir_if_not_exists(self, path: str) -> None:
         """Если целевой папки не было создано"""
         if not os.path.exists(path):
             self._fs_manipulator.makedirs(path)

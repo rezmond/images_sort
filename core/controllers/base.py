@@ -18,7 +18,7 @@ class ControllerBase(metaclass=ABCMeta):
 
     def __init__(self, model: MoverModel, view_class: ViewBase):
         from ..views import ViewBase
-        check_type('view_class', view_class, ViewBase)
+        # check_type('view_class', view_class, ViewBase)
         self._model = model
         self._view = view_class(self, self._model)
 
