@@ -1,11 +1,10 @@
-from typing import Tuple, List
+from typing import Callable, Tuple, List
 
 from typeguard import typechecked
 
 from core.types import ScanResult, FileDescriptor
 from core.utils.base import Observable
 from ..fs import FolderExtractorBase
-from ..utils import validate_folder_path
 from ..move_map import MoveMap
 from .base import ScannerBase
 from .date_extractor_base import DateExtractorBase
@@ -20,11 +19,14 @@ class Scanner(ScannerBase):
             self,
             observable: Observable,
             date_extractor: DateExtractorBase,
-            folder_extractor: FolderExtractorBase) -> None:
+            folder_extractor: FolderExtractorBase,
+            validate_folder_path: Callable[[str, str], None],
+    ) -> None:
         self._scanned = None
         self._scanning_observable = observable
         self._date_extractor = date_extractor
         self._folder_extractor = folder_extractor
+        self._validate_folder_path = validate_folder_path
 
     @property
     def on_file_found(self):
@@ -92,4 +94,4 @@ class Scanner(ScannerBase):
         return self._scanned
 
     def _validate_src(self, source_folder):
-        validate_folder_path(source_folder, 'source')
+        self._validate_folder_path(source_folder, 'source')

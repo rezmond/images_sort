@@ -16,7 +16,6 @@ from core.types import (
 )
 from core.utils import MoveResult
 from ..fs import FsManipulatorBase, FsActions
-from ..utils import validate_folder_path
 from .base import MoverBase
 
 
@@ -27,7 +26,8 @@ class Mover(MoverBase):
             self,
             observable_factory: Callable[[], Observable],
             fs_manipulator: FsManipulatorBase,
-            comparator: Comparator
+            comparator: Comparator,
+            validate_folder_path: Callable[[str, str], None]
     ) -> None:
         self._fs_manipulator = fs_manipulator
         self._fs_actions = None
@@ -36,6 +36,7 @@ class Mover(MoverBase):
         self._move_function = None
         self._moved_image_event_listeners = observable_factory()
         self._move_finish_event_listeners = observable_factory()
+        self._validate_folder_path = validate_folder_path
 
     @typechecked
     def _cmp_files(
@@ -148,4 +149,4 @@ class Mover(MoverBase):
         '''
         Without typechecked because it will check arguments manually
         '''
-        validate_folder_path(dst, 'destination')
+        self._validate_folder_path(dst, 'destination')

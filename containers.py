@@ -7,7 +7,7 @@ from core.model import MoverModel
 from core.utils.base import Observable
 from core.entities.date_extractor import DateExtractor
 from core.use_cases.media_presenters import VideoPresenter, ImagePresenter
-from core.system_interfaces import FsManipulator
+from core.system_interfaces import FsManipulator, validate_folder_path
 from core.controllers import ConsoleViewController
 from core.views import ConsoleView
 from libs import get_exif_data
@@ -20,6 +20,8 @@ class Container(containers.DeclarativeContainer):
     observable = providers.Factory(
         Observable,
     )
+
+    folder_path_validator = providers.Object(validate_folder_path)
 
     exif_data_getter = providers.Object(get_exif_data)
 
@@ -45,6 +47,7 @@ class Container(containers.DeclarativeContainer):
         observable=observable,
         date_extractor=date_extractor,
         folder_extractor=fs_manipulator,
+        validate_folder_path=folder_path_validator
     )
 
     comparator = providers.Singleton(filecmp.cmp)
@@ -54,6 +57,7 @@ class Container(containers.DeclarativeContainer):
         observable_factory=observable.provider,
         fs_manipulator=fs_manipulator,
         comparator=comparator,
+        validate_folder_path=folder_path_validator,
     )
 
     model = providers.Singleton(
