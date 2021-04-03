@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-
-from unittest.mock import call, Mock
+import contextlib
+from unittest.mock import call, Mock, MagicMock
 
 import pytest
 
 from containers import Container
 from core.types import ScanResult, FileDescriptor
 from core.entities.fs import FsManipulatorBase
+from core.utils.base import Observable
 from utils import full_path
 
 
@@ -14,6 +14,21 @@ from utils import full_path
 def container():
     ioc = Container()
     yield ioc
+
+
+@contextlib.contextmanager
+def check_subscription(container):
+    observable_mock = MagicMock(spec=Observable)
+    fs_manipulator_mock = Mock(spec=FsManipulatorBase)
+
+    with container.observable.override(observable_mock),\
+            container.fs_manipulator.override(fs_manipulator_mock),\
+            container.comparator.override(Mock()):
+        mover = container.mover()
+
+    handler_mock = Mock()
+    yield mover, handler_mock
+    observable_mock.__iadd__.assert_called_once_with(handler_mock)
 
 
 class TestMover:
@@ -126,3 +141,13 @@ class TestMover:
         ], [
             full_path('tests/data/1.jpg'),
         ], [], []), 'Should return correct MoveResult'
+
+
+def test_on_move_finished_subscribe(container):
+    with check_subscription(container) as (mover, handler_mock):
+        mover.on_move_finished += handler_mock
+
+
+def test_on_image_moved_subscribe(container):
+    with check_subscription(container) as (mover, handler_mock):
+        mover.on_image_moved += handler_mock
