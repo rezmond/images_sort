@@ -21,5 +21,5 @@ Run tests with the coverage:
 `
 
 Roadmap:
-    [] - write tests for getting date from \*.mp4
+    [X] - write tests for getting date from \*.mp4
     [] - replace real files in tests to mocks
