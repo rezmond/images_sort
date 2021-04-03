@@ -7,6 +7,7 @@ from core.model import MoverModel
 from core.utils.base import Observable
 from core.entities.date_extractor import DateExtractor
 from core.use_cases.media_presenters import VideoPresenter, ImagePresenter
+from core.use_cases.move_map import MoveMap
 from core.system_interfaces import FsManipulator, validate_folder_path
 from core.controllers import ConsoleViewController
 from core.views import ConsoleView
@@ -42,12 +43,15 @@ class Container(containers.DeclarativeContainer):
 
     fs_manipulator = providers.Factory(FsManipulator)
 
+    move_map = providers.Factory(MoveMap)
+
     scanner = providers.Factory(
         Scanner,
         observable=observable,
         date_extractor=date_extractor,
         folder_extractor=fs_manipulator,
-        validate_folder_path=folder_path_validator
+        validate_folder_path=folder_path_validator,
+        move_map=move_map,
     )
 
     comparator = providers.Singleton(filecmp.cmp)

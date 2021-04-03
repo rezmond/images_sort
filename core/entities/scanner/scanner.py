@@ -5,9 +5,9 @@ from typeguard import typechecked
 from core.types import ScanResult, FileDescriptor
 from core.utils.base import Observable
 from ..fs import FolderExtractorBase
-from ..move_map import MoveMap
 from .base import ScannerBase
 from .date_extractor_base import DateExtractorBase
+from .move_map_base import MoveMapBase
 
 ImagesSeparated = Tuple[List[FileDescriptor], List[str]]
 
@@ -21,12 +21,14 @@ class Scanner(ScannerBase):
             date_extractor: DateExtractorBase,
             folder_extractor: FolderExtractorBase,
             validate_folder_path: Callable[[str, str], None],
+            move_map: MoveMapBase,
     ) -> None:
         self._scanned = None
         self._scanning_observable = observable
         self._date_extractor = date_extractor
         self._folder_extractor = folder_extractor
         self._validate_folder_path = validate_folder_path
+        self._move_map = move_map
 
     @property
     def on_file_found(self):
@@ -65,7 +67,6 @@ class Scanner(ScannerBase):
         self._validate_src(src_folder_path)
 
         no_data = []
-        move_map = MoveMap()
         img_files_info, not_img_file_path = self\
             ._get_images_list(src_folder_path)
 
@@ -79,10 +80,10 @@ class Scanner(ScannerBase):
                 no_data.append(file_descriptor.path)
                 continue
 
-            move_map.add_data(date, file_descriptor)
+            self._move_map.add_data(date, file_descriptor)
 
         self._scanned = ScanResult(
-            move_map.get_map(),
+            self._move_map.get_map(),
             no_data,
             not_img_file_path,
         )

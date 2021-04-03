@@ -1,37 +1,32 @@
 import os
-import contextlib
 from datetime import date
 from unittest.mock import call, Mock
 
 import pytest
-import yaml
 
-from core.entities import DateExtractorBase, FolderExtractorBase
+from core.entities import DateExtractorBase, FolderExtractorBase, MoveMapBase
 from core.types import FileDescriptor
 from core.utils.base import Observable
-from utils import full_path
-from ...utils import assert_dict_equal
-
-PATH_TO_TEST_DATA = full_path('tests/data')
+from .fixtures import get_move_map
 
 
 @pytest.fixture
 def expected_move_map():
-    current_dir = os.path.dirname(__file__)
-    file_path = os.path.join(current_dir, './fixtures/move_map.yml')
-    with open(file_path, 'r') as file_:
-        move_map = yaml.full_load(file_)
+    return get_move_map()
 
-    for year_values in move_map.values():
-        for preiod_name, period_values in year_values.items():
-            year_values[preiod_name] = [
-                FileDescriptor(
-                    value['path'],
-                    value['name']
-                ) for value in period_values
-            ]
 
-    return move_map
+def get_fs_manipulator_mock():
+    return Mock(spec=FolderExtractorBase, **{
+        'folder_to_file_pathes.return_value': (
+            ('1.jpg', '/test/path/1.jpg'),
+            ('2.jpg', '/test/path/2.jpg'),
+            ('3.jpg', '/test/path/3.jpg'),
+            ('5.jpg', '/test/path/5.jpg'),
+            ('4.jpg', '/test/path/4.jpg'),
+            ('1-1.jpg', '/test/path/folder-1/1-1.jpg'),
+            ('video1.mp4', '/test/path/video1.mp4'),
+        ),
+    })
 
 
 def get_scanner(container, **kwargs):
@@ -39,11 +34,13 @@ def get_scanner(container, **kwargs):
         'date_extractor': Mock(spec=DateExtractorBase),
         'observable': Mock(spec=Observable),
         'fs_manipulator': Mock(spec=FolderExtractorBase),
+        'move_map': Mock(spec=MoveMapBase),
         'validator': Mock(),
     }, **kwargs}
     with container.date_extractor.override(mocks['date_extractor']),\
             container.observable.override(mocks['observable']),\
             container.fs_manipulator.override(mocks['fs_manipulator']),\
+            container.move_map.override(mocks['move_map']),\
             container.folder_path_validator.override(mocks['validator']):
         scanner = container.scanner()
     return scanner
@@ -85,28 +82,28 @@ def test_scan(container, expected_move_map):
         'is_allowed_extension.return_value': True,
         'get_date': get_date_mock,
     })
-    fs_manipulator_mock = Mock(spec=FolderExtractorBase, **{
-        'folder_to_file_pathes.return_value': (
-            ('1.jpg', '/test/path/1.jpg'),
-            ('2.jpg', '/test/path/2.jpg'),
-            ('3.jpg', '/test/path/3.jpg'),
-            ('5.jpg', '/test/path/5.jpg'),
-            ('4.jpg', '/test/path/4.jpg'),
-            ('1-1.jpg', '/test/path/folder-1/1-1.jpg'),
-            ('video1.mp4', '/test/path/video1.mp4'),
-        ),
-    })
+    move_map_mock = Mock(spec=MoveMapBase)
     scanner = get_scanner(
         container,
         date_extractor=date_extractor_mock,
-        fs_manipulator=fs_manipulator_mock,
+        fs_manipulator=get_fs_manipulator_mock(),
+        move_map=move_map_mock,
     )
 
     scanner.scan('')
     scanned = scanner.get_data()
 
-    assert_dict_equal(scanned.move_map, expected_move_map,
-                      'Should return correct move_map')
+    expected_add_calls = [
+        call(get_date_mock(x), FileDescriptor(x, os.path.basename(x)))
+        for x in (
+            '/test/path/5.jpg',
+            '/test/path/4.jpg',
+            '/test/path/3.jpg',
+            '/test/path/2.jpg',
+            '/test/path/1.jpg',
+        )]
+
+    move_map_mock.add_data.assert_has_calls(expected_add_calls)
 
     expected_no_exif = [
         '/test/path/video1.mp4',
@@ -120,19 +117,21 @@ def test_scan(container, expected_move_map):
 
 
 def test_found_items(container):
-    scanner = container.scanner()
+    fs_manipulator_mock = get_fs_manipulator_mock()
+    scanner = get_scanner(
+        container, fs_manipulator=fs_manipulator_mock, observable=Observable())
     handler_mock = Mock()
     scanner.on_file_found += handler_mock
-    scanner.scan(PATH_TO_TEST_DATA)
+    scanner.scan('')
 
     expected_calls = [
-        call(full_path('tests/data/2.jpg')),
-        call(full_path('tests/data/1.jpg')),
-        call(full_path('tests/data/3.jpg')),
-        call(full_path('tests/data/video1.mp4')),
-        call(full_path('tests/data/5.jpg')),
-        call(full_path('tests/data/folder-1/1-1.jpg')),
-        call(full_path('tests/data/4.jpg')),
+        call('/test/path/2.jpg'),
+        call('/test/path/1.jpg'),
+        call('/test/path/3.jpg'),
+        call('/test/path/video1.mp4'),
+        call('/test/path/5.jpg'),
+        call('/test/path/folder-1/1-1.jpg'),
+        call('/test/path/4.jpg'),
     ]
 
     handler_mock.assert_has_calls(expected_calls, any_order=True)

@@ -91,17 +91,17 @@ def test_delete_duplicates(container):
 
     delete_mock = fs_manipulator_mock.delete
     delete_mock.assert_has_calls([
-        call(full_path('tests/data/2.jpg')),
-        call(full_path('tests/data/1.jpg'))
+        call(full_path('/test/path/2.jpg')),
+        call(full_path('/test/path/1.jpg'))
     ], any_order=True)
 
     move_mock = fs_manipulator_mock.move
     move_mock.assert_has_calls([
-        call(full_path('tests/data/3.jpg'),
+        call(full_path('/test/path/3.jpg'),
              full_path('tests/out/2017/summer/3.jpg')),
-        call(full_path('tests/data/5.jpg'),
+        call(full_path('/test/path/5.jpg'),
              full_path('tests/out/2017/winter (end)/5.jpg')),
-        call(full_path('tests/data/4.jpg'),
+        call(full_path('/test/path/4.jpg'),
              full_path('tests/out/2017/winter (end)/4.jpg'))
     ], any_order=True)
 

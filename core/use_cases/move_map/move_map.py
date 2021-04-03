@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-
 from datetime import datetime
 from typing import Any
 
 from typeguard import typechecked
 
+from core.entities import MoveMapBase
 
-class MoveMap:
+
+class MoveMap(MoveMapBase):
 
     BLOCKS = {
         'winter (begin)': (1, 2),
