@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import contextlib
 from unittest.mock import call, Mock, MagicMock, PropertyMock
 
 import pytest
 
-from containers import Container
 from core.entities.fs import FsManipulatorBase
 from core.entities.scanner.base import ScannerBase
 from core.entities.mover import MoverBase
@@ -16,12 +13,6 @@ from .fixtures import get_move_map
 
 
 scanner_result = ScanResult(get_move_map(), 2, 3)
-
-
-@pytest.fixture
-def container():
-    ioc = Container()
-    yield ioc
 
 
 @pytest.fixture
