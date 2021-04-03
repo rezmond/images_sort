@@ -61,9 +61,7 @@ class Scanner(ScannerBase):
         return medias, not_media
 
     @typechecked
-    def scan(
-        self, src_folder_path: str
-    ) -> None:
+    def scan(self, src_folder_path: str) -> None:
         self._validate_src(src_folder_path)
 
         no_data = []

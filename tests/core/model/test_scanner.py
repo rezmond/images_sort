@@ -1,8 +1,11 @@
-import pytest
 from unittest.mock import call, Mock
 
+import pytest
+
 from containers import Container
-from ....utils import full_path
+from core.entities import DateExtractorBase, FolderExtractorBase
+from core.utils.base import Observable
+from utils import full_path
 from ...utils import assert_dict_equal
 from .fixtures import get_move_map
 
@@ -69,3 +72,23 @@ def test_found_items(container):
     ]
 
     handler_mock.assert_has_calls(expected_calls, any_order=True)
+
+
+def test_filling_mot_media(container):
+    date_extractor_mock = Mock(spec=DateExtractorBase, **{
+        'is_allowed_extension.return_value': False
+    })
+    observable_mock = Mock(spec=Observable)
+    fs_manipulator_mock = Mock(spec=FolderExtractorBase, **{
+        'folder_to_file_pathes.return_value': (('', 'b'),)
+    })
+    with container.date_extractor.override(date_extractor_mock),\
+            container.observable.override(observable_mock),\
+            container.fs_manipulator.override(fs_manipulator_mock),\
+            container.folder_path_validator.override(Mock()):
+        scanner = container.scanner()
+    scanner.scan('/test/path')
+    result = scanner.get_data()
+    assert result.move_map == {}
+    assert result.no_data == []
+    assert result.not_media == ['b']
