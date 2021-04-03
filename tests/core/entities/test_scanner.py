@@ -7,7 +7,7 @@ import pytest
 from core.entities import DateExtractorBase, FolderExtractorBase, MoveMapBase
 from core.types import FileDescriptor
 from core.utils.base import Observable
-from .fixtures import get_move_map
+from ..fixtures import get_move_map
 
 
 @pytest.fixture
