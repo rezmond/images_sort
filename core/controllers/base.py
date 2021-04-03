@@ -7,7 +7,7 @@ from typeguard import check_type
 from ..model import MoverModel
 
 if TYPE_CHECKING:
-    from ..views import ViewBase
+    from ..views import ViewBase  # pragma: no cover
 
 
 class ControllerBase(metaclass=ABCMeta):
