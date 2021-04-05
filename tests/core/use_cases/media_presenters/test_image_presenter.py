@@ -1,16 +1,6 @@
 from unittest.mock import Mock
 from datetime import datetime
 
-import pytest
-
-from containers import Container
-
-
-@pytest.fixture
-def container():
-    ioc = Container()
-    yield ioc
-
 
 def test_can_get_data_from_exif(container):
     exif_data_getter_mock = Mock(return_value='2000-01-01T12:00:00')
