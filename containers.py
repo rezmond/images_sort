@@ -30,9 +30,12 @@ class Container(containers.DeclarativeContainer):
         ImagePresenter,
         get_exif_data=exif_data_getter,
     )
+    video_presenter = providers.Factory(
+        VideoPresenter,
+    )
 
     media_presenters = providers.List(
-        providers.Singleton(VideoPresenter),
+        providers.Singleton(video_presenter),
         providers.Singleton(image_presenter),
     )
 
