@@ -2,7 +2,7 @@ import os
 import shutil
 
 from typeguard import typechecked
-from typing import Iterable, Tuple
+from typing import Iterable
 
 from core.entities import FsManipulatorBase, FolderExtractorBase
 
@@ -25,8 +25,12 @@ class FsManipulator(FsManipulatorBase, FolderExtractorBase):
         os.makedirs(path, exist_ok=True)
 
     @staticmethod
+    def isfile(path: str) -> None:
+        os.path.isfile(path)
+
+    @staticmethod
     @typechecked
-    def folder_to_file_pathes(path: str) -> Iterable[Tuple[str, str]]:
+    def folder_to_file_pathes(path: str) -> Iterable[str]:
         for dirpath, _, filenames in os.walk(path):
             for filename in filenames:
-                yield filename, os.path.join(dirpath, filename)
+                yield os.path.join(dirpath, filename)

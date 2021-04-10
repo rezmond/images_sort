@@ -1,9 +1,12 @@
+import os
+
 from datetime import datetime
-from typing import Any
 
 from typeguard import typechecked
 
 from core.entities import MoveMapBase
+
+# TODO: add the "Seasons" prefix
 
 
 class MoveMap(MoveMapBase):
@@ -15,9 +18,6 @@ class MoveMap(MoveMapBase):
         'autumn': (9, 11),
         'winter (end)': (12, 12),
     }
-
-    def __init__(self):
-        self._map = {}
 
     @typechecked
     def _get_block_name(self, month: int) -> str:
@@ -32,29 +32,17 @@ class MoveMap(MoveMapBase):
                 return key
 
     @typechecked
-    def _add_year_id(self, date: datetime.date) -> str:
-        year_id = str(date.year)
+    def get_dst_path(self, date: datetime.date):
+        return os.path.join(
+            self._get_year_chunk(date),
+            self._get_month_chunk(date),
+        )
 
-        if year_id not in set(self._map.keys()):
-            self._map[year_id] = {}
-
-        return year_id
+    @staticmethod
+    @typechecked
+    def _get_year_chunk(date: datetime.date) -> str:
+        return str(date.year)
 
     @typechecked
-    def _add_month_id(self, year_id: str, date: datetime.date) -> str:
-        month_id = self._get_block_name(date.month)
-        year = self._map[year_id]
-        if month_id not in set(year.keys()):
-            year[month_id] = []
-        return month_id
-
-    @typechecked
-    def add_data(self, date: datetime.date, data: Any) -> None:
-        year_id = self._add_year_id(date)
-        month_id = self._add_month_id(year_id, date)
-
-        self._map[year_id][month_id].append(data)
-
-    @typechecked
-    def get_map(self) -> dict:
-        return self._map
+    def _get_month_chunk(self, date: datetime.date) -> str:
+        return self._get_block_name(date.month)

@@ -1,15 +1,13 @@
-from typing import Callable, Tuple, List
+from typing import Callable, Tuple, Iterator
 
 from typeguard import typechecked
 
-from core.types import ScanResult, FileDescriptor
+from core.types import MoveType, FileWay
 from core.utils.base import Observable
 from ..fs import FolderExtractorBase
 from .base import ScannerBase
 from .date_extractor_base import DateExtractorBase
 from .move_map_base import MoveMapBase
-
-ImagesSeparated = Tuple[List[FileDescriptor], List[str]]
 
 
 class Scanner(ScannerBase):
@@ -41,56 +39,45 @@ class Scanner(ScannerBase):
         '''
 
     @typechecked
-    def _get_images_list(self, current_dir_path: str) -> ImagesSeparated:
+    def _get_images_list(
+            self, current_dir_path: str) -> Iterator[Tuple[str, bool]]:
         """
+        TODO: update the description
         It returns all suitable by extension files taking into account nesting.
         Plus the path list of not medias.
         """
 
-        medias = []
-        not_media = []
-        files_with_names = self._folder_extractor\
+        file_pathes = self._folder_extractor\
             .folder_to_file_pathes(current_dir_path)
-        for node_name, node_path in files_with_names:
-            self._scanning_observable.update(node_path)
+        for file_path in file_pathes:
+            self._scanning_observable.update(file_path)
 
-            if self._date_extractor.is_allowed_extension(node_path):
-                medias.append(FileDescriptor(node_path, node_name))
+            if self._date_extractor.is_allowed_extension(file_path):
+                yield file_path, True
                 continue
 
-            not_media.append(node_path)
-
-        return medias, not_media
+            yield file_path, False
 
     @typechecked
-    def scan(self, src_folder_path: str) -> None:
-        self._validate_src(src_folder_path)
+    def scan(self, src_folder: str) -> Iterator[FileWay]:
+        self._validate_src(src_folder)
 
-        no_data = []
-        img_files_info, not_img_file_path = self\
-            ._get_images_list(src_folder_path)
+        for file_path, is_media in self._get_images_list(src_folder):
+            if not is_media:
+                yield FileWay(type=MoveType.NO_MEDIA, src=file_path)
+                continue
 
-        sorted_files_info = sorted(
-            img_files_info, key=lambda x: x.name, reverse=True)
-
-        for file_descriptor in sorted_files_info:
-            date = self._date_extractor.get_date(file_descriptor.path)
+            date = self._date_extractor.get_date(file_path)
 
             if not date:
-                no_data.append(file_descriptor.path)
+                yield FileWay(type=MoveType.NO_DATA, src=file_path)
                 continue
 
-            self._move_map.add_data(date, file_descriptor)
-
-        self._scanned = ScanResult(
-            self._move_map.get_map(),
-            no_data,
-            not_img_file_path,
-        )
-
-    @typechecked
-    def get_data(self) -> ScanResult:
-        return self._scanned
+            yield FileWay(
+                type=MoveType.MEDIA,
+                src=file_path,
+                dst=self._move_map.get_dst_path(date),
+            )
 
     def _validate_src(self, source_folder):
         self._validate_folder_path(source_folder, 'source')

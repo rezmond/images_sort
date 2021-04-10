@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 from functools import partial
 from typing import Callable, Tuple
@@ -7,14 +5,7 @@ from typing import Callable, Tuple
 from typeguard import typechecked
 
 from core.utils.base import Observable
-from core.types import (
-    BlocksType,
-    Comparator,
-    FileDescriptor,
-    ScanResult,
-    YearType,
-)
-from core.utils import MoveResult
+from core.types import Comparator, FileWay, MoveReport, MoveResult
 from ..fs import FsManipulatorBase, FsActions
 from .base import MoverBase
 
@@ -31,10 +22,8 @@ class Mover(MoverBase):
     ) -> None:
         self._fs_manipulator = fs_manipulator
         self._fs_actions = None
-        self._comparator = comparator
         self._move_result = None
-        self._move_function = None
-        self._moved_image_event_listeners = observable_factory()
+        self._comparator = comparator
         self._move_finish_event_listeners = observable_factory()
         self._validate_folder_path = validate_folder_path
 
@@ -42,9 +31,11 @@ class Mover(MoverBase):
     def _cmp_files(
         self,
         dst_dir: str,
-        file_descriptor: FileDescriptor
+        src: str,
     ) -> Tuple[bool, str]:
         """
+        TODO: refactor the method
+
         Check the destination folder for already existed files with the
         same names.
 
@@ -56,18 +47,19 @@ class Mover(MoverBase):
         current method will rename the target file name added a number til
         the name will unique.
         """
-        curr_file_name = os.path.split(file_descriptor.path)[1]
+        curr_file_name = os.path.split(src)[1]
         dst_file_path = os.path.join(dst_dir, curr_file_name)
 
-        if not os.path.isfile(dst_file_path):
+        if not self._fs_manipulator.isfile(dst_file_path):
             return True, dst_file_path
 
         base_file_name, extension = os.path.splitext(curr_file_name)
-        compare = partial(self._fs_actions.compare, dst=dst_file_path)
+        compare = partial(self._fs_actions.compare, src=src)
 
         num = 1
-        while os.path.isfile(dst_file_path):
-            if compare(file_descriptor.path):
+        while self._fs_manipulator.isfile(dst_file_path):
+            # TODO: cover that line by tests
+            if compare(dst=dst_file_path):
                 return False, dst_file_path
 
             curr_file_name = f'{base_file_name}_{num}{extension}'
@@ -82,65 +74,41 @@ class Mover(MoverBase):
         if not os.path.exists(path):
             self._fs_manipulator.makedirs(path)
 
+    @typechecked
     def move(self,
-             scanned: ScanResult,
+             file_way: FileWay,
              dst_folder: str,
-             move_mode: bool = False) -> MoveResult:
+             move_mode: bool = False) -> None:
         self._validate_dst(dst_folder)
         self._fs_actions = FsActions(
             self._fs_manipulator, self._comparator, move_mode, move_mode)
 
-        self._move_result = MoveResult(
-            [], [], scanned.no_data, scanned.not_media)
+        full_dst = os.path.join(dst_folder, file_way.dst)
+        self._make_dir_if_not_exists(full_dst)
+        self._move_by_cmp(file_way.src, full_dst)
 
-        # перемещение файлов
-        year_items = scanned.move_map.items()
-        for y_name, y_value in year_items:
-            month_items = y_value.items()
-            self._move_by_month(dst_folder, y_name, month_items)
-
-        self._move_finish_event_listeners.update(self._move_result)
-        return self._move_result
-
-    def _move_by_month(
-        self,
-        dst_folder: str,
-        year_name: str,
-        month_items: YearType,
-    ):
-        for m_name, m_value in month_items:
-            dst_dir_path = (
-                os.path.join(dst_folder, year_name, m_name))
-
-            self._make_dir_if_not_exists(dst_dir_path)
-            self._move_by_cmp(m_value, dst_dir_path)
+        self._move_finish_event_listeners.update(
+            MoveReport(file_way=file_way, result=self._move_result))
 
     @typechecked
-    def _move_by_cmp(self, m_value: BlocksType, dst_dir_path: str) -> None:
-        for file_descriptor in m_value:
-            to_move, result_path = self._cmp_files(
-                dst_dir_path, file_descriptor)
+    def _move_by_cmp(self, src: str, full_dst: str) -> None:
+        to_move, result_path = self._cmp_files(full_dst, src)
 
-            if to_move:
-                self._physical_move(file_descriptor.path, result_path)
-                continue
+        if to_move:
+            self._physical_move(src, result_path)
+            return
 
-            self._resolve_conflict(file_descriptor.path)
+        self._resolve_conflict(src)
 
     @typechecked
-    def _physical_move(self, path: str, result_path: str) -> None:
-        self._fs_actions.move(path, result_path)
-        self._moved_image_event_listeners.update((path, result_path))
-        self._move_result.moved.append(path)
+    def _physical_move(self, src: str, result_path: str) -> None:
+        self._fs_actions.move(src, result_path)
+        self._move_result = MoveResult.MOVED
 
     @typechecked
-    def _resolve_conflict(self, path: str) -> None:
-        self._fs_actions.delete(path)
-        self._move_result.already_exists.append(path)
-
-    @MoverBase.on_image_moved.getter
-    def on_image_moved(self):
-        return self._moved_image_event_listeners
+    def _resolve_conflict(self, src: str) -> None:
+        self._fs_actions.delete(src)
+        self._move_result = MoveResult.ALREADY_EXISTED
 
     @MoverBase.on_move_finished.getter
     def on_move_finished(self):

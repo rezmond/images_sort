@@ -8,31 +8,9 @@ def move_map(container):
     yield container.move_map()
 
 
-def test_correct_add_data(move_map):
-    test_data = {'test': 'object'}
-    move_map.add_data(date.fromisoformat('2020-01-01'), test_data)
+def test_correct_result(move_map):
+    dst_path = move_map.get_dst_path(date.fromisoformat('2020-01-01'))
+    assert dst_path == '2020/winter (begin)'
 
-    assert move_map.get_map() == {
-        '2020': {
-            'winter (begin)': [test_data]
-        }
-    }
-
-    test_data_2 = {'test': 'object2'}
-    move_map.add_data(date.fromisoformat('2020-01-01'), test_data_2)
-
-    assert move_map.get_map() == {
-        '2020': {
-            'winter (begin)': [test_data, test_data_2]
-        }
-    }
-
-    test_data_3 = {'test': 'object2'}
-    move_map.add_data(date.fromisoformat('2020-04-01'), test_data_3)
-
-    assert move_map.get_map() == {
-        '2020': {
-            'winter (begin)': [test_data, test_data_3],
-            'spring': [test_data_3],
-        }
-    }
+    dst_path = move_map.get_dst_path(date.fromisoformat('2020-04-01'))
+    assert dst_path == '2020/spring'

@@ -1,30 +1,16 @@
-# -*- coding: utf-8 -*-
+from abc import ABC, abstractmethod
 
-from abc import ABCMeta, abstractmethod
-
-from core.types import ScanResult
-from core.utils import MoveResult
+from core.types import FileWay
 
 
-class MoverBase(metaclass=ABCMeta):
+class MoverBase(ABC):
 
     @abstractmethod
     def move(self,
-             scanned: ScanResult,
+             file_way: FileWay,
              dst_folder: str,
-             move_mode: bool) -> MoveResult:
+             move_mode: bool) -> None:
         '''Moves files'''
-
-    @property
-    @abstractmethod
-    def on_image_moved(self):
-        '''Calls when an image have moved.'''
-
-    @on_image_moved.setter
-    def on_image_moved(self, val):
-        '''
-        It was created for the "+=" operator could work with that property
-        '''
 
     @property
     @abstractmethod

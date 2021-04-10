@@ -38,19 +38,22 @@ def subscription_context(container):
 
 
 def test_move_call(container):
-    scanner_mock = Mock(spec=ScannerBase)
-    scanner_mock.get_data.return_value = scanner_result
+    scanner_mock = Mock(spec=ScannerBase, **{
+        'scan.return_value': (x for x in range(3))
+    })
     mover_mock = Mock(spec=MoverBase)
     with container.fs_manipulator.override(Mock(spec=FsManipulatorBase)),\
             container.observable.override(MagicMock(spec=Observable)),\
             container.scanner.override(scanner_mock),\
             container.mover.override(mover_mock):
         model = container.model()
-        model.set_dst_folder('dst')
-        model.set_src_folder('src')
-        model.move()
 
-    mover_mock.move.assert_called_with(scanner_result, 'dst', False)
+    model.set_dst_folder('dst')
+    model.set_src_folder('src')
+    model.move()
+
+    scanner_mock.scan.assert_called_once_with('src')
+    mover_mock.move.assert_has_calls([call(x, 'dst', False) for x in range(3)])
 
 
 def test_on_image_move_subscribe(subscription_context):
@@ -71,55 +74,24 @@ def test_on_move_finish_subscribe(subscription_context):
         model.on_move_finished += handler_mock
 
 
-def test_delete_duplicates(container):
-    fs_manipulator_mock = Mock(spec=FsManipulatorBase)
-
-    with container.fs_manipulator.override(fs_manipulator_mock),\
-            container.comparator.override(Mock(return_value=True)):
-        mover = container.mover()
-        mover.move(ScanResult(get_move_map(), 2, 3),
-                   full_path('tests/out/'), True)
-
-    delete_mock = fs_manipulator_mock.delete
-    delete_mock.assert_has_calls([
-        call(full_path('/test/path/2.jpg')),
-        call(full_path('/test/path/1.jpg'))
-    ], any_order=True)
-
-    move_mock = fs_manipulator_mock.move
-    move_mock.assert_has_calls([
-        call(full_path('/test/path/3.jpg'),
-             full_path('tests/out/2017/summer/3.jpg')),
-        call(full_path('/test/path/5.jpg'),
-             full_path('tests/out/2017/winter (end)/5.jpg')),
-        call(full_path('/test/path/4.jpg'),
-             full_path('tests/out/2017/winter (end)/4.jpg'))
-    ], any_order=True)
-
-    copy_mock = fs_manipulator_mock.copy
-    copy_mock.assert_not_called()
-
-
 def test_clean_mode_safe(container):
-    scanner_mock = Mock(spec=ScannerBase)
+    scanner_mock = Mock(spec=ScannerBase, **{'scan.return_value': [None]})
     mover_mock = Mock(spec=MoverBase)
     with container.mover.override(mover_mock),\
             container.scanner.override(scanner_mock):
         model = container.model()
-        model.move()
+    model.move()
 
-    mover_mock.move.assert_called_once_with(
-        scanner_mock.get_data.return_value, None, False)
+    mover_mock.move.assert_called_once_with(None, None, False)
 
 
 def test_clean_mode_dangerously(container):
-    scanner_mock = Mock(spec=ScannerBase)
+    scanner_mock = Mock(spec=ScannerBase, **{'scan.return_value': [None]})
     mover_mock = Mock(spec=MoverBase)
     with container.mover.override(mover_mock),\
             container.scanner.override(scanner_mock):
         model = container.model()
-        model.clean_mode(True)
-        model.move()
+    model.clean_mode(True)
+    model.move()
 
-    mover_mock.move.assert_called_once_with(
-        scanner_mock.get_data.return_value, None, True)
+    mover_mock.move.assert_called_once_with(None, None, True)

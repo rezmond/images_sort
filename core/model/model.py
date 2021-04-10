@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from typeguard import typechecked
 
 from core.entities.scanner import ScannerBase
 from core.entities.mover import MoverBase
-from core.utils import MoveResult
 
 
 class MoverModel:
@@ -21,12 +18,9 @@ class MoverModel:
     def clean_mode(self, enable: bool):
         self._clean_mode = enable
 
-    def move(self) -> MoveResult:
-        self._scanner.scan(self._src_folder)
-        scanned = self._scanner.get_data()
-        move_result = self._mover.move(
-            scanned, self._dst_folder, self._clean_mode)
-        return move_result
+    def move(self) -> None:
+        for file_way in self._scanner.scan(self._src_folder):
+            self._mover.move(file_way, self._dst_folder, self._clean_mode)
 
     @property
     def on_image_moved(self):
