@@ -21,7 +21,6 @@ class Scanner(ScannerBase):
             validate_folder_path: Callable[[str, str], None],
             move_map: MoveMapBase,
     ) -> None:
-        self._scanned = None
         self._scanning_observable = observable
         self._date_extractor = date_extractor
         self._folder_extractor = folder_extractor
@@ -39,43 +38,35 @@ class Scanner(ScannerBase):
         '''
 
     @typechecked
-    def _get_images_list(
-            self, current_dir_path: str) -> Iterator[Tuple[str, bool]]:
-        """
-        TODO: update the description
-        It returns all suitable by extension files taking into account nesting.
-        Plus the path list of not medias.
-        """
+    def _get_media_pairs(self, dir_path: str) -> Iterator[Tuple[str, bool]]:
+        pathes = self._folder_extractor.folder_to_file_pathes(dir_path)
+        for path in pathes:
+            self._scanning_observable.update(path)
 
-        file_pathes = self._folder_extractor\
-            .folder_to_file_pathes(current_dir_path)
-        for file_path in file_pathes:
-            self._scanning_observable.update(file_path)
-
-            if self._date_extractor.is_allowed_extension(file_path):
-                yield file_path, True
+            if self._date_extractor.is_allowed_extension(path):
+                yield path, True
                 continue
 
-            yield file_path, False
+            yield path, False
 
     @typechecked
     def scan(self, src_folder: str) -> Iterator[FileWay]:
         self._validate_src(src_folder)
 
-        for file_path, is_media in self._get_images_list(src_folder):
+        for path, is_media in self._get_media_pairs(src_folder):
             if not is_media:
-                yield FileWay(type=MoveType.NO_MEDIA, src=file_path)
+                yield FileWay(type=MoveType.NO_MEDIA, src=path)
                 continue
 
-            date = self._date_extractor.get_date(file_path)
+            date = self._date_extractor.get_date(path)
 
             if not date:
-                yield FileWay(type=MoveType.NO_DATA, src=file_path)
+                yield FileWay(type=MoveType.NO_DATA, src=path)
                 continue
 
             yield FileWay(
                 type=MoveType.MEDIA,
-                src=file_path,
+                src=path,
                 dst=self._move_map.get_dst_path(date),
             )
 
