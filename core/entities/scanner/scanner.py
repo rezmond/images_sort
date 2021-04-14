@@ -1,10 +1,10 @@
-from typing import Callable, Tuple, Iterator
+from typing import Tuple, Iterator
 
 from typeguard import typechecked
 
 from core.types import MoveType, FileWay
 from core.utils.base import Observable
-from ..fs import FolderExtractorBase
+from ..fs import FolderExtractorBase, FolderPathValidatorBase
 from .base import ScannerBase
 from .date_extractor_base import DateExtractorBase
 from .move_map_base import MoveMapBase
@@ -18,13 +18,13 @@ class Scanner(ScannerBase):
             observable: Observable,
             date_extractor: DateExtractorBase,
             folder_extractor: FolderExtractorBase,
-            validate_folder_path: Callable[[str, str], None],
+            folder_path_validator: FolderPathValidatorBase,
             move_map: MoveMapBase,
     ) -> None:
         self._scanning_observable = observable
         self._date_extractor = date_extractor
         self._folder_extractor = folder_extractor
-        self._validate_folder_path = validate_folder_path
+        self._validate_folder_path = folder_path_validator.validate
         self._move_map = move_map
 
     @property

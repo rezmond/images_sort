@@ -8,7 +8,6 @@ from core.entities.scanner.base import ScannerBase
 from core.entities.mover import MoverBase
 from core.types import ScanResult
 from core.utils.base import Observable
-from utils import full_path
 from ..fixtures import get_move_map
 
 

@@ -6,22 +6,27 @@ import pytest
 
 from core.types import FileWay, MoveType, MoveResult, MoveReport
 from core.entities.fs import FsManipulatorBase
+from core.system_interfaces import FolderCheckerBase
 from core.utils.base import Observable
-from utils import full_path
+
+
+class FsManipulatorCompilation(FolderCheckerBase, FsManipulatorBase):
+    pass
+
 
 from_to = (
-    (full_path('tests/data/2.jpg'), '2017/spring/'),
-    (full_path('tests/data/3.jpg'), '2017/summer/'),
-    (full_path('tests/data/5.jpg'), '2017/winter (end)/'),
-    (full_path('tests/data/4.jpg'), '2017/winter (end)/'),
-    (full_path('tests/data/1.jpg'), '2017/winter (begin)/'),
+    ('/src/path/data/2.jpg', '2017/spring/'),
+    ('/src/path/data/3.jpg', '2017/summer/'),
+    ('/src/path/data/5.jpg', '2017/winter (end)/'),
+    ('/src/path/data/4.jpg', '2017/winter (end)/'),
+    ('/src/path/data/1.jpg', '2017/winter (begin)/'),
 )
 
 
 @contextlib.contextmanager
 def check_subscription(container):
     observable_mock = MagicMock(spec=Observable)
-    fs_manipulator_mock = Mock(spec=FsManipulatorBase)
+    fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
 
     with container.observable.override(observable_mock),\
             container.fs_manipulator.override(fs_manipulator_mock),\
@@ -34,7 +39,7 @@ def check_subscription(container):
 
 
 def test_move_without_dst_param(container):
-    fs_manipulator_mock = Mock(spec=FsManipulatorBase)
+    fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
     with container.fs_manipulator.override(fs_manipulator_mock),\
             container.comparator.override(Mock()),\
             pytest.raises(ValueError) as exc_info:
@@ -46,7 +51,7 @@ def test_move_without_dst_param(container):
 
 
 def test_move_by_relative_path(container):
-    fs_manipulator_mock = Mock(spec=FsManipulatorBase)
+    fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
 
     with container.fs_manipulator.override(fs_manipulator_mock),\
         container.comparator.override(Mock()),\
@@ -66,7 +71,7 @@ def test_move_by_absolute_path(container):
         return comporator_mock(path, None) or path.endswith('/2.jpg')
 
     on_item_moved_handler_mock = Mock()
-    fs_manipulator_mock = Mock(spec=FsManipulatorBase, **{
+    fs_manipulator_mock = Mock(spec=FsManipulatorCompilation, **{
         'isfile': is_file_mock
     })
 
@@ -80,25 +85,25 @@ def test_move_by_absolute_path(container):
             src=src,
             dst=dst,
             type=MoveType.MEDIA,
-        ), full_path('tests/out')
+        ), '/src/path/tests/out'
     ) for (src, dst) in from_to)
 
     calls = [
         call(
-            full_path('tests/data/2.jpg'),
-            full_path('tests/out/2017/spring/2_1.jpg')
+            '/src/path/data/2.jpg',
+            '/dst/path/2017/spring/2_1.jpg'
         ),
         call(
-            full_path('tests/data/5.jpg'),
-            full_path('tests/out/2017/winter (end)/5.jpg')
+            '/src/path/data/5.jpg',
+            '/dst/path/2017/winter (end)/5.jpg'
         ),
         call(
-            full_path('tests/data/3.jpg'),
-            full_path('tests/out/2017/summer/3.jpg')
+            '/src/path/data/3.jpg',
+            '/dst/path/2017/summer/3.jpg'
         ),
         call(
-            full_path('tests/data/4.jpg'),
-            full_path('tests/out/2017/winter (end)/4.jpg')
+            '/src/path/data/4.jpg',
+            '/dst/path/2017/winter (end)/4.jpg'
         ),
     ]
 
@@ -129,10 +134,10 @@ def test_on_move_finished_subscribe(container):
 
 def test_delete_duplicates(container):
     to_delete = from_to[0: 2]
-    to_delete_dst = list(map(full_path, (
-        os.path.join('tests/out', '2017/spring/2.jpg'),
-        os.path.join('tests/out', '2017/summer/3.jpg'),
-    )))
+    to_delete_dst = list((
+        os.path.join('/dst/path/out', '2017/spring/2.jpg'),
+        os.path.join('/dst/path/out', '2017/summer/3.jpg'),
+    ))
 
     def comporator_mock(_, dst):
         nonlocal to_delete_dst
@@ -142,7 +147,8 @@ def test_delete_duplicates(container):
         nonlocal to_delete_dst
         return path in to_delete_dst
 
-    fs_manipulator_mock = Mock(spec=FsManipulatorBase, isfile=is_file_mock)
+    fs_manipulator_mock = Mock(
+        spec=FsManipulatorCompilation, isfile=is_file_mock)
 
     with container.fs_manipulator.override(fs_manipulator_mock),\
             container.comparator.override(comporator_mock):
@@ -153,7 +159,7 @@ def test_delete_duplicates(container):
             src=src,
             dst=dst,
             type=MoveType.MEDIA,
-        ), full_path('tests/out'), True
+        ), '/dst/path', True
     ) for (src, dst) in from_to)
 
     delete_mock = fs_manipulator_mock.delete
@@ -162,8 +168,8 @@ def test_delete_duplicates(container):
 
     move_mock = fs_manipulator_mock.move
     expects = [
-        call(pair[0], full_path(os.path.join(
-            'tests/out', pair[1], os.path.basename(pair[0]))))
+        call(pair[0], os.path.join(
+            '/dst/path', pair[1], os.path.basename(pair[0])))
         for pair in from_to if pair not in to_delete]
     move_mock.assert_has_calls(expects, any_order=True)
 

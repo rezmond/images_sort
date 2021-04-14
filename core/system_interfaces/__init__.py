@@ -1,2 +1,3 @@
 from .fs_manipulator import FsManipulator
-from .validate_folder_path import validate_folder_path
+from .folder_path_validator import FolderPathValidator
+from .folder_checker_base import FolderCheckerBase

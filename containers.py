@@ -8,7 +8,7 @@ from core.utils.base import Observable
 from core.entities.date_extractor import DateExtractor
 from core.use_cases.media_presenters import VideoPresenter, ImagePresenter
 from core.use_cases.move_map import MoveMap
-from core.system_interfaces import FsManipulator, validate_folder_path
+from core.system_interfaces import FsManipulator, FolderPathValidator
 from core.controllers import ConsoleViewController
 from core.views import ConsoleView
 from libs import get_exif_data
@@ -22,7 +22,12 @@ class Container(containers.DeclarativeContainer):
         Observable,
     )
 
-    folder_path_validator = providers.Object(validate_folder_path)
+    fs_manipulator = providers.Factory(FsManipulator)
+
+    folder_path_validator = providers.Factory(
+        FolderPathValidator,
+        fs_manipulator=fs_manipulator,
+    )
 
     exif_data_getter = providers.Object(get_exif_data)
 
@@ -44,8 +49,6 @@ class Container(containers.DeclarativeContainer):
         media_presenters=media_presenters
     )
 
-    fs_manipulator = providers.Factory(FsManipulator)
-
     move_map = providers.Factory(MoveMap)
 
     scanner = providers.Factory(
@@ -53,7 +56,7 @@ class Container(containers.DeclarativeContainer):
         observable=observable,
         date_extractor=date_extractor,
         folder_extractor=fs_manipulator,
-        validate_folder_path=folder_path_validator,
+        folder_path_validator=folder_path_validator,
         move_map=move_map,
     )
 
@@ -64,7 +67,7 @@ class Container(containers.DeclarativeContainer):
         observable_factory=observable.provider,
         fs_manipulator=fs_manipulator,
         comparator=comparator,
-        validate_folder_path=folder_path_validator,
+        folder_path_validator=folder_path_validator,
     )
 
     model = providers.Singleton(

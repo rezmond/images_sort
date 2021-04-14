@@ -7,6 +7,7 @@ from core.entities import DateExtractorBase, FolderExtractorBase, MoveMapBase
 from core.types import FileWay, MoveType
 from core.utils.base import Observable
 
+
 base_path_map = (
     ('/src/path/1.jpg', date.fromisoformat('2017-01-15')),
     ('/src/path/2.jpg', date.fromisoformat('2017-03-14')),

@@ -5,9 +5,10 @@ from typeguard import typechecked
 from typing import Iterable
 
 from core.entities import FsManipulatorBase, FolderExtractorBase
+from .folder_checker_base import FolderCheckerBase
 
 
-class FsManipulator(FsManipulatorBase, FolderExtractorBase):
+class FsManipulator(FsManipulatorBase, FolderExtractorBase, FolderCheckerBase):
     @staticmethod
     def move(src: str, dst: str) -> None:
         shutil.move(src, dst)
@@ -25,8 +26,12 @@ class FsManipulator(FsManipulatorBase, FolderExtractorBase):
         os.makedirs(path, exist_ok=True)
 
     @staticmethod
-    def isfile(path: str) -> None:
-        os.path.isfile(path)
+    def isfile(path: str) -> bool:
+        return os.path.isfile(path)
+
+    @staticmethod
+    def isfolder(path: str) -> bool:
+        return os.path.isdir(path)
 
     @staticmethod
     @typechecked
