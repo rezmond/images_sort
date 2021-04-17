@@ -57,7 +57,7 @@ from_to = (
         '2017/winter (begin)/',
         '/dst/path/2017/winter (begin)/1.jpg',
         True,
-        noop,
+        lambda x: x.endswith('/1.jpg'),
     ),
 )
 
@@ -87,9 +87,10 @@ def check_subscription(container):
 def test_move_without_dst_param(container):
     fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
     with container.fs_manipulator.override(fs_manipulator_mock),\
-            container.comparator.override(Mock()),\
-            pytest.raises(ValueError) as exc_info:
+            container.comparator.override(Mock()):
         mover = container.mover()
+
+    with pytest.raises(ValueError) as exc_info:
         mover.move(FileWay(), '')
 
     assert 'path did not set' in str(exc_info.value), \
@@ -100,9 +101,10 @@ def test_move_by_relative_path(container):
     fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
 
     with container.fs_manipulator.override(fs_manipulator_mock),\
-        container.comparator.override(Mock()),\
-            pytest.raises(ValueError) as exc_info:
+            container.comparator.override(Mock()):
         mover = container.mover()
+
+    with pytest.raises(ValueError) as exc_info:
         mover.move(FileWay(), 'test-1')
 
     assert 'absolute' in str(exc_info.value), \
@@ -125,6 +127,7 @@ def test_move_by_absolute_path(container):
     with container.fs_manipulator.override(fs_manipulator_mock),\
             container.comparator.override(comporator_mock):
         mover = container.mover()
+
     mover.on_move_finished += on_item_moved_handler_mock
 
     list(mover.move(
@@ -144,7 +147,7 @@ def test_move_by_absolute_path(container):
             call(MoveReport(
                 result=(
                     MoveResult.ALREADY_EXISTED
-                    if comporator_mock(plan.src, None)
+                    if plan.identical(plan.final_dst)
                     else MoveResult.MOVED
                 ),
                 file_way=FileWay(
@@ -153,7 +156,7 @@ def test_move_by_absolute_path(container):
                     type=MoveType.MEDIA,
                 )
             ))
-            for plan in from_to], any_order=True)
+            for plan in from_to])
 
 
 def test_on_move_finished_subscribe(container):
@@ -193,7 +196,7 @@ def test_delete_duplicates(container):
 
     delete_mock = fs_manipulator_mock.delete
     delete_mock.assert_has_calls(
-        [call(plan.src) for plan in to_delete], any_order=True)
+        [call(plan.src) for plan in to_delete])
 
     def build_final_dst(plan):
         return os.path.join(
@@ -203,7 +206,7 @@ def test_delete_duplicates(container):
     expects = [
         call(plan.src, build_final_dst(plan))
         for plan in from_to if plan not in to_delete]
-    move_mock.assert_has_calls(expects, any_order=True)
+    move_mock.assert_has_calls(expects)
 
     copy_mock = fs_manipulator_mock.copy
     copy_mock.assert_not_called()
