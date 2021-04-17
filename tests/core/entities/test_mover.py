@@ -1,5 +1,6 @@
 import os
 import contextlib
+from collections import namedtuple
 from unittest.mock import call, Mock, MagicMock
 
 import pytest
@@ -14,13 +15,58 @@ class FsManipulatorCompilation(FolderCheckerBase, FsManipulatorBase):
     pass
 
 
+MovePlan = namedtuple(
+    'MovePlan', ('src', 'dst', 'final_dst', 'existed', 'identical'))
+
+
+def noop(_):
+    return None
+
+
 from_to = (
-    ('/src/path/data/2.jpg', '2017/spring/'),
-    ('/src/path/data/3.jpg', '2017/summer/'),
-    ('/src/path/data/5.jpg', '2017/winter (end)/'),
-    ('/src/path/data/4.jpg', '2017/winter (end)/'),
-    ('/src/path/data/1.jpg', '2017/winter (begin)/'),
+    MovePlan(
+        '/src/path/data/2.jpg',
+        '2017/spring/',
+        '/dst/path/2017/spring/2_1.jpg',
+        True,
+        lambda x: x.endswith('/2.jpg'),
+    ),
+    MovePlan(
+        '/src/path/data/3.jpg',
+        '2017/summer/',
+        '/dst/path/2017/summer/3.jpg',
+        False,
+        noop,
+    ),
+    MovePlan(
+        '/src/path/data/5.jpg',
+        '2017/winter (end)/',
+        '/dst/path/2017/winter (end)/5.jpg',
+        False,
+        noop,
+    ),
+    MovePlan(
+        '/src/path/data/4.jpg',
+        '2017/winter (end)/',
+        '/dst/path/2017/winter (end)/4.jpg',
+        False,
+        noop,
+    ),
+    MovePlan(
+        '/src/path/data/1.jpg',
+        '2017/winter (begin)/',
+        '/dst/path/2017/winter (begin)/1.jpg',
+        True,
+        noop,
+    ),
 )
+
+
+def from_to_find(predicate):
+    return next(
+        (plan for plan in from_to if predicate(plan)),
+        MovePlan('', '', '', False, noop)
+    )
 
 
 @contextlib.contextmanager
@@ -64,11 +110,12 @@ def test_move_by_relative_path(container):
 
 
 def test_move_by_absolute_path(container):
-    def comporator_mock(x, _):
-        return x.endswith('/1.jpg')
 
-    def is_file_mock(path):
-        return comporator_mock(path, None) or path.endswith('/2.jpg')
+    def comporator_mock(_, final_dst):
+        return from_to_find(lambda x: x.final_dst == final_dst).existed
+
+    def is_file_mock(final_dst):
+        return from_to_find(lambda x: x.identical(final_dst)).existed
 
     on_item_moved_handler_mock = Mock()
     fs_manipulator_mock = Mock(spec=FsManipulatorCompilation, **{
@@ -82,32 +129,14 @@ def test_move_by_absolute_path(container):
 
     list(mover.move(
         FileWay(
-            src=src,
-            dst=dst,
+            src=plan.src,
+            dst=plan.dst,
             type=MoveType.MEDIA,
         ), '/dst/path'
-    ) for (src, dst) in from_to)
-
-    calls = [
-        call(
-            '/src/path/data/2.jpg',
-            '/dst/path/2017/spring/2_1.jpg'
-        ),
-        call(
-            '/src/path/data/3.jpg',
-            '/dst/path/2017/summer/3.jpg'
-        ),
-        call(
-            '/src/path/data/5.jpg',
-            '/dst/path/2017/winter (end)/5.jpg'
-        ),
-        call(
-            '/src/path/data/4.jpg',
-            '/dst/path/2017/winter (end)/4.jpg'
-        ),
-    ]
+    ) for plan in from_to)
 
     copy_mock = fs_manipulator_mock.copy
+    calls = [call(plan.src, plan.final_dst) for plan in from_to[0:-1]]
     copy_mock.assert_has_calls(calls)
 
     on_item_moved_handler_mock.assert_has_calls(
@@ -115,16 +144,16 @@ def test_move_by_absolute_path(container):
             call(MoveReport(
                 result=(
                     MoveResult.ALREADY_EXISTED
-                    if comporator_mock(src, None)
+                    if comporator_mock(plan.src, None)
                     else MoveResult.MOVED
                 ),
                 file_way=FileWay(
-                    src=src,
-                    dst=dst,
+                    src=plan.src,
+                    dst=plan.dst,
                     type=MoveType.MEDIA,
                 )
             ))
-            for (src, dst) in from_to], any_order=True)
+            for plan in from_to], any_order=True)
 
 
 def test_on_move_finished_subscribe(container):
@@ -134,17 +163,17 @@ def test_on_move_finished_subscribe(container):
 
 def test_delete_duplicates(container):
     to_delete = from_to[0: 2]
-    to_delete_dst = list((
-        os.path.join('/dst/path', '2017/spring/2.jpg'),
-        os.path.join('/dst/path', '2017/summer/3.jpg'),
-    ))
+    to_delete_dst = [
+        os.path.join('/dst/path', x) for x in (
+            '2017/spring/2.jpg',
+            '2017/summer/3.jpg',
+        )
+    ]
 
     def comporator_mock(_, dst):
-        nonlocal to_delete_dst
         return dst in to_delete_dst
 
     def is_file_mock(path):
-        nonlocal to_delete_dst
         return path in to_delete_dst
 
     fs_manipulator_mock = Mock(
@@ -156,21 +185,24 @@ def test_delete_duplicates(container):
 
     list(mover.move(
         FileWay(
-            src=src,
-            dst=dst,
+            src=plan.src,
+            dst=plan.dst,
             type=MoveType.MEDIA,
         ), '/dst/path', True
-    ) for (src, dst) in from_to)
+    ) for plan in from_to)
 
     delete_mock = fs_manipulator_mock.delete
     delete_mock.assert_has_calls(
-        [call(src) for (src, _) in to_delete], any_order=True)
+        [call(plan.src) for plan in to_delete], any_order=True)
+
+    def build_final_dst(plan):
+        return os.path.join(
+            '/dst/path', plan.dst, os.path.basename(plan.src))
 
     move_mock = fs_manipulator_mock.move
     expects = [
-        call(pair[0], os.path.join(
-            '/dst/path', pair[1], os.path.basename(pair[0])))
-        for pair in from_to if pair not in to_delete]
+        call(plan.src, build_final_dst(plan))
+        for plan in from_to if plan not in to_delete]
     move_mock.assert_has_calls(expects, any_order=True)
 
     copy_mock = fs_manipulator_mock.copy

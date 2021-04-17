@@ -46,20 +46,23 @@ class Mover(MoverBase):
         If a file with that name exists but it is not identical, then the
         current method will rename the target file name added a number til
         the name will unique.
+
+        :returns: (<can be moved>, <final_path>)
         """
         curr_file_name = os.path.split(src)[1]
         dst_file_path = os.path.join(dst_dir, curr_file_name)
 
-        if not self._fs_manipulator.isfile(dst_file_path):
+        is_dst_path_busy = self._fs_manipulator.isfile
+        if not is_dst_path_busy(dst_file_path):
             return True, dst_file_path
 
         base_file_name, extension = os.path.splitext(curr_file_name)
-        compare = partial(self._fs_actions.compare, src=src)
+        is_dst_file_identical = partial(self._fs_actions.compare, src=src)
 
         num = 1
-        while self._fs_manipulator.isfile(dst_file_path):
-            # TODO: cover that line by tests
-            if compare(dst=dst_file_path):
+        is_new_dst_path_busy = is_dst_path_busy
+        while is_new_dst_path_busy(dst_file_path):
+            if is_dst_file_identical(dst=dst_file_path):
                 return False, dst_file_path
 
             curr_file_name = f'{base_file_name}_{num}{extension}'
