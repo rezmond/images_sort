@@ -85,7 +85,7 @@ def test_move_by_absolute_path(container):
             src=src,
             dst=dst,
             type=MoveType.MEDIA,
-        ), '/src/path/tests/out'
+        ), '/dst/path'
     ) for (src, dst) in from_to)
 
     calls = [
@@ -94,12 +94,12 @@ def test_move_by_absolute_path(container):
             '/dst/path/2017/spring/2_1.jpg'
         ),
         call(
-            '/src/path/data/5.jpg',
-            '/dst/path/2017/winter (end)/5.jpg'
-        ),
-        call(
             '/src/path/data/3.jpg',
             '/dst/path/2017/summer/3.jpg'
+        ),
+        call(
+            '/src/path/data/5.jpg',
+            '/dst/path/2017/winter (end)/5.jpg'
         ),
         call(
             '/src/path/data/4.jpg',
@@ -108,7 +108,7 @@ def test_move_by_absolute_path(container):
     ]
 
     copy_mock = fs_manipulator_mock.copy
-    copy_mock.assert_has_calls(calls, any_order=True)
+    copy_mock.assert_has_calls(calls)
 
     on_item_moved_handler_mock.assert_has_calls(
         [
@@ -135,8 +135,8 @@ def test_on_move_finished_subscribe(container):
 def test_delete_duplicates(container):
     to_delete = from_to[0: 2]
     to_delete_dst = list((
-        os.path.join('/dst/path/out', '2017/spring/2.jpg'),
-        os.path.join('/dst/path/out', '2017/summer/3.jpg'),
+        os.path.join('/dst/path', '2017/spring/2.jpg'),
+        os.path.join('/dst/path', '2017/summer/3.jpg'),
     ))
 
     def comporator_mock(_, dst):
