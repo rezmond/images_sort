@@ -2,7 +2,6 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from containers import Container
 from core.model import MoverModel
 from core.views import ConsoleView
 
@@ -18,15 +17,14 @@ def view_class():
 
 
 @pytest.fixture
-def container(model, view_class):
-    ioc = Container()
-    with ioc.model.override(model),\
-            ioc.view_class.override(view_class):
-        yield ioc
+def controller(container, model, view_class):
+    with container.model.override(model),\
+            container.view_class.override(view_class):
+        instance = container.controller()
+    return instance
 
 
-def test_set_params(model, view_class, container):
-    controller = container.controller()
+def test_set_params(controller, model, view_class):
     controller.set_src_folder('/test/src/path')
     controller.set_dst_folder('/test/dst/path')
 
@@ -35,35 +33,35 @@ def test_set_params(model, view_class, container):
     model.set_dst_folder.assert_called_once_with('/test/dst/path')
 
 
-def test_move(model, view_class, container):
-    controller = container.controller()
+def test_move(controller, model, view_class):
     controller.move()
     model.move.assert_called_once()
 
 
-def test_enable_moved_images_log(model, view_class, container):
-    controller = container.controller()
+def test_enable_moved_images_log(controller, model, view_class):
     iadd_mock = Mock()
-    model.on_image_moved.__iadd__ = iadd_mock
+    model.on_move_finished.__iadd__ = iadd_mock
     controller.enable_moved_images_log()
     iadd_mock.assert_called_once()
 
 
-def test_handle_image_moved(model, view_class, container):
-    def mock_of_handler(handler):
-        handler(('a', 'b'))
+def test_handle_image_moved(controller, model, view_class):
+    def received_handler(*args):
+        return None
 
-    controller = container.controller()
-    model.on_image_moved.__iadd__ = Mock(side_effect=mock_of_handler)
+    def mock_of_handler(_, handler):
+        nonlocal received_handler
+        received_handler = handler
+
+    model.on_move_finished.__iadd__ = mock_of_handler
     controller.enable_moved_images_log()
+    received_handler(('a', 'b'))
 
     view_class.return_value.handle_image_moved\
         .assert_called_once_with(('a', 'b'))
 
 
-def test_clean_mode_is_passing_value_down(model, view_class, container):
-    controller = container.controller()
-
+def test_clean_mode_is_passing_value_down(controller, model, view_class):
     controller.clean_mode(True)
     controller.clean_mode(False)
     model.clean_mode.assert_has_calls([

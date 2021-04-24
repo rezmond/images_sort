@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from typing import Tuple
 
 from typeguard import typechecked
@@ -18,7 +16,7 @@ class ConsoleViewController(ControllerBase):
     @typechecked
     def enable_moved_images_log(self, enable: bool = True):
         if enable:
-            self._model.on_image_moved += self._handle_image_moved
+            self._model.on_move_finished += self._handle_image_moved
 
     @typechecked
     def _handle_image_moved(self, move_pair: Tuple[str, str]) -> None:

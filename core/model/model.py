@@ -23,16 +23,6 @@ class MoverModel:
             self._mover.move(file_way, self._dst_folder, self._clean_mode)
 
     @property
-    def on_image_moved(self):
-        return self._mover.on_image_moved
-
-    @on_image_moved.setter
-    def on_image_moved(self, value):
-        '''
-        It was created for the "+=" operator could work with that property
-        '''
-
-    @property
     def on_file_found(self):
         return self._scanner.on_file_found
 
