@@ -29,17 +29,6 @@ parser.add_argument(
     help='remove the duplicates and actually move the files')
 
 
-def after_scanning(func):
-    @wraps(func)
-    def wrapper(instance, *args, **kwargs):
-        if not instance._has_scanned:
-            print('\n')
-            instance._finish_show_scanning_status()
-        return func(instance, *args, **kwargs)
-
-    return wrapper
-
-
 class ConsoleView(ViewBase):
     def __init__(self, *args, **kwargs):
         ViewBase.__init__(self, *args, **kwargs)
@@ -51,11 +40,6 @@ class ConsoleView(ViewBase):
 
     def _finish_show_scanning_status(self):
         self._has_scanned = True
-
-    @after_scanning
-    def handle_image_move_finished(self, move_pair: Tuple[str, str]):
-        from_, to_ = move_pair
-        print(f'{from_} -> {to_}')
 
     def show(self):
         args = parser.parse_args()
