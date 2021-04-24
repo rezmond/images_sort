@@ -57,7 +57,7 @@ def test_handle_image_moved(controller, model, view_class):
     controller.enable_moved_images_log()
     received_handler(('a', 'b'))
 
-    view_class.return_value.handle_image_moved\
+    view_class.return_value.handle_move_finished\
         .assert_called_once_with(('a', 'b'))
 
 

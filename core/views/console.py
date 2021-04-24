@@ -48,13 +48,12 @@ class ConsoleView(ViewBase):
         self._controller.set_dst_folder(args.dst)
         self._controller.enable_moved_images_log(args.list_items)
         self._controller.clean_mode(args.clean)
-        self._model.on_move_finished += self._show_move_finished_report
         self._model.on_file_found += self._show_scanned_file
 
     def _show_scanned_file(self, scanned_file_name: str) -> None:
         print(f'found: {scanned_file_name}', end='\r')
 
-    def _show_move_finished_report(self, report: MoveReport) -> None:
+    def handle_move_finished(self, report: MoveReport) -> None:
         assert report.result == MoveResult.MOVED
         print(
             f'\r\033[K{report.file_way.src} -> {report.file_way.final_dst}',

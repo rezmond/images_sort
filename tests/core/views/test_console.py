@@ -90,22 +90,11 @@ def test_incorrect_param(view, controller_mock, model_mock):
 def test_show_report(view, model_mock):
     caught_io = io.StringIO()
 
-    catched_handlers = {}
-
-    def mock_of_handler(handler):
-        catched_handlers['test'] = handler
-
-    model_mock.on_move_finished.__iadd__ = Mock(
-        side_effect=mock_of_handler)
-
-    with patch('sys.argv', [None, '/src/folder', '/dst/folder', '-l']):
-        view.show()
-
     src = '/src/path/test.jpeg'
     final_dst = '/dst/path/test_6.jpeg'
 
     with contextlib.redirect_stdout(caught_io):
-        catched_handlers['test'](MoveReport(
+        view.handle_move_finished(MoveReport(
             file_way=FileWay(
                 src=src,
                 dst='/dst/path',

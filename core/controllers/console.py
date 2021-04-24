@@ -16,8 +16,8 @@ class ConsoleViewController(ControllerBase):
     @typechecked
     def enable_moved_images_log(self, enable: bool = True):
         if enable:
-            self._model.on_move_finished += self._handle_image_moved
+            self._model.on_move_finished += self._handle_move_finished
 
     @typechecked
-    def _handle_image_moved(self, move_pair: Tuple[str, str]) -> None:
-        self._view.handle_image_moved(move_pair)
+    def _handle_move_finished(self, move_pair: Tuple[str, str]) -> None:
+        self._view.handle_move_finished(move_pair)
