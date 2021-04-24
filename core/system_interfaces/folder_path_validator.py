@@ -14,17 +14,18 @@ class FolderPathValidator(FolderPathValidatorBase):
 
     @typechecked
     def validate(self, param_value: str, param_humanize: str) -> None:
+
         if not param_value:
             raise ValueError(
-                'The {0} folder\'s path did not set.'
-                ' Please set the {0} folder path and try again.'
+                'The "{0}" folder\'s path has not been set.'
+                ' Please set the "{0}" folder path and try again.'
                 .format(param_humanize))
 
         if not os.path.isabs(param_value):
             raise ValueError(
-                f'The {param_humanize} folder path should be absolute,'
+                f'The "{param_humanize}" folder path should be absolute,'
                 f' but got "{param_value}"')
 
         if not self._fs_manipulator.isfolder(param_value):
             raise ValueError(
-                f'The folder "{param_value}" not found')
+                f'The "{param_value}" folder was not found')

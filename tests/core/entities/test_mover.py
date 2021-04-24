@@ -93,7 +93,7 @@ def test_move_without_dst_param(container):
     with pytest.raises(ValueError) as exc_info:
         mover.move(FileWay(), '')
 
-    assert 'path did not set' in str(exc_info.value), \
+    assert 'path has not been set' in str(exc_info.value), \
         'Should catch not set the src or the dst folder path'
 
 
