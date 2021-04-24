@@ -34,8 +34,6 @@ class Mover(MoverBase):
         src: str,
     ) -> Tuple[bool, str]:
         """
-        TODO: refactor the method
-
         Check the destination folder for already existed files with the
         same names.
 
@@ -73,7 +71,6 @@ class Mover(MoverBase):
 
     @typechecked
     def _make_dir_if_not_exists(self, path: str) -> None:
-        """Если целевой папки не было создано"""
         if not os.path.exists(path):
             self._fs_manipulator.makedirs(path)
 
