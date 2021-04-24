@@ -35,6 +35,7 @@ class MoveResult(Enum):
 class FileWay:
     src: str = None
     dst: str = None  # TODO: rename because it is not full path
+    final_dst: str = None
     type: MoveType = None
 
 

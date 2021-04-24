@@ -19,6 +19,11 @@ class MoverModel:
         self._clean_mode = enable
 
     def move(self) -> None:
+        '''
+            TODO: separate to two phases:
+                1. Scan
+                2. (If confirmed) Move
+        '''
         for file_way in self._scanner.scan(self._src_folder):
             self._mover.move(file_way, self._dst_folder, self._clean_mode)
 

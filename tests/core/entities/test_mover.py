@@ -153,6 +153,7 @@ def test_move_by_absolute_path(container):
                 file_way=FileWay(
                     src=plan.src,
                     dst=plan.dst,
+                    final_dst=plan.final_dst,
                     type=MoveType.MEDIA,
                 )
             ))

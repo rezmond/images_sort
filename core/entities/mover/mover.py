@@ -85,20 +85,27 @@ class Mover(MoverBase):
 
         full_dst = os.path.join(dst_folder, file_way.dst)
         self._make_dir_if_not_exists(full_dst)
-        self._move_by_cmp(file_way.src, full_dst)
+        final_dst = self._move_by_cmp(file_way.src, full_dst)
 
         self._move_finish_event_listeners.update(
-            MoveReport(file_way=file_way, result=self._move_result))
+            MoveReport(
+                file_way=FileWay(
+                    src=file_way.src,
+                    dst=file_way.dst,
+                    final_dst=final_dst,
+                    type=file_way.type,
+                ), result=self._move_result))
 
     @typechecked
-    def _move_by_cmp(self, src: str, full_dst: str) -> None:
+    def _move_by_cmp(self, src: str, full_dst: str) -> str:
         to_move, result_path = self._cmp_files(full_dst, src)
 
         if to_move:
             self._physical_move(src, result_path)
-            return
+        else:
+            self._resolve_conflict(src)
 
-        self._resolve_conflict(src)
+        return result_path
 
     @typechecked
     def _physical_move(self, src: str, result_path: str) -> None:

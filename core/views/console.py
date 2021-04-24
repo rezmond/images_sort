@@ -3,7 +3,7 @@ from typing import Tuple
 from functools import wraps
 
 from .base import ViewBase
-from ..utils import MoveResult
+from core.types import MoveReport, MoveResult
 
 MAIN_PROGRAMM = 'sorter.py'
 
@@ -43,13 +43,17 @@ def after_scanning(func):
 class ConsoleView(ViewBase):
     def __init__(self, *args, **kwargs):
         ViewBase.__init__(self, *args, **kwargs)
+        '''
+            TODO: use this property when the two phases approach
+            will be implementing
+        '''
         self._has_scanned = False
 
     def _finish_show_scanning_status(self):
         self._has_scanned = True
 
     @after_scanning
-    def handle_image_moved(self, move_pair: Tuple[str, str]):
+    def handle_image_move_finished(self, move_pair: Tuple[str, str]):
         from_, to_ = move_pair
         print(f'{from_} -> {to_}')
 
@@ -60,17 +64,15 @@ class ConsoleView(ViewBase):
         self._controller.set_dst_folder(args.dst)
         self._controller.enable_moved_images_log(args.list_items)
         self._controller.clean_mode(args.clean)
-        self._model.on_move_finished += self._show_move_report
+        self._model.on_move_finished += self._show_move_finished_report
         self._model.on_file_found += self._show_scanned_file
 
     def _show_scanned_file(self, scanned_file_name: str) -> None:
         print(f'found: {scanned_file_name}', end='\r')
 
-    @after_scanning
-    def _show_move_report(self, move_result: MoveResult) -> None:
+    def _show_move_finished_report(self, report: MoveReport) -> None:
+        assert report.result == MoveResult.MOVED
         print(
-            f'Moved: {len(move_result.moved)}\n'
-            f'Already exists: {len(move_result.already_exists)}\n'
-            f'Has no a date data: {len(move_result.no_data)}\n'
-            f'Not media: {len(move_result.not_media)}\n'
+            f'\r\033[K{report.file_way.src} -> {report.file_way.final_dst}',
+            end=''
         )

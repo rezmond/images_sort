@@ -5,7 +5,7 @@ from unittest.mock import patch, call, Mock, MagicMock
 import pytest
 
 from core.controllers import ControllerBase
-from core.utils import MoveResult
+from core.types import MoveReport, FileWay, MoveType, MoveResult
 from core.model import MoverModel
 
 
@@ -91,7 +91,7 @@ def test_show_list_of_moved(view):
     file_ = io.StringIO()
     with contextlib.redirect_stdout(file_),\
             patch('sys.argv', [None, '/src/folder', '/dst/folder', '-l']):
-        view.handle_image_moved(('test-src', 'test-dst'))
+        view.handle_image_move_finished(('test-src', 'test-dst'))
     printed_list = file_.getvalue()
 
     assert 'test-src' in printed_list, \
@@ -101,17 +101,33 @@ def test_show_list_of_moved(view):
 
 
 def test_show_report(view, model_mock):
-    file_ = io.StringIO()
+    caught_io = io.StringIO()
+
+    catched_handlers = {}
 
     def mock_of_handler(handler):
-        handler(MoveResult([], [1], [2, 2], [3, 3, 3]))
+        catched_handlers['test'] = handler
 
     model_mock.on_move_finished.__iadd__ = Mock(
         side_effect=mock_of_handler)
-    with contextlib.redirect_stdout(file_),\
-            patch('sys.argv', [None, '/src/folder', '/dst/folder', '-l']):
-        view.show()
-    printed_list = file_.getvalue()
 
-    for i in range(4):
-        assert str(i) in printed_list, 'Incorrect move report'
+    with patch('sys.argv', [None, '/src/folder', '/dst/folder', '-l']):
+        view.show()
+
+    src = '/src/path/test.jpeg'
+    final_dst = '/dst/path/test_6.jpeg'
+
+    with contextlib.redirect_stdout(caught_io):
+        catched_handlers['test'](MoveReport(
+            file_way=FileWay(
+                src=src,
+                dst='/dst/path',
+                final_dst=final_dst,
+                type=MoveType.MEDIA
+            ),
+            result=MoveResult.MOVED,
+        ))
+
+    printed_list = caught_io.getvalue()
+
+    assert printed_list == f'\r\033[K{src} -> {final_dst}'
