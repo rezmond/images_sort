@@ -3,6 +3,7 @@ from unittest import mock
 import pytest
 
 from core.entities.fs import FsActions, FsManipulatorBase
+from core.types import Comparator
 
 
 @pytest.fixture
@@ -59,3 +60,16 @@ def test_dangerously_delete(comparator, manipulator):
 
     manipulator.delete.assert_called_once()
     manipulator.delete.assert_called_with('path')
+
+
+def test_compare(manipulator):
+    local_comparator = mock.Mock(spec=Comparator, return_value=True)
+    actions = FsActions(manipulator, local_comparator, True, True)
+    actions.compare('src', 'dst')
+
+    manipulator.move.assert_not_called()
+    manipulator.copy.assert_not_called()
+    manipulator.makedirs.assert_not_called()
+
+    local_comparator.assert_called_once()
+    local_comparator.assert_called_with('src', 'dst')
