@@ -3,14 +3,7 @@ from datetime import datetime
 
 import pytest
 
-from containers import Container
 from core.entities import MediaPresenterBase
-
-
-@pytest.fixture
-def container():
-    ioc = Container()
-    yield ioc
 
 
 def create_media_mock(*extensions):

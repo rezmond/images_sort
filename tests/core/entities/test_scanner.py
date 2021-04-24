@@ -3,7 +3,12 @@ from unittest.mock import call, Mock
 
 import pytest
 
-from core.entities import DateExtractorBase, FolderExtractorBase, MoveMapBase
+from core.entities import (
+    DateExtractorBase,
+    FolderExtractorBase,
+    MoveMapBase,
+    FolderPathValidatorBase,
+)
 from core.types import FileWay, MoveType
 from core.utils.base import Observable
 
@@ -33,7 +38,7 @@ def get_scanner(container, **kwargs):
         'observable': Mock(spec=Observable),
         'fs_manipulator': Mock(spec=FolderExtractorBase),
         'move_map': Mock(spec=MoveMapBase),
-        'validator': Mock(),
+        'validator': Mock(spec=FolderPathValidatorBase),
     }, **kwargs}
     with container.date_extractor.override(mocks['date_extractor']),\
             container.observable.override(mocks['observable']),\
@@ -56,7 +61,10 @@ def test_scan_no_path_error(container):
 
 
 def test_scan_path_validation_error(container):
-    validator_mock = Mock(side_effect=ValueError('test message'))
+    validator_mock = Mock(
+        spec=FolderPathValidatorBase,
+        **{'validate.side_effect': ValueError('test message')},
+    )
     scanner = get_scanner(container, validator=validator_mock)
 
     with pytest.raises(ValueError) as exc_info:

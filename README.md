@@ -24,4 +24,4 @@ Roadmap:
    - [ ] The moving process show
    - [ ] Propose to create destination folder if it is not existed
    - [ ] Update the script help
-   - [ ] Case for images withot exif data, but with file name like "20200429_*.jpg"
+   - [ ] Case for images without exif data, but with file name like "20200429_*.jpg"
