@@ -31,21 +31,23 @@ def get_fs_manipulator_mock():
     })
 
 
-def call_view(container, argv_args):
+@contextlib.contextmanager
+def with_view(container, argv_args):
     fs_manipulator_mock = get_fs_manipulator_mock()
     with patch('sys.argv', argv_args), \
             container.fs_manipulator.override(fs_manipulator_mock):
         view_class = container.view_class()
         controller = container.controller()
         model = container.model()
-        view = view_class(controller, model)
-        view.show()
+        yield view_class(controller, model)
 
 
 def test_scan_log(container):
     caught_io = io.StringIO()
-    with contextlib.redirect_stdout(caught_io):
-        call_view(container, [None, '-s', '/src/folder', '/dst/folder'])
+    argv_args = [None, '-s', '/src/folder', '/dst/folder']
+    with contextlib.redirect_stdout(caught_io), \
+            with_view(container, argv_args) as view:
+        view.show()
 
     assert caught_io.getvalue() == (
         f'[{"=" * 15}{"-" * 45}] 25% .../src/path/1.jpg\r'
