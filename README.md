@@ -27,7 +27,7 @@ Roadmap:
 
         Prompt:
 
-          > python3 start -s
+          > python3 start -s /src/folder/path /dst/folder/path
 
         The keys only for stabilisation time. <br/>
         -s, --scan      - start the scan process. <br/>
