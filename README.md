@@ -21,6 +21,7 @@ Run tests with the coverage:
 `
 
 Roadmap:
+
    - [ ] The moving process view:
 
 
@@ -32,6 +33,7 @@ Roadmap:
         -s, --scan      - start the scan process. <br/>
         -r, --report    - create report after move. -m parameter requires. <br/>
         -m, --move      - scans then moves. <br/>
+
  
         - [ ] 1. Scan progress:
 
