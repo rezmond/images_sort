@@ -32,22 +32,22 @@ def get_fs_manipulator_mock():
 
 
 @contextlib.contextmanager
-def with_view(container, argv_args):
+def with_controller(container, argv_args):
     fs_manipulator_mock = get_fs_manipulator_mock()
     with patch('sys.argv', argv_args), \
             container.fs_manipulator.override(fs_manipulator_mock):
-        view_class = container.view_class()
         controller = container.controller()
-        model = container.model()
-        yield view_class(controller, model)
+        yield controller
 
 
 def test_scan_log(container):
     caught_io = io.StringIO()
     argv_args = [None, '-s', '/src/folder', '/dst/folder']
-    with contextlib.redirect_stdout(caught_io), \
-            with_view(container, argv_args) as view:
-        view.show()
+    exif_data_getter_mock = Mock(return_value='2000-01-01T12:00:00')
+    with container.exif_data_getter.override(exif_data_getter_mock), \
+        contextlib.redirect_stdout(caught_io), \
+            with_controller(container, argv_args) as controller:
+        controller.show()
 
     assert caught_io.getvalue() == (
         f'[{"=" * 15}{"-" * 45}] 25% .../src/path/1.jpg\r'

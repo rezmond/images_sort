@@ -8,10 +8,9 @@ from .base import ControllerBase
 class ConsoleViewController(ControllerBase):
     def __init__(self, *args, **kwars):
         super(ConsoleViewController, self).__init__(*args, **kwars)
-        self._view.show()
 
-    def clean_mode(self, *args):
-        self._model.clean_mode(*args)
+    def show(self):
+        self._view.show()
 
     @typechecked
     def enable_moved_images_log(self, enable: bool = True):

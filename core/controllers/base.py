@@ -21,10 +21,13 @@ class ControllerBase(metaclass=ABCMeta):
         self._model = model
         self._view = view_class(self, self._model)
 
-    @abstractmethod
     @typechecked
     def clean_mode(self, enable: bool) -> None:
-        '''Enables the clean_mode of the model'''
+        self._model.clean_mode(enable)
+
+    @typechecked
+    def scan_mode(self, enable: bool) -> None:
+        self._model.scan_mode(enable)
 
     @abstractmethod
     @typechecked
@@ -37,5 +40,10 @@ class ControllerBase(metaclass=ABCMeta):
     def set_src_folder(self, *args):
         self._model.set_src_folder(*args)
 
-    def move(self):
-        self._model.move()
+    @abstractmethod
+    @typechecked
+    def show(self) -> None:
+        '''Init the app show'''
+
+    def scan(self):
+        self._model.scan()

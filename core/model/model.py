@@ -10,13 +10,22 @@ class MoverModel:
     def __init__(self, mover: MoverBase, scanner: ScannerBase):
         self._mover = mover
         self._scanner = scanner
+        self._file_ways = []
         self._src_folder = None
         self._dst_folder = None
         self._clean_mode = False
+        self._scan_mode = False
 
     @typechecked
     def clean_mode(self, enable: bool):
         self._clean_mode = enable
+
+    @typechecked
+    def scan_mode(self, enable: bool):
+        self._scan_mode = enable
+
+    def scan(self):
+        self._file_ways = list(self._scanner.scan(self._src_folder))
 
     def move(self) -> None:
         '''
@@ -24,7 +33,7 @@ class MoverModel:
                 1. Scan
                 2. (If confirmed) Move
         '''
-        for file_way in self._scanner.scan(self._src_folder):
+        for file_way in self._file_ways:
             self._mover.move(file_way, self._dst_folder, self._clean_mode)
 
     @property

@@ -52,8 +52,11 @@ class ConsoleView(ViewBase):
         self._controller.set_src_folder(args.src)
         self._controller.set_dst_folder(args.dst)
         self._controller.enable_moved_images_log(args.list_items)
+        self._controller.scan_mode(args.scan)
         self._controller.clean_mode(args.clean)
         self._model.on_file_found += self._show_scanned_file
+
+        self._controller.scan()
 
     def _show_scanned_file(self, scanned_file_name: str) -> None:
         print(f'found: {scanned_file_name}', end='\r')
