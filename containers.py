@@ -53,7 +53,6 @@ class Container(containers.DeclarativeContainer):
 
     scanner = providers.Factory(
         Scanner,
-        observable=observable,
         date_extractor=date_extractor,
         folder_extractor=fs_manipulator,
         folder_path_validator=folder_path_validator,

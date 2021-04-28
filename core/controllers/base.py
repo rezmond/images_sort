@@ -46,4 +46,4 @@ class ControllerBase(metaclass=ABCMeta):
         '''Init the app show'''
 
     def scan(self):
-        self._model.scan()
+        return self._model.scan()

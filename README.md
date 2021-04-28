@@ -38,8 +38,8 @@ Roadmap:
  
         - [ ] 1. Scan progress:
 
-              [====>                    ] %%
-              /current/file/path.ext
+              Scanning:
+              n /current/file/path.ext
 
         - [ ] 2. Show report:
 

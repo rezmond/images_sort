@@ -1,7 +1,9 @@
 import argparse
 
+from typeguard import typechecked
+
 from .base import ViewBase
-from core.types import MoveReport, MoveResult
+from core.types import MoveReport, MoveResult, FileWay
 
 MAIN_PROGRAMM = 'sorter.py'
 
@@ -54,12 +56,19 @@ class ConsoleView(ViewBase):
         self._controller.enable_moved_images_log(args.list_items)
         self._controller.scan_mode(args.scan)
         self._controller.clean_mode(args.clean)
-        self._model.on_file_found += self._show_scanned_file
 
-        self._controller.scan()
+        self._scan()
 
-    def _show_scanned_file(self, scanned_file_name: str) -> None:
-        print(f'found: {scanned_file_name}', end='\r')
+    @typechecked
+    def _scan(self) -> None:
+        print('Scanning:')
+        for scan_result in self._controller.scan():
+            self._show_scanned_file(*scan_result)
+        print()
+
+    @typechecked
+    def _show_scanned_file(self, file_path: str, total: int) -> None:
+        print(f'\r\033[K{total}: {file_path}', end='')
 
     def handle_move_finished(self, report: MoveReport) -> None:
         assert report.result == MoveResult.MOVED

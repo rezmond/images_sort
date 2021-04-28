@@ -107,19 +107,6 @@ def test_scan(container):
     assert scanned == expected_scanned
 
 
-def test_found_items(container):
-    fs_manipulator_mock = get_fs_manipulator_mock()
-    scanner = get_scanner(
-        container, fs_manipulator=fs_manipulator_mock, observable=Observable())
-    handler_mock = Mock()
-    scanner.on_file_found += handler_mock
-
-    list(scanner.scan(''))
-
-    expected_calls = list(map(call, base_pathes))
-    handler_mock.assert_has_calls(expected_calls)
-
-
 def test_filling_not_media(container):
     scanner = get_scanner(
         container,

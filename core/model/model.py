@@ -25,7 +25,9 @@ class MoverModel:
         self._scan_mode = enable
 
     def scan(self):
-        self._file_ways = list(self._scanner.scan(self._src_folder))
+        for file_way in self._scanner.scan(self._src_folder):
+            self._file_ways.append(file_way)
+            yield file_way.src, len(self._file_ways)
 
     def move(self) -> None:
         '''
@@ -35,16 +37,6 @@ class MoverModel:
         '''
         for file_way in self._file_ways:
             self._mover.move(file_way, self._dst_folder, self._clean_mode)
-
-    @property
-    def on_file_found(self):
-        return self._scanner.on_file_found
-
-    @on_file_found.setter
-    def on_file_found(self, value):
-        '''
-        It was created for the "+=" operator could work with that property
-        '''
 
     @property
     def on_move_finished(self):

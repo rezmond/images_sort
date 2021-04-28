@@ -55,12 +55,6 @@ def test_move_call(container):
     mover_mock.move.assert_has_calls([call(x, 'dst', False) for x in range(3)])
 
 
-def test_on_file_found_subscribe(subscription_context):
-    with subscription_context('on_file_found', 'scanner_mock') \
-            as (model, handler_mock):
-        model.on_file_found += handler_mock
-
-
 def test_on_move_finish_subscribe(subscription_context):
     with subscription_context('on_move_finished', 'mover_mock') \
             as (model, handler_mock):

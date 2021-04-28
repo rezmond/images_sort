@@ -2,6 +2,7 @@ import io
 import contextlib
 from datetime import date
 from unittest.mock import patch, Mock
+from itertools import starmap
 
 from core.entities import (
     FolderExtractorBase,
@@ -49,9 +50,8 @@ def test_scan_log(container):
             with_controller(container, argv_args) as controller:
         controller.show()
 
-    assert caught_io.getvalue() == (
-        f'[{"=" * 15}{"-" * 45}] 25% .../src/path/1.jpg\r'
-        f'[{"=" * 30}{"-" * 30}] 50% .../src/path/2.jpg\r'
-        f'[{"=" * 45}{"-" * 15}] 75% .../src/path/3.jpg\r'
-        f'[{"=" * 60}{"-" * 0 }] 100% .../src/path/4.jpg\r'
-    )
+    expect = 'Scanning:\n' + ''.join(
+        starmap('\r\033[K{}: {}'.format, enumerate(base_pathes, 1))
+    ) + '\n'
+
+    assert caught_io.getvalue() == expect
