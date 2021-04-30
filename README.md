@@ -36,7 +36,7 @@ Roadmap:
         -m, --move      - scans then moves. <br/>
 
  
-        - [ ] 1. Scan progress:
+        - [X] 1. Scan progress:
 
               Scanning:
               n /current/file/path.ext
@@ -51,7 +51,7 @@ Roadmap:
 
         - [ ] 3. (If `-m` was not provided)
 
-              Do You wish to move the x files [y,n,?]?: 
+              Do You want to move the x files [y,n,?]?: 
 
         - [ ] 4.
             
