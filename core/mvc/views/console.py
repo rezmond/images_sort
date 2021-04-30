@@ -2,8 +2,9 @@ import argparse
 
 from typeguard import typechecked
 
-from .base import ViewBase
 from core.types import MoveReport, MoveResult, FileWay
+from ..model import OutputBoundary
+from .base import ViewBase
 
 MAIN_PROGRAMM = 'sorter.py'
 
@@ -36,7 +37,7 @@ parser.add_argument(
     help='remove the duplicates and actually move the files')
 
 
-class ConsoleView(ViewBase):
+class ConsoleView(ViewBase, OutputBoundary):
     def __init__(self, *args, **kwargs):
         ViewBase.__init__(self, *args, **kwargs)
         '''
@@ -62,12 +63,11 @@ class ConsoleView(ViewBase):
     @typechecked
     def _scan(self) -> None:
         print('Scanning:')
-        for scan_result in self._controller.scan():
-            self._show_scanned_file(*scan_result)
+        self._controller.scan()
         print()
 
     @typechecked
-    def _show_scanned_file(self, file_path: str, total: int) -> None:
+    def scanned_file(self, file_path: str, total: int) -> None:
         print(f'\r\033[K{total}: {file_path}', end='')
 
     def handle_move_finished(self, report: MoveReport) -> None:

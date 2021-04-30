@@ -3,13 +3,21 @@ from typeguard import typechecked
 from core.entities.scanner import ScannerBase
 from core.entities.mover import MoverBase
 
+from .output_boundary import OutputBoundary
+
 
 class MoverModel:
 
     @typechecked
-    def __init__(self, mover: MoverBase, scanner: ScannerBase):
+    def __init__(
+        self,
+        mover: MoverBase,
+        scanner: ScannerBase,
+        output_boundary: OutputBoundary
+    ):
         self._mover = mover
         self._scanner = scanner
+        self._output_boundary = output_boundary
         self._file_ways = []
         self._src_folder = None
         self._dst_folder = None
@@ -27,7 +35,8 @@ class MoverModel:
     def scan(self):
         for file_way in self._scanner.scan(self._src_folder):
             self._file_ways.append(file_way)
-            yield file_way.src, len(self._file_ways)
+            self._output_boundary.scanned_file(
+                file_way.src, len(self._file_ways))
 
     def move(self) -> None:
         '''
