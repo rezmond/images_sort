@@ -2,8 +2,8 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from core.model import MoverModel
-from core.views import ConsoleView
+from core.mvc.model import MoverModel
+from core.mvc.views import ConsoleView
 
 
 @pytest.fixture

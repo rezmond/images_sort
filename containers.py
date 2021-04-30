@@ -3,14 +3,14 @@ import filecmp
 from dependency_injector import containers, providers
 
 from core.entities import Mover, Scanner
-from core.model import MoverModel
 from core.utils.base import Observable
 from core.entities.date_extractor import DateExtractor
 from core.use_cases.media_presenters import VideoPresenter, ImagePresenter
 from core.use_cases.move_map import MoveMap
 from core.system_interfaces import FsManipulator, FolderPathValidator
-from core.controllers import ConsoleViewController
-from core.views import ConsoleView
+from core.mvc.controllers import ConsoleViewController
+from core.mvc.model import MoverModel
+from core.mvc.views import ConsoleView
 from libs import get_exif_data
 
 

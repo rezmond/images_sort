@@ -4,9 +4,9 @@ from unittest.mock import patch, call, Mock, MagicMock
 
 import pytest
 
-from core.controllers import ControllerBase
+from core.mvc.controllers import ControllerBase
+from core.mvc.model import MoverModel
 from core.types import MoveReport, FileWay, MoveType, MoveResult
-from core.model import MoverModel
 
 
 @pytest.fixture
