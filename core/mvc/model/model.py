@@ -2,6 +2,7 @@ from typeguard import typechecked
 
 from core.entities.scanner import ScannerBase
 from core.entities.mover import MoverBase
+from core.types import ScanReport, MoveType
 
 from .output_boundary import OutputBoundary
 from .input_boundary import InputBoundary
@@ -38,6 +39,21 @@ class MoverModel(InputBoundary):
             self._file_ways.append(file_way)
             self._output_boundary.scanned_file(
                 file_way.src, len(self._file_ways))
+
+        self._output_boundary.scan_finished(self._get_scan_report())
+
+    def _get_scan_report(self):
+        report = ScanReport()
+        for file_way in self._file_ways:
+            if file_way.type == MoveType.MEDIA:
+                report.movable.append(file_way)
+            elif file_way.type == MoveType.NO_MEDIA:
+                report.no_media.append(file_way)
+            elif file_way.type == MoveType.NO_DATA:
+                report.no_data.append(file_way)
+            else:
+                raise Exception(f'Incorrect file way type "{file_way.type}"')
+        return report
 
     def move(self) -> None:
         '''

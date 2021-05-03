@@ -92,7 +92,7 @@ class Mover(MoverBase):
                 file_way=FileWay(
                     src=file_way.src,
                     dst=file_way.dst,
-                    final_dst=final_dst,
+                    full_dst=final_dst,
                     type=file_way.type,
                 ), result=self._move_result))
 

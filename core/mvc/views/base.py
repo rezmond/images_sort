@@ -1,24 +1,22 @@
-from abc import ABCMeta
+from abc import ABC
 
 from typeguard import typechecked
 
-from ..controllers.base import ControllerBase
+from ..controllers import InputInteractor
 from ..presenters import OutputInteractor
 
 
-class ViewBase(metaclass=ABCMeta):
-
-    view_class = None
+class ViewBase(ABC):
 
     @typechecked
     def __init__(self) -> None:
-        self._controller = None
-        self._presenter = None
+        self._input_interactor = None
+        self._output_interactor = None
 
     @typechecked
-    def set_controller(self, controller: ControllerBase):
-        self._controller = controller
+    def set_controller(self, input_interactor: InputInteractor):
+        self._input_interactor = input_interactor
 
     @typechecked
-    def set_presenter(self, presenter: OutputInteractor):
-        self._presenter = presenter
+    def set_presenter(self, output_interactor: OutputInteractor):
+        self._output_interactor = output_interactor

@@ -33,15 +33,24 @@ def get_fs_manipulator_mock():
 
 
 @contextlib.contextmanager
-def with_controller(container, argv_args):
+def with_presenter(container, argv_args):
     fs_manipulator_mock = get_fs_manipulator_mock()
     with patch('sys.argv', argv_args), \
             container.fs_manipulator.override(fs_manipulator_mock):
         controller = container.controller()
         view = container.view()
         view.set_controller(controller)
-        controller.set_input_interactor(view)
-        yield controller
+        presenter = container.presenter()
+        yield presenter
+
+
+def assert_lines_equal(actual, expected):
+    actual_lines = actual.splitlines()
+    expected_lines = expected.splitlines()
+
+    assert len(actual_lines) == len(expected_lines)
+    for actual_line, expected_line in zip(actual_lines, expected_lines):
+        assert actual_line == expected_line
 
 
 def test_scan_log(container):
@@ -50,11 +59,24 @@ def test_scan_log(container):
     exif_data_getter_mock = Mock(return_value='2000-01-01T12:00:00')
     with container.exif_data_getter.override(exif_data_getter_mock), \
         contextlib.redirect_stdout(caught_io), \
-            with_controller(container, argv_args) as controller:
-        controller.show()
+            with_presenter(container, argv_args) as presenter:
+        presenter.show()
 
-    expect = 'Scanning:\n' + ''.join(
+    scanning_expect = 'Scanning:\n' + ''.join(
         starmap('\r\033[K{}: {}'.format, enumerate(base_pathes, 1))
     ) + '\n'
 
-    assert caught_io.getvalue() == expect
+    assert_lines_equal(caught_io.getvalue()[
+                       :len(scanning_expect)], scanning_expect)
+
+    pad = ' ' * 65
+    report_expect_lines = (
+        f'Movable:      {pad}4\n'
+        f'Not a media:  {pad}0\n'
+        f'No data:      {pad}0\n'
+        f'{"=" * 80}\n'
+        f'Total found:  {pad}4\n'
+        '\n'
+    )
+    scan_report_actual = caught_io.getvalue()[len(scanning_expect):]
+    assert_lines_equal(scan_report_actual, report_expect_lines)

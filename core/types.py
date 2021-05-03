@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Callable, Iterable
 
@@ -21,7 +21,7 @@ class MoveResult(Enum):
 class FileWay:
     src: str = None
     dst: str = None  # TODO: rename because it is not full path
-    final_dst: str = None
+    full_dst: str = None
     type: MoveType = None
 
 
@@ -29,3 +29,10 @@ class FileWay:
 class MoveReport:
     result: MoveResult
     file_way: FileWay
+
+
+@dataclass(frozen=True)
+class ScanReport:
+    movable: Iterable[FileWay] = field(default_factory=list)
+    no_media: Iterable[FileWay] = field(default_factory=list)
+    no_data: Iterable[FileWay] = field(default_factory=list)

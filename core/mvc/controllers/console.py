@@ -7,9 +7,6 @@ from .base import ControllerBase
 
 class ConsoleViewController(ControllerBase):
 
-    def show(self):
-        self._input_interactor.show()
-
     @typechecked
     def enable_moved_images_log(self, enable: bool = True):
         if enable:

@@ -41,11 +41,11 @@ Roadmap:
               Scanning:
               n /current/file/path.ext
 
-        - [ ] 2. Show report:
+        - [X] 2. Show report:
 
-              Safe to move:       x
-              Already existed:    y
-              Not a media:        z
+              Movable:            x
+              Not a media:        y
+              No data:            z
               =====================
               Total found:x + y + z
 

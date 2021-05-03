@@ -70,7 +70,7 @@ class Container(containers.DeclarativeContainer):
         folder_path_validator=folder_path_validator,
     )
 
-    view = providers.Factory(
+    view = providers.Singleton(
         ConsoleView,
     )
 
@@ -86,7 +86,7 @@ class Container(containers.DeclarativeContainer):
         output_boundary=presenter,
     )
 
-    controller = providers.Factory(
+    controller = providers.Singleton(
         ConsoleViewController,
         input_boundary=model,
     )

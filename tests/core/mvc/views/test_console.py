@@ -98,7 +98,7 @@ def test_show_report(view, model_mock):
             file_way=FileWay(
                 src=src,
                 dst='/dst/path',
-                final_dst=final_dst,
+                full_dst=final_dst,
                 type=MoveType.MEDIA
             ),
             result=MoveResult.MOVED,
