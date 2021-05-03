@@ -11,6 +11,7 @@ from core.system_interfaces import FsManipulator, FolderPathValidator
 from core.mvc.controllers import ConsoleViewController
 from core.mvc.model import MoverModel
 from core.mvc.views import ConsoleView
+from core.mvc.presenters import ConsolePresenter
 from libs import get_exif_data
 
 
@@ -71,18 +72,21 @@ class Container(containers.DeclarativeContainer):
 
     view = providers.Factory(
         ConsoleView,
-        controller,
+    )
+
+    presenter = providers.Factory(
+        ConsolePresenter,
+        output_interactor=view,
     )
 
     model = providers.Singleton(
         MoverModel,
         mover=mover,
         scanner=scanner,
-        output_boundary=view,
+        output_boundary=presenter,
     )
 
     controller = providers.Factory(
         ConsoleViewController,
-        model=model,
-        view=view,
+        input_boundary=model,
     )

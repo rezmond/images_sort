@@ -3,7 +3,8 @@ import argparse
 from typeguard import typechecked
 
 from core.types import MoveReport, MoveResult, FileWay
-from ..model import OutputBoundary
+from ..presenters import OutputInteractor
+from ..controllers import InputInteractor
 from .base import ViewBase
 
 MAIN_PROGRAMM = 'sorter.py'
@@ -37,9 +38,9 @@ parser.add_argument(
     help='remove the duplicates and actually move the files')
 
 
-class ConsoleView(ViewBase, OutputBoundary):
+class ConsoleView(ViewBase, OutputInteractor, InputInteractor):
     def __init__(self, *args, **kwargs):
-        ViewBase.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         '''
             TODO: use this property when the two phases approach
             will be implementing
@@ -67,8 +68,8 @@ class ConsoleView(ViewBase, OutputBoundary):
         print()
 
     @typechecked
-    def scanned_file(self, file_path: str, total: int) -> None:
-        print(f'\r\033[K{total}: {file_path}', end='')
+    def scanned_file(self, path: str, total: int) -> None:
+        print(f'\r\033[K{total}: {path}', end='')
 
     def handle_move_finished(self, report: MoveReport) -> None:
         assert report.result == MoveResult.MOVED

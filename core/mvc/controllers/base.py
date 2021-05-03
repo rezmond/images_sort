@@ -1,33 +1,28 @@
-from __future__ import annotations
 from abc import ABCMeta, abstractmethod
-from typing import TYPE_CHECKING
 
 from typeguard import typechecked
 
-from ..model import MoverModel
-
-if TYPE_CHECKING:
-    from ..views import ViewBase  # pragma: no cover
+from ..model import InputBoundary
+from .input_interactor import InputInteractor
 
 
 class ControllerBase(metaclass=ABCMeta):
-    '''
-    The "ViewBase" is circular dependecy.
-    So it is tricky the type checking here
-    '''
 
-    def __init__(self, model: MoverModel, view_class: ViewBase):
-        from ..views import ViewBase
-        self._model = model
-        self._view = view_class(self, self._model)
+    def __init__(self, input_boundary=InputBoundary):
+        self._input_boundary = input_boundary
+        self._input_interactor = None
+
+    @typechecked
+    def set_input_interactor(self, input_interactor: InputInteractor) -> None:
+        self._input_interactor = input_interactor
 
     @typechecked
     def clean_mode(self, enable: bool) -> None:
-        self._model.clean_mode(enable)
+        self._input_boundary.clean_mode(enable)
 
     @typechecked
     def scan_mode(self, enable: bool) -> None:
-        self._model.scan_mode(enable)
+        self._input_boundary.scan_mode(enable)
 
     @abstractmethod
     @typechecked
@@ -35,15 +30,10 @@ class ControllerBase(metaclass=ABCMeta):
         '''Sabscribes to notifications from the model about moved media'''
 
     def set_dst_folder(self, *args):
-        self._model.set_dst_folder(*args)
+        self._input_boundary.set_dst_folder(*args)
 
     def set_src_folder(self, *args):
-        self._model.set_src_folder(*args)
-
-    @abstractmethod
-    @typechecked
-    def show(self) -> None:
-        '''Init the app show'''
+        self._input_boundary.set_src_folder(*args)
 
     def scan(self):
-        return self._model.scan()
+        return self._input_boundary.scan()

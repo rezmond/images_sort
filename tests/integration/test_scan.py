@@ -38,6 +38,9 @@ def with_controller(container, argv_args):
     with patch('sys.argv', argv_args), \
             container.fs_manipulator.override(fs_manipulator_mock):
         controller = container.controller()
+        view = container.view()
+        view.set_controller(controller)
+        controller.set_input_interactor(view)
         yield controller
 
 

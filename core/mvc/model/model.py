@@ -4,9 +4,10 @@ from core.entities.scanner import ScannerBase
 from core.entities.mover import MoverBase
 
 from .output_boundary import OutputBoundary
+from .input_boundary import InputBoundary
 
 
-class MoverModel:
+class MoverModel(InputBoundary):
 
     @typechecked
     def __init__(
