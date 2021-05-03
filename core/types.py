@@ -1,21 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from collections import namedtuple
-from typing import Dict, List, Callable
+from typing import Callable, Iterable
 
-ScanResult = namedtuple('ScanResult', (
-    'move_map',
-    'no_data',
-    'not_media',
-))
-
-FileDescriptor = namedtuple('FileDescriptor', (
-    'path',
-    'name',
-))
-
-BlocksType = List[FileDescriptor]
-YearType = Dict[str, BlocksType]
 
 Comparator = Callable[[str, str], bool]
 
