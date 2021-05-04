@@ -16,3 +16,8 @@ class OutputBoundary(ABC):
     @abstractmethod
     def scan_finished(self, scan_report: ScanReport) -> None:
         '''Show scan report'''
+
+    @typechecked
+    @abstractmethod
+    def finish(self) -> None:
+        '''Finish a stage'''

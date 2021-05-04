@@ -49,7 +49,7 @@ Roadmap:
               =====================
               Total found:x + y + z
 
-        - [ ] 3. (If `-m` was not provided)
+        - [ ] 3. (If `-m` was not provided. End, if the `-s` provided.)
 
               Do You want to move the x files [y,n,?]?: 
 

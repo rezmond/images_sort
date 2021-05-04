@@ -21,3 +21,7 @@ class ConsolePresenter(OutputBoundary):
     @typechecked
     def scan_finished(self, scan_report: ScanReport) -> None:
         self._output_interactor.show_scan_report(scan_report)
+
+    @typechecked
+    def finish(self) -> None:
+        self._output_interactor.close()

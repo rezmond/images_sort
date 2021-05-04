@@ -1,3 +1,4 @@
+import sys
 import argparse
 
 from typeguard import typechecked
@@ -33,6 +34,11 @@ parser.add_argument(
     action='store_true',
     help='start the scan process')
 parser.add_argument(
+    '-m', '--move',
+    default=False,
+    action='store_true',
+    help='start moving directly after scan process')
+parser.add_argument(
     '-c', '--clean',
     default=False,
     action='store_true',
@@ -58,6 +64,7 @@ class ConsoleView(ViewBase, OutputInteractor, InputInteractor):
         self._input_interactor.set_dst_folder(args.dst)
         self._input_interactor.enable_moved_images_log(args.list_items)
         self._input_interactor.scan_mode(args.scan)
+        self._input_interactor.move_mode(args.move)
         self._input_interactor.clean_mode(args.clean)
 
         self._scan()
@@ -93,3 +100,7 @@ class ConsoleView(ViewBase, OutputInteractor, InputInteractor):
             f'\r\033[K{report.file_way.src} -> {report.file_way.full_dst}',
             end=''
         )
+
+    @typechecked
+    def close(self):
+        sys.exit(0)

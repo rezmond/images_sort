@@ -23,16 +23,23 @@ class MoverModel(InputBoundary):
         self._file_ways = []
         self._src_folder = None
         self._dst_folder = None
-        self._clean_mode = False
-        self._scan_mode = False
+        self._modes = {
+            'clean': False,
+            'move': False,
+            'scan': False,
+        }
 
     @typechecked
     def clean_mode(self, enable: bool):
-        self._clean_mode = enable
+        self._modes['clean'] = enable
 
     @typechecked
     def scan_mode(self, enable: bool):
-        self._scan_mode = enable
+        self._modes['scan'] = enable
+
+    @typechecked
+    def move_mode(self, enable: bool):
+        self._modes['move'] = enable
 
     def scan(self):
         for file_way in self._scanner.scan(self._src_folder):
@@ -41,6 +48,9 @@ class MoverModel(InputBoundary):
                 file_way.src, len(self._file_ways))
 
         self._output_boundary.scan_finished(self._get_scan_report())
+
+        if self._modes['scan']:
+            self._output_boundary.finish()
 
     def _get_scan_report(self):
         report = ScanReport()
@@ -62,7 +72,7 @@ class MoverModel(InputBoundary):
                 2. (If confirmed) Move
         '''
         for file_way in self._file_ways:
-            self._mover.move(file_way, self._dst_folder, self._clean_mode)
+            self._mover.move(file_way, self._dst_folder, self._modes['clean'])
 
     @property
     def on_move_finished(self):

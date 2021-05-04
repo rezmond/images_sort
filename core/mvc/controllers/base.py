@@ -18,6 +18,10 @@ class ControllerBase(InputInteractor):
     def scan_mode(self, enable: bool) -> None:
         self._input_boundary.scan_mode(enable)
 
+    @typechecked
+    def move_mode(self, enable: bool) -> None:
+        self._input_boundary.move_mode(enable)
+
     def set_dst_folder(self, *args):
         self._input_boundary.set_dst_folder(*args)
 
