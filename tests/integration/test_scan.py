@@ -3,6 +3,8 @@ import contextlib
 from datetime import date
 from unittest.mock import patch, Mock
 
+from pytest import raises
+
 from core.entities import (
     FolderExtractorBase,
     FsManipulatorBase,
@@ -58,8 +60,12 @@ def test_scan_log(container):
     exif_data_getter_mock = Mock(return_value='2000-01-01T12:00:00')
     with container.exif_data_getter.override(exif_data_getter_mock), \
         contextlib.redirect_stdout(caught_io), \
-            with_presenter(container, argv_args) as presenter:
+            with_presenter(container, argv_args) as presenter,\
+            raises(SystemExit) as sys_exit_mock:
         presenter.show()
+
+    assert sys_exit_mock.type == SystemExit
+    assert sys_exit_mock.value.code == 0
 
     pad = ' ' * 65
     scanning_expect = (
