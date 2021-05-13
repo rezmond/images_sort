@@ -2,7 +2,6 @@ import io
 import contextlib
 from datetime import date
 from unittest.mock import patch, Mock
-from itertools import starmap
 
 from core.entities import (
     FolderExtractorBase,
@@ -62,21 +61,20 @@ def test_scan_log(container):
             with_presenter(container, argv_args) as presenter:
         presenter.show()
 
-    scanning_expect = 'Scanning:\n' + ''.join(
-        starmap('\r\033[K{}: {}'.format, enumerate(base_pathes, 1))
-    ) + '\n'
-
-    assert_lines_equal(caught_io.getvalue()[
-                       :len(scanning_expect)], scanning_expect)
-
     pad = ' ' * 65
-    report_expect_lines = (
+    scanning_expect = (
+        'Scanning:\n'
+        '\r\033[K1: /src/path/1.jpg'
+        '\r\033[K2: /src/path/2.jpg'
+        '\r\033[K3: /src/path/3.jpg'
+        '\r\033[K4: /src/path/4.jpg'
+        '\n'
         f'Movable:      {pad}4\n'
         f'Not a media:  {pad}0\n'
         f'No data:      {pad}0\n'
-        f'{"=" * 80}\n'
+        f'====={"=" * 70}=====\n'
         f'Total found:  {pad}4\n'
         '\n'
     )
-    scan_report_actual = caught_io.getvalue()[len(scanning_expect):]
-    assert_lines_equal(scan_report_actual, report_expect_lines)
+
+    assert_lines_equal(caught_io.getvalue(), scanning_expect)
