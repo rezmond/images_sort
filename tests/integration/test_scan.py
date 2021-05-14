@@ -62,10 +62,8 @@ def test_scan_log(container):
         contextlib.redirect_stdout(caught_io), \
             with_presenter(container, argv_args) as presenter,\
             raises(SystemExit) as sys_exit_mock:
-        presenter.show()
 
-    assert sys_exit_mock.type == SystemExit
-    assert sys_exit_mock.value.code == 0
+        presenter.show()
 
     pad = ' ' * 65
     scanning_expect = (
@@ -84,3 +82,6 @@ def test_scan_log(container):
     )
 
     assert_lines_equal(caught_io.getvalue(), scanning_expect)
+
+    assert sys_exit_mock.type == SystemExit
+    assert sys_exit_mock.value.code == 0
