@@ -49,9 +49,12 @@ Roadmap:
               =====================
               Total found:x + y + z
 
-        - [ ] 3. (If `-m` was not provided. End, if the `-s` provided.)
+        - [ ] 3. 
 
-              Do You want to move the x files [y,n,?]?: 
+            - [X] 3.1 End, if the `-s` provided.
+            - [ ] 3.2 If `-m` was not provided.
+
+                  Do You want to move the x files [y,n,?]?: 
 
         - [ ] 4.
             
