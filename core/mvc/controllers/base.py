@@ -1,14 +1,21 @@
+from abc import ABC
+
 from typeguard import typechecked
 
 from ..model import InputBoundary
 from .input_interactor import InputInteractor
 
 
-class ControllerBase(InputInteractor):
+class ControllerBase(ABC):
 
-    def __init__(self, input_boundary=InputBoundary):
+    @typechecked
+    def __init__(
+            self,
+            input_boundary: InputBoundary,
+            input_interactor: InputInteractor
+    ) -> None:
         self._input_boundary = input_boundary
-        self._input_interactor = None
+        self._input_interactor = input_interactor
 
     @typechecked
     def clean_mode(self, enable: bool) -> None:

@@ -89,4 +89,5 @@ class Container(containers.DeclarativeContainer):
     controller = providers.Singleton(
         ConsoleViewController,
         input_boundary=model,
+        input_interactor=view,
     )
