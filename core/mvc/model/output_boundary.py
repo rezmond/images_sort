@@ -21,3 +21,8 @@ class OutputBoundary(ABC):
     @abstractmethod
     def finish(self) -> None:
         '''Finish a stage'''
+
+    @typechecked
+    @abstractmethod
+    def confirm(self, message: str) -> bool:
+        '''Show message and return confirmation'''

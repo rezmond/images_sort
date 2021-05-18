@@ -1,6 +1,7 @@
 import sys
 import argparse
 
+import click
 from typeguard import typechecked
 
 from utils import report_line, report_devider
@@ -56,6 +57,10 @@ class ConsoleView(ViewBase, OutputInteractor, InputInteractor):
 
     def _finish_show_scanning_status(self):
         self._has_scanned = True
+
+    @typechecked
+    def confirm(self, message: str) -> bool:
+        return click.confirm(message)
 
     def show(self):
         args = parser.parse_args()

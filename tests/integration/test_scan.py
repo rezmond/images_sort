@@ -1,4 +1,5 @@
 import io
+import sys
 import contextlib
 from datetime import date
 from unittest.mock import patch, Mock
@@ -45,6 +46,14 @@ def with_presenter(container, argv_args):
         yield presenter
 
 
+@contextlib.contextmanager
+def redirect_stdin(new_stdin):
+    original_stdin = sys.stdin
+    sys.stdin = new_stdin
+    yield
+    sys.stdin = original_stdin
+
+
 def assert_lines_equal(actual, expected):
     actual_lines = actual.splitlines()
     expected_lines = expected.splitlines()
@@ -82,6 +91,26 @@ def test_scan_log(container):
     )
 
     assert_lines_equal(caught_io.getvalue(), scanning_expect)
+
+    assert sys_exit_mock.type == SystemExit
+    assert sys_exit_mock.value.code == 0
+
+
+def test_cancel_move_log(container):
+    caught_io = io.StringIO()
+    input_io = io.StringIO('n\n')
+    argv_args = [None, '/src/folder', '/dst/folder']
+    exif_data_getter_mock = Mock(return_value='2000-01-01T12:00:00')
+    with container.exif_data_getter.override(exif_data_getter_mock), \
+        contextlib.redirect_stdout(caught_io), \
+        redirect_stdin(input_io), \
+            with_presenter(container, argv_args) as presenter, \
+            raises(SystemExit) as sys_exit_mock:
+        presenter.show()
+
+    expected_message = 'Do You want to move the 4 files [y/N]: '
+    last_line = caught_io.getvalue().splitlines()[-1]
+    assert last_line == expected_message
 
     assert sys_exit_mock.type == SystemExit
     assert sys_exit_mock.value.code == 0

@@ -51,6 +51,8 @@ class MoverModel(InputBoundary):
 
         if self._modes['scan']:
             self._output_boundary.finish()
+        else:
+            self._move_if_confirmed()
 
     def _get_scan_report(self):
         report = ScanReport()
@@ -64,6 +66,15 @@ class MoverModel(InputBoundary):
             else:
                 raise Exception(f'Incorrect file way type "{file_way.type}"')
         return report
+
+    def _move_if_confirmed(self):
+        scan_report = self._get_scan_report()
+        movable_count = len(scan_report.movable)
+        is_confirmed = self._output_boundary.confirm(
+            f'Do You want to move the {movable_count} files')
+
+        if not is_confirmed:
+            self._output_boundary.finish()
 
     def move(self) -> None:
         '''
