@@ -78,4 +78,4 @@ Roadmap:
    - [ ] May be. Add flags to skip some of step in previous section
    - [ ] Update the script help
    - [ ] Case for images without exif data, but with file name like "20200429_*.jpg"
-   - [ ] Introduce the `mvc` folder
+   - [X] Introduce the `mvc` folder
