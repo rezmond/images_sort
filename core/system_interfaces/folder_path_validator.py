@@ -28,4 +28,4 @@ class FolderPathValidator(FolderPathValidatorBase):
 
         if not self._fs_manipulator.isfolder(param_value):
             raise ValueError(
-                f'The "{param_value}" folder was not found')
+                f'The "{param_value}" folder does not exist')
