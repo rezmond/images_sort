@@ -23,6 +23,7 @@ class Mover(MoverBase):
         self._fs_manipulator = fs_manipulator
         self._fs_actions = None
         self._move_result = None
+        self._dst_folder = None
         self._comparator = comparator
         self._move_finish_event_listeners = observable_factory()
         self._validate_folder_path = folder_path_validator.validate
@@ -77,13 +78,15 @@ class Mover(MoverBase):
     @typechecked
     def move(self,
              file_way: FileWay,
-             dst_folder: str,
              move_mode: bool = False) -> None:
-        self._validate_dst(dst_folder)
+        '''
+        TODO: move the move_mode initialisation to a method
+        '''
+
         self._fs_actions = FsActions(
             self._fs_manipulator, self._comparator, move_mode, move_mode)
 
-        full_dst = os.path.join(dst_folder, file_way.dst)
+        full_dst = os.path.join(self._dst_folder, file_way.dst)
         self._make_dir_if_not_exists(full_dst)
         final_dst = self._move_by_cmp(file_way.src, full_dst)
 
@@ -120,6 +123,11 @@ class Mover(MoverBase):
     @MoverBase.on_move_finished.getter
     def on_move_finished(self):
         return self._move_finish_event_listeners
+
+    @typechecked
+    def set_dst_folder(self, value: str) -> None:
+        self._validate_dst(value)
+        self._dst_folder = value
 
     def _validate_dst(self, dst: str) -> None:
         '''

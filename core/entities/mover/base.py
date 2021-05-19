@@ -8,7 +8,6 @@ class MoverBase(ABC):
     @abstractmethod
     def move(self,
              file_way: FileWay,
-             dst_folder: str,
              move_mode: bool) -> None:
         '''Moves files'''
 
@@ -22,3 +21,7 @@ class MoverBase(ABC):
         '''
         It was created for the "+=" operator could work with that property
         '''
+
+    @abstractmethod
+    def set_dst_folder(self, value: str) -> None:
+        '''Raise an exception if the target folder is incorrect'''

@@ -68,6 +68,10 @@ class MoverModel(InputBoundary):
         return report
 
     def _move_if_confirmed(self):
+        if self._modes['move']:
+            self.move()
+            return
+
         scan_report = self._get_scan_report()
         movable_count = len(scan_report.movable)
         is_confirmed = self._output_boundary.confirm(
@@ -77,13 +81,9 @@ class MoverModel(InputBoundary):
             self._output_boundary.finish()
 
     def move(self) -> None:
-        '''
-            TODO: separate to two phases:
-                1. Scan
-                2. (If confirmed) Move
-        '''
+        self._mover.set_dst_folder(self._dst_folder)
         for file_way in self._file_ways:
-            self._mover.move(file_way, self._dst_folder, self._modes['clean'])
+            self._mover.move(file_way, self._modes['clean'])
 
     @property
     def on_move_finished(self):
