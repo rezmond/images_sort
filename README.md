@@ -58,7 +58,7 @@ Roadmap:
 
         - [ ] 4.
             
-              The "/dist/folder/" folder does not exist.
+              The "/dst/folder/" folder does not exist.
               Create the folder [y/n/?]?:
         
         - [ ] 5. Move progress:
@@ -79,3 +79,4 @@ Roadmap:
    - [ ] Update the script help
    - [ ] Case for images without exif data, but with file name like "20200429_*.jpg"
    - [X] Introduce the `mvc` folder
+   - [ ] Is the target folder needed on scanning only mode?
