@@ -28,6 +28,23 @@ base_path_map = (
 base_pathes = [path for (path, _) in base_path_map]
 
 
+pad = ' ' * 65
+base_scan_output = (
+    'Scanning:\n'
+    '\r\033[K1: /src/path/1.jpg'
+    '\r\033[K2: /src/path/2.jpg'
+    '\r\033[K3: /src/path/3.jpg'
+    '\r\033[K4: /src/path/4.jpg'
+    '\n'
+    f'Movable:      {pad}4\n'
+    f'Not a media:  {pad}0\n'
+    f'No data:      {pad}0\n'
+    f'====={"=" * 70}=====\n'
+    f'Total found:  {pad}4\n'
+    '\n'
+)
+
+
 def get_fs_manipulator_mock():
     return Mock(spec=FsManipulatorCompilation, **{
         'folder_to_file_pathes.return_value': base_pathes,
@@ -74,23 +91,8 @@ def test_scan_log(container):
 
         presenter.show()
 
-    pad = ' ' * 65
-    scanning_expect = (
-        'Scanning:\n'
-        '\r\033[K1: /src/path/1.jpg'
-        '\r\033[K2: /src/path/2.jpg'
-        '\r\033[K3: /src/path/3.jpg'
-        '\r\033[K4: /src/path/4.jpg'
-        '\n'
-        f'Movable:      {pad}4\n'
-        f'Not a media:  {pad}0\n'
-        f'No data:      {pad}0\n'
-        f'====={"=" * 70}=====\n'
-        f'Total found:  {pad}4\n'
-        '\n'
-    )
-
-    assert_lines_equal(caught_io.getvalue(), scanning_expect)
+    expected_value = base_scan_output
+    assert_lines_equal(caught_io.getvalue(), expected_value)
 
     assert sys_exit_mock.type == SystemExit
     assert sys_exit_mock.value.code == 0
@@ -108,9 +110,9 @@ def test_cancel_move_log(container):
             raises(SystemExit) as sys_exit_mock:
         presenter.show()
 
-    expected_message = 'Do You want to move the 4 files [y/N]: '
-    last_line = caught_io.getvalue().splitlines()[-1]
-    assert last_line == expected_message
+    expected_value = base_scan_output + \
+        'Do You want to move the 4 files [y/N]: '
+    assert_lines_equal(caught_io.getvalue(), expected_value)
 
     assert sys_exit_mock.type == SystemExit
     assert sys_exit_mock.value.code == 0
