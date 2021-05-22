@@ -1,34 +1,12 @@
 import io
-import sys
 import contextlib
-from datetime import date
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
 
 from pytest import raises
-
-from core.entities import (
-    FolderExtractorBase,
-    FsManipulatorBase,
-)
-from core.system_interfaces import FolderCheckerBase
+from .utils import with_presenter, redirect_stdin, assert_lines_equal
 
 
-class FsManipulatorCompilation(
-        FolderCheckerBase, FsManipulatorBase, FolderExtractorBase):
-    pass
-
-
-base_path_map = (
-    ('/src/path/1.jpg', date.fromisoformat('2017-01-15')),
-    ('/src/path/2.jpg', date.fromisoformat('2017-03-14')),
-    ('/src/path/3.jpg', date.fromisoformat('2017-06-20')),
-    ('/src/path/4.jpg', date.fromisoformat('2017-12-30')),
-)
-
-base_pathes = [path for (path, _) in base_path_map]
-
-
-pad = ' ' * 65
+PAD = ' ' * 65
 base_scan_output = (
     'Scanning:\n'
     '\r\033[K1: /src/path/1.jpg'
@@ -36,48 +14,13 @@ base_scan_output = (
     '\r\033[K3: /src/path/3.jpg'
     '\r\033[K4: /src/path/4.jpg'
     '\n'
-    f'Movable:      {pad}4\n'
-    f'Not a media:  {pad}0\n'
-    f'No data:      {pad}0\n'
+    f'Movable:      {PAD}4\n'
+    f'Not a media:  {PAD}0\n'
+    f'No data:      {PAD}0\n'
     f'====={"=" * 70}=====\n'
-    f'Total found:  {pad}4\n'
+    f'Total found:  {PAD}4\n'
     '\n'
 )
-
-
-def get_fs_manipulator_mock():
-    return Mock(spec=FsManipulatorCompilation, **{
-        'folder_to_file_pathes.return_value': base_pathes,
-    })
-
-
-@contextlib.contextmanager
-def with_presenter(container, argv_args):
-    fs_manipulator_mock = get_fs_manipulator_mock()
-    with patch('sys.argv', argv_args), \
-            container.fs_manipulator.override(fs_manipulator_mock):
-        controller = container.controller()
-        view = container.view()
-        view.set_controller(controller)
-        presenter = container.presenter()
-        yield presenter
-
-
-@contextlib.contextmanager
-def redirect_stdin(new_stdin):
-    original_stdin = sys.stdin
-    sys.stdin = new_stdin
-    yield
-    sys.stdin = original_stdin
-
-
-def assert_lines_equal(actual, expected):
-    actual_lines = actual.splitlines()
-    expected_lines = expected.splitlines()
-
-    assert len(actual_lines) == len(expected_lines)
-    for actual_line, expected_line in zip(actual_lines, expected_lines):
-        assert actual_line == expected_line
 
 
 def test_scan_log(container):
@@ -116,22 +59,3 @@ def test_cancel_move_log(container):
 
     assert sys_exit_mock.type == SystemExit
     assert sys_exit_mock.value.code == 0
-
-
-def test_creates_target_folder(container):
-    caught_io = io.StringIO()
-    input_io = io.StringIO('n\n')
-    argv_args = [None, '-m', '/src/folder', '/dst/folder']
-    exif_data_getter_mock = Mock(return_value='2000-01-01T12:00:00')
-    with container.exif_data_getter.override(exif_data_getter_mock), \
-        contextlib.redirect_stdout(caught_io), \
-        redirect_stdin(input_io), \
-            with_presenter(container, argv_args) as presenter:
-        presenter.show()
-
-    expected_value = base_scan_output + \
-        ('The "/dst/folder" folder does not exist.\n'
-            'Do You want to create it [y/N]: '
-         )
-
-    assert_lines_equal(caught_io.getvalue(), expected_value)
