@@ -2,11 +2,10 @@ import os
 
 from typeguard import typechecked
 
-from core.entities import FolderPathValidatorBase
 from .folder_checker_base import FolderCheckerBase
 
 
-class FolderPathValidator(FolderPathValidatorBase):
+class FolderPathValidator:
 
     @typechecked
     def __init__(self, fs_manipulator: FolderCheckerBase) -> None:

@@ -8,7 +8,6 @@ from core.entities import (
     FolderExtractorBase,
     FsManipulatorBase,
 )
-from core.system_interfaces import FolderCheckerBase
 
 base_path_map = (
     ('/src/path/1.jpg', date.fromisoformat('2017-01-15')),
@@ -20,8 +19,7 @@ base_path_map = (
 base_pathes = [path for (path, _) in base_path_map]
 
 
-class FsManipulatorCompilation(
-        FolderCheckerBase, FsManipulatorBase, FolderExtractorBase):
+class FsManipulatorCompilation(FsManipulatorBase, FolderExtractorBase):
     pass
 
 

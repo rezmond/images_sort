@@ -5,10 +5,9 @@ from typeguard import typechecked
 from typing import Iterable
 
 from core.entities import FsManipulatorBase, FolderExtractorBase
-from .folder_checker_base import FolderCheckerBase
 
 
-class FsManipulator(FsManipulatorBase, FolderExtractorBase, FolderCheckerBase):
+class FsManipulator(FsManipulatorBase, FolderExtractorBase):
     @staticmethod
     def move(src: str, dst: str) -> None:
         shutil.move(src, dst)

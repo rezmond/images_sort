@@ -3,7 +3,7 @@ from typing import Tuple, Iterator
 from typeguard import typechecked
 
 from core.types import MoveType, FileWay
-from ..fs import FolderExtractorBase, FolderPathValidatorBase
+from ..fs import FolderExtractorBase, FolderPathValidator, FolderCheckerBase
 from .base import ScannerBase
 from .date_extractor_base import DateExtractorBase
 from .move_map_base import MoveMapBase
@@ -16,12 +16,12 @@ class Scanner(ScannerBase):
             self,
             date_extractor: DateExtractorBase,
             folder_extractor: FolderExtractorBase,
-            folder_path_validator: FolderPathValidatorBase,
+            fs_manipulator: FolderCheckerBase,
             move_map: MoveMapBase,
     ) -> None:
         self._date_extractor = date_extractor
         self._folder_extractor = folder_extractor
-        self._validate_folder_path = folder_path_validator.validate
+        self._folder_path_validator = FolderPathValidator(fs_manipulator)
         self._move_map = move_map
 
     @typechecked
@@ -56,4 +56,4 @@ class Scanner(ScannerBase):
             )
 
     def _validate_src(self, source_folder):
-        self._validate_folder_path(source_folder, 'source')
+        self._folder_path_validator.validate(source_folder, 'source')

@@ -1,7 +1,9 @@
-from abc import ABCMeta, abstractstaticmethod
+from abc import abstractstaticmethod
+
+from .folder_checker_base import FolderCheckerBase
 
 
-class FsManipulatorBase(metaclass=ABCMeta):
+class FsManipulatorBase(FolderCheckerBase):
 
     @abstractstaticmethod
     def move(src: str, dst: str) -> None:

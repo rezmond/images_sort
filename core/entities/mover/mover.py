@@ -6,7 +6,7 @@ from typeguard import typechecked
 
 from core.utils.base import Observable
 from core.types import Comparator, FileWay, MoveReport, MoveResult
-from ..fs import FsManipulatorBase, FsActions, FolderPathValidatorBase
+from ..fs import FsManipulatorBase, FsActions, FolderPathValidator
 from .base import MoverBase
 
 
@@ -18,7 +18,6 @@ class Mover(MoverBase):
             observable_factory: Callable[[], Observable],
             fs_manipulator: FsManipulatorBase,
             comparator: Comparator,
-            folder_path_validator: FolderPathValidatorBase
     ) -> None:
         self._fs_manipulator = fs_manipulator
         self._fs_actions = None
@@ -26,7 +25,7 @@ class Mover(MoverBase):
         self._dst_folder = None
         self._comparator = comparator
         self._move_finish_event_listeners = observable_factory()
-        self._validate_folder_path = folder_path_validator.validate
+        self._folder_path_validator = FolderPathValidator(self._fs_manipulator)
 
     @typechecked
     def _cmp_files(
@@ -133,4 +132,4 @@ class Mover(MoverBase):
         '''
         Without typechecked because it will check arguments manually
         '''
-        self._validate_folder_path(dst, 'destination')
+        self._folder_path_validator.validate(dst, 'destination')

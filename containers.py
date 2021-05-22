@@ -7,7 +7,7 @@ from core.utils.base import Observable
 from core.entities.date_extractor import DateExtractor
 from core.use_cases.media_presenters import VideoPresenter, ImagePresenter
 from core.use_cases.move_map import MoveMap
-from core.system_interfaces import FsManipulator, FolderPathValidator
+from core.system_interfaces import FsManipulator
 from core.mvc.controllers import ConsoleViewController
 from core.mvc.model import MoverModel
 from core.mvc.views import ConsoleView
@@ -24,11 +24,6 @@ class Container(containers.DeclarativeContainer):
     )
 
     fs_manipulator = providers.Factory(FsManipulator)
-
-    folder_path_validator = providers.Factory(
-        FolderPathValidator,
-        fs_manipulator=fs_manipulator,
-    )
 
     exif_data_getter = providers.Object(get_exif_data)
 
@@ -56,7 +51,7 @@ class Container(containers.DeclarativeContainer):
         Scanner,
         date_extractor=date_extractor,
         folder_extractor=fs_manipulator,
-        folder_path_validator=folder_path_validator,
+        fs_manipulator=fs_manipulator,
         move_map=move_map,
     )
 
@@ -67,7 +62,6 @@ class Container(containers.DeclarativeContainer):
         observable_factory=observable.provider,
         fs_manipulator=fs_manipulator,
         comparator=comparator,
-        folder_path_validator=folder_path_validator,
     )
 
     view = providers.Singleton(
