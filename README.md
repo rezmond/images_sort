@@ -56,10 +56,10 @@ Roadmap:
 
                   Do You want to move the x files [y,N]: 
 
-        - [ ] 4.
+        - [X] 4.
             
               The "/dst/folder/" folder does not exist.
-              Create the folder [y/n/?]?:
+              Do You want to create it [y/N]:
         
         - [ ] 5. Move progress:
 
