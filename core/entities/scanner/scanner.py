@@ -4,6 +4,7 @@ from typeguard import typechecked
 
 from core.types import MoveType, FileWay
 from ..fs import FolderExtractorBase, FolderPathValidator, FolderCheckerBase
+from ..exceptions import FolderNotFoundError
 from .base import ScannerBase
 from .date_extractor_base import DateExtractorBase
 from .move_map_base import MoveMapBase
@@ -55,5 +56,8 @@ class Scanner(ScannerBase):
                 dst=self._move_map.get_dst_path(date),
             )
 
-    def _validate_src(self, source_folder):
-        self._folder_path_validator.validate(source_folder, 'source')
+    def _validate_src(self, path):
+        either_existed = self._folder_path_validator.validate('source', path)
+
+        if either_existed.is_left():
+            raise FolderNotFoundError('source', path)

@@ -2,6 +2,11 @@ import os
 
 from typeguard import typechecked
 
+from libs import Right, Left, Either
+from ..exceptions import (
+    NoArgumentPassedError,
+    RelativeFolderPathError,
+)
 from .folder_checker_base import FolderCheckerBase
 
 
@@ -12,19 +17,15 @@ class FolderPathValidator:
         self._fs_manipulator = fs_manipulator
 
     @typechecked
-    def validate(self, param_value: str, param_humanize: str) -> None:
+    def validate(self, name: str, path: str) -> Either:
 
-        if not param_value:
-            raise ValueError(
-                'The "{0}" folder\'s path has not been set.'
-                ' Please set the "{0}" folder path and try again.'
-                .format(param_humanize))
+        if not path:
+            raise NoArgumentPassedError(name)
 
-        if not os.path.isabs(param_value):
-            raise ValueError(
-                f'The "{param_humanize}" folder path should be absolute,'
-                f' but got "{param_value}"')
+        if not os.path.isabs(path):
+            raise RelativeFolderPathError(name, path)
 
-        if not self._fs_manipulator.isfolder(param_value):
-            raise ValueError(
-                f'The "{param_value}" folder does not exist')
+        if not self._fs_manipulator.isfolder(path):
+            return Left(path)
+
+        return Right(path)

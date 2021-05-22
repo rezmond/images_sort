@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 from core.types import FileWay
 
+from libs import Either
+
 
 class MoverBase(ABC):
 
@@ -23,5 +25,11 @@ class MoverBase(ABC):
         '''
 
     @abstractmethod
-    def set_dst_folder(self, value: str) -> None:
-        '''Raise an exception if the target folder is incorrect'''
+    def set_dst_folder(self, value: str) -> Either:
+        '''
+        Raise an exception if the target folder is incorrect
+        '''
+
+    @abstractmethod
+    def create_and_set_dst_folder(self, value: str) -> None:
+        ''''''

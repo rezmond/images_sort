@@ -51,9 +51,17 @@ def with_presenter(container, argv_args, **mocks):
 
 
 def assert_lines_equal(actual, expected):
-    actual_lines = actual.splitlines()
+    if isinstance(actual, list):
+        actual_lines = actual
+    else:
+        actual_lines = actual.splitlines()
+
     expected_lines = expected.splitlines()
 
     assert len(actual_lines) == len(expected_lines)
     for actual_line, expected_line in zip(actual_lines, expected_lines):
-        assert actual_line == expected_line
+        assert actual_line == expected_line, (
+            'the strings are not equal.\n'
+            f'First:\t{actual_line}\n'
+            f'Second:\t{expected_line}'
+        )

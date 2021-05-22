@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typeguard import typechecked
 
 from core.types import ScanReport
+from libs import Either
 
 
 class OutputBoundary(ABC):
@@ -26,3 +27,10 @@ class OutputBoundary(ABC):
     @abstractmethod
     def confirm(self, message: str) -> bool:
         '''Show message and return confirmation'''
+
+    @typechecked
+    @abstractmethod
+    def request_create_dst_folder(self, dst: str) -> Either:
+        '''
+        Resolve the case when user-provided destination path is not a folder
+        '''

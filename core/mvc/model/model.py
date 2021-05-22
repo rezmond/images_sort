@@ -4,6 +4,7 @@ from core.entities.scanner import ScannerBase
 from core.entities.mover import MoverBase
 from core.types import ScanReport, MoveType
 
+from libs import Either, Right
 from .output_boundary import OutputBoundary
 from .input_boundary import InputBoundary
 
@@ -85,9 +86,23 @@ class MoverModel(InputBoundary):
 
     @typechecked
     def move(self) -> None:
-        self._mover.set_dst_folder(self._dst_folder)
+        self._mover\
+            .set_dst_folder(self._dst_folder)\
+            .either(
+                self._resolve_dst_does_not_exist,
+                lambda _: Right(None),
+            ).map(lambda _: self._move())
+
+    @typechecked
+    def _move(self) -> None:
         for file_way in self._file_ways:
             self._mover.move(file_way, self._modes['clean'])
+
+    @typechecked
+    def _resolve_dst_does_not_exist(self, dst: str) -> Either:
+        return self._output_boundary\
+            .request_create_dst_folder(dst)\
+            .map(self._mover.create_and_set_dst_folder)
 
     @property
     def on_move_finished(self):

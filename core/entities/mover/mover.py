@@ -6,6 +6,7 @@ from typeguard import typechecked
 
 from core.utils.base import Observable
 from core.types import Comparator, FileWay, MoveReport, MoveResult
+from libs import Either
 from ..fs import FsManipulatorBase, FsActions, FolderPathValidator
 from .base import MoverBase
 
@@ -124,12 +125,20 @@ class Mover(MoverBase):
         return self._move_finish_event_listeners
 
     @typechecked
-    def set_dst_folder(self, value: str) -> None:
-        self._validate_dst(value)
-        self._dst_folder = value
+    def set_dst_folder(self, dst: str) -> Either:
+        return self._validate_dst(dst)\
+            .map(self._set_dst_folder)
 
-    def _validate_dst(self, dst: str) -> None:
+    @typechecked
+    def create_and_set_dst_folder(self, dst: str) -> None:
+        self._fs_manipulator.create_folder(dst)
+        self._dst_folder = dst
+
+    def _set_dst_folder(self, dst: str):
+        self._dst_folder = dst
+
+    def _validate_dst(self, dst: str) -> Either:
         '''
         Without typechecked because it will check arguments manually
         '''
-        self._folder_path_validator.validate(dst, 'destination')
+        return self._folder_path_validator.validate('destination', dst)

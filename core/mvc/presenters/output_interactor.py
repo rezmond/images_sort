@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typeguard import typechecked
 
 from core.types import ScanReport
+from libs import Either
 
 
 class OutputInteractor(ABC):
@@ -20,4 +21,9 @@ class OutputInteractor(ABC):
     @typechecked
     @abstractmethod
     def show_scan_report(self, scan_report: ScanReport) -> None:
-        '''Show scan report'''
+        ''''''
+
+    @typechecked
+    @abstractmethod
+    def request_create_dst_folder(self, dst: str) -> Either:
+        ''''''

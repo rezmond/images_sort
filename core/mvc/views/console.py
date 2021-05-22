@@ -6,6 +6,7 @@ from typeguard import typechecked
 
 from utils import report_line, report_devider
 from core.types import MoveReport, MoveResult, FileWay, ScanReport
+from libs import Either, Left, Right
 from ..presenters import OutputInteractor
 from ..controllers import InputInteractor
 from .base import ViewBase
@@ -109,3 +110,12 @@ class ConsoleView(ViewBase, OutputInteractor, InputInteractor):
     @typechecked
     def close(self):
         sys.exit(0)
+
+    @typechecked
+    def request_create_dst_folder(self, dst: str) -> Either:
+        print(f'The "{dst}" folder does not exist.')
+
+        if click.confirm('Do You want to create it'):
+            return Right(dst)
+
+        return Left(dst)

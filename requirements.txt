@@ -6,3 +6,4 @@ python-dateutil==2.8.1
 dependency-injector==4.31.0
 pyyaml==5.4.1
 click==8.0.0
+PyMonad==2.4.0
