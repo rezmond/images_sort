@@ -40,8 +40,9 @@ def get_fs_manipulator_mock():
 
 
 @contextlib.contextmanager
-def with_presenter(container, argv_args):
-    fs_manipulator_mock = get_fs_manipulator_mock()
+def with_presenter(container, argv_args, **mocks):
+    fs_manipulator_mock = mocks.get(
+        'fs_manipulator', get_fs_manipulator_mock())
     with patch('sys.argv', argv_args), \
             container.fs_manipulator.override(fs_manipulator_mock):
         controller = container.controller()
