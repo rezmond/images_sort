@@ -41,7 +41,8 @@ class MoverModel(InputBoundary):
     def move_mode(self, enable: bool):
         self._modes['move'] = enable
 
-    def scan(self):
+    @typechecked
+    def scan(self) -> None:
         for file_way in self._scanner.scan(self._src_folder):
             self._file_ways.append(file_way)
             self._output_boundary.scanned_file(
@@ -54,7 +55,8 @@ class MoverModel(InputBoundary):
         else:
             self._move_if_confirmed()
 
-    def _get_scan_report(self):
+    @typechecked
+    def _get_scan_report(self) -> ScanReport:
         report = ScanReport()
         for file_way in self._file_ways:
             if file_way.type == MoveType.MEDIA:
@@ -67,7 +69,8 @@ class MoverModel(InputBoundary):
                 raise Exception(f'Incorrect file way type "{file_way.type}"')
         return report
 
-    def _move_if_confirmed(self):
+    @typechecked
+    def _move_if_confirmed(self) -> None:
         if self._modes['move']:
             self.move()
             return
@@ -80,6 +83,7 @@ class MoverModel(InputBoundary):
         if not is_confirmed:
             self._output_boundary.finish()
 
+    @typechecked
     def move(self) -> None:
         self._mover.set_dst_folder(self._dst_folder)
         for file_way in self._file_ways:
