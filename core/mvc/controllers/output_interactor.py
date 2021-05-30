@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
+from typing import ContextManager, Iterable
 
 from typeguard import typechecked
 
-from core.types import ScanReport
+from core.types import ScanReport, MoveReport
 from libs import Either
 
 
@@ -26,4 +27,16 @@ class OutputInteractor(ABC):
     @typechecked
     @abstractmethod
     def request_create_dst_folder(self, dst: str) -> Either:
+        ''''''
+
+    @typechecked
+    @abstractmethod
+    def file_moved_report_to_str(self, report: MoveReport) -> str:
+        ''''''
+
+    @typechecked
+    @abstractmethod
+    def move_context(
+        self, moved_reports: Iterable[MoveReport]
+    ) -> ContextManager[Iterable[MoveReport]]:
         ''''''

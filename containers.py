@@ -11,7 +11,6 @@ from core.system_interfaces import FsManipulator
 from core.mvc.controllers import ConsoleViewController
 from core.mvc.model import MoverModel
 from core.mvc.views import ConsoleView
-from core.mvc.presenters import ConsolePresenter
 from libs import get_exif_data
 
 
@@ -59,29 +58,22 @@ class Container(containers.DeclarativeContainer):
 
     mover = providers.Factory(
         Mover,
-        observable_factory=observable.provider,
         fs_manipulator=fs_manipulator,
         comparator=comparator,
-    )
-
-    view = providers.Singleton(
-        ConsoleView,
-    )
-
-    presenter = providers.Factory(
-        ConsolePresenter,
-        output_interactor=view,
     )
 
     model = providers.Singleton(
         MoverModel,
         mover=mover,
         scanner=scanner,
-        output_boundary=presenter,
     )
 
     controller = providers.Singleton(
         ConsoleViewController,
         input_boundary=model,
-        input_interactor=view,
+    )
+
+    view = providers.Singleton(
+        ConsoleView,
+        controller=controller,
     )

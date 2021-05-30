@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 
+from typing import Iterable
 from typeguard import typechecked
 
-from core.types import ScanReport
+from core.types import ScanReport, MoveReport
 from libs import Either
 
 
@@ -34,3 +35,8 @@ class OutputBoundary(ABC):
         '''
         Resolve the case when user-provided destination path is not a folder
         '''
+
+    @typechecked
+    @abstractmethod
+    def on_move_started(self, moved_reports: Iterable[MoveReport]) -> None:
+        ''''''

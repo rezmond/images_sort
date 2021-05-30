@@ -3,7 +3,7 @@ import contextlib
 from unittest.mock import Mock
 
 from pytest import raises
-from .utils import with_presenter, redirect_stdin, assert_lines_equal
+from .utils import with_controller, redirect_stdin, assert_lines_equal
 
 
 PAD = ' ' * 65
@@ -29,10 +29,10 @@ def test_scan_log(container):
     exif_data_getter_mock = Mock(return_value='2000-01-01T12:00:00')
     with container.exif_data_getter.override(exif_data_getter_mock), \
         contextlib.redirect_stdout(caught_io), \
-            with_presenter(container, argv_args) as presenter,\
+            with_controller(container, argv_args) as controller,\
             raises(SystemExit) as sys_exit_mock:
 
-        presenter.show()
+        controller.show()
 
     expected_value = base_scan_output
     assert_lines_equal(caught_io.getvalue(), expected_value)
@@ -49,9 +49,9 @@ def test_cancel_move_log(container):
     with container.exif_data_getter.override(exif_data_getter_mock), \
         contextlib.redirect_stdout(caught_io), \
         redirect_stdin(input_io), \
-            with_presenter(container, argv_args) as presenter, \
+            with_controller(container, argv_args) as controller, \
             raises(SystemExit) as sys_exit_mock:
-        presenter.show()
+        controller.show()
 
     expected_value = base_scan_output + \
         'Do You want to move the 4 files [y/N]: '

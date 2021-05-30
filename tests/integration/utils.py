@@ -3,7 +3,6 @@ import sys
 from datetime import date
 from unittest.mock import patch, Mock
 
-
 from core.entities import (
     FolderExtractorBase,
     FsManipulatorBase,
@@ -34,29 +33,42 @@ def redirect_stdin(new_stdin):
 def get_fs_manipulator_mock():
     return Mock(spec=FsManipulatorCompilation, **{
         'folder_to_file_pathes.return_value': base_pathes,
+        'isfolder.return_value': True,
     })
 
 
+def get_comparator_mock():
+    return Mock(sreturn_value=False)
+
+
 @contextlib.contextmanager
-def with_presenter(container, argv_args, **mocks):
+def with_controller(container, argv_args, **mocks):
     fs_manipulator_mock = mocks.get(
         'fs_manipulator', get_fs_manipulator_mock())
+    comparator_mock = mocks.get(
+        'comparator', get_comparator_mock())
     with patch('sys.argv', argv_args), \
-            container.fs_manipulator.override(fs_manipulator_mock):
-        controller = container.controller()
+            container.fs_manipulator.override(fs_manipulator_mock),\
+            container.comparator.override(comparator_mock):
         view = container.view()
-        view.set_controller(controller)
-        presenter = container.presenter()
-        yield presenter
+
+        controller = container.controller()
+        controller.set_io_interactor(view)
+
+        model = container.model()
+        model.set_output_boundary(controller)
+
+        controller = container.controller()
+        yield controller
 
 
 def assert_lines_equal(actual, expected):
     if isinstance(actual, list):
         actual_lines = actual
     else:
-        actual_lines = actual.splitlines()
+        actual_lines = actual.split('\n')
 
-    expected_lines = expected.splitlines()
+    expected_lines = expected.split('\n')
 
     assert len(actual_lines) == len(expected_lines)
     for actual_line, expected_line in zip(actual_lines, expected_lines):

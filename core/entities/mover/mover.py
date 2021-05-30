@@ -1,10 +1,9 @@
 import os
 from functools import partial
-from typing import Callable, Tuple
+from typing import Tuple
 
 from typeguard import typechecked
 
-from core.utils.base import Observable
 from core.types import Comparator, FileWay, MoveReport, MoveResult
 from libs import Either
 from ..fs import FsManipulatorBase, FsActions, FolderPathValidator
@@ -16,7 +15,6 @@ class Mover(MoverBase):
     @typechecked
     def __init__(
             self,
-            observable_factory: Callable[[], Observable],
             fs_manipulator: FsManipulatorBase,
             comparator: Comparator,
     ) -> None:
@@ -25,7 +23,6 @@ class Mover(MoverBase):
         self._move_result = None
         self._dst_folder = None
         self._comparator = comparator
-        self._move_finish_event_listeners = observable_factory()
         self._folder_path_validator = FolderPathValidator(self._fs_manipulator)
 
     @typechecked
@@ -78,7 +75,7 @@ class Mover(MoverBase):
     @typechecked
     def move(self,
              file_way: FileWay,
-             move_mode: bool = False) -> None:
+             move_mode: bool = False) -> MoveReport:
         '''
         TODO: move the move_mode initialisation to a method
         '''
@@ -90,14 +87,13 @@ class Mover(MoverBase):
         self._make_dir_if_not_exists(full_dst)
         final_dst = self._move_by_cmp(file_way.src, full_dst)
 
-        self._move_finish_event_listeners.update(
-            MoveReport(
-                file_way=FileWay(
-                    src=file_way.src,
-                    dst=file_way.dst,
-                    full_dst=final_dst,
-                    type=file_way.type,
-                ), result=self._move_result))
+        return MoveReport(
+            file_way=FileWay(
+                src=file_way.src,
+                dst=file_way.dst,
+                full_dst=final_dst,
+                type=file_way.type,
+            ), result=self._move_result)
 
     @typechecked
     def _move_by_cmp(self, src: str, full_dst: str) -> str:
@@ -119,10 +115,6 @@ class Mover(MoverBase):
     def _resolve_conflict(self, src: str) -> None:
         self._fs_actions.delete(src)
         self._move_result = MoveResult.ALREADY_EXISTED
-
-    @MoverBase.on_move_finished.getter
-    def on_move_finished(self):
-        return self._move_finish_event_listeners
 
     @typechecked
     def set_dst_folder(self, dst: str) -> Either:

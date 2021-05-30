@@ -1,21 +1,25 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from typeguard import typechecked
 
-from ..model import InputBoundary
-from .input_interactor import InputInteractor
+from core.types import ScanReport, MoveReport
+from ..model import InputBoundary, OutputBoundary
+from .io_interactor import IoInteractor
 
 
-class ControllerBase(ABC):
+class ControllerBase(OutputBoundary, ABC):
 
     @typechecked
     def __init__(
             self,
             input_boundary: InputBoundary,
-            input_interactor: InputInteractor
     ) -> None:
         self._input_boundary = input_boundary
-        self._input_interactor = input_interactor
+        self._io_interactor = None
+
+    @typechecked
+    def set_io_interactor(self, io_interactor: IoInteractor) -> None:
+        self._io_interactor = io_interactor
 
     @typechecked
     def clean_mode(self, enable: bool) -> None:
@@ -37,3 +41,20 @@ class ControllerBase(ABC):
 
     def scan(self):
         return self._input_boundary.scan()
+
+    @typechecked
+    def scanned_file(self, path: str, total: int) -> None:
+        self._io_interactor.scanned_file(path, total)
+
+    @typechecked
+    def scan_finished(self, scan_report: ScanReport) -> None:
+        self._io_interactor.show_scan_report(scan_report)
+
+    @typechecked
+    def finish(self) -> None:
+        self._io_interactor.close()
+
+    @typechecked
+    @abstractmethod
+    def show(self) -> None:
+        '''Shows user interface'''

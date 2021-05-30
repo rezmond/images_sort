@@ -2,8 +2,7 @@ from typeguard import typechecked
 
 from core.entities.scanner import ScannerBase
 from core.entities.mover import MoverBase
-from core.types import ScanReport, MoveType
-
+from core.types import ScanReport, MoveType, MoveReport
 from libs import Either, Right
 from .output_boundary import OutputBoundary
 from .input_boundary import InputBoundary
@@ -16,11 +15,10 @@ class MoverModel(InputBoundary):
         self,
         mover: MoverBase,
         scanner: ScannerBase,
-        output_boundary: OutputBoundary
     ):
         self._mover = mover
         self._scanner = scanner
-        self._output_boundary = output_boundary
+        self._output_boundary = None
         self._file_ways = []
         self._src_folder = None
         self._dst_folder = None
@@ -28,7 +26,12 @@ class MoverModel(InputBoundary):
             'clean': False,
             'move': False,
             'scan': False,
+            'verbosity': 0,
         }
+
+    @typechecked
+    def set_output_boundary(self, output_boundary: OutputBoundary):
+        self._output_boundary = output_boundary
 
     @typechecked
     def clean_mode(self, enable: bool):
@@ -95,8 +98,12 @@ class MoverModel(InputBoundary):
 
     @typechecked
     def _move(self) -> None:
-        for file_way in self._file_ways:
-            self._mover.move(file_way, self._modes['clean'])
+        def _move_generator():
+            for file_way in self._file_ways:
+                yield self._mover.move(file_way, self._modes['clean'])
+
+        self._output_boundary.on_move_started(
+            _move_generator(), length=len(self._file_ways))
 
     @typechecked
     def _resolve_dst_does_not_exist(self, dst: str) -> Either:
@@ -104,15 +111,9 @@ class MoverModel(InputBoundary):
             .request_create_dst_folder(dst)\
             .map(self._mover.create_and_set_dst_folder)
 
-    @property
+    @InputBoundary.on_move_finished.getter
     def on_move_finished(self):
         return self._mover.on_move_finished
-
-    @on_move_finished.setter
-    def on_move_finished(self, value):
-        '''
-        It was created for the "+=" operator could work with that property
-        '''
 
     def set_dst_folder(self, value: str) -> None:
         self._dst_folder = value

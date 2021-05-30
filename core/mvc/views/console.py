@@ -1,15 +1,14 @@
 import sys
 import argparse
+from typing import Callable, ContextManager, Iterable
 
 import click
 from typeguard import typechecked
 
 from utils import report_line, report_devider
-from core.types import MoveReport, MoveResult, FileWay, ScanReport
+from core.types import MoveReport, MoveResult, ScanReport
 from libs import Either, Left, Right
-from ..presenters import OutputInteractor
-from ..controllers import InputInteractor
-from .base import ViewBase
+from ..controllers import IoInteractor, ControllerBase
 
 MAIN_PROGRAMM = 'sorter.py'
 
@@ -26,10 +25,10 @@ parser.add_argument(
     type=str,
     help='the destination folder full path.')
 parser.add_argument(
-    '-l', '--list-items',
-    default=False,
-    action='store_true',
-    help='the destination folder full path.')
+    '-v', '--verbosity',
+    default=0,
+    type=int,
+    help='verbosity level')
 parser.add_argument(
     '-s', '--scan',
     default=False,
@@ -47,17 +46,9 @@ parser.add_argument(
     help='remove the duplicates and actually move the files')
 
 
-class ConsoleView(ViewBase, OutputInteractor, InputInteractor):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        '''
-            TODO: use this property when the two phases approach
-            will be implementing
-        '''
-        self._has_scanned = False
-
-    def _finish_show_scanning_status(self):
-        self._has_scanned = True
+class ConsoleView(IoInteractor):
+    def __init__(self, controller=ControllerBase):
+        self._controller = controller
 
     @typechecked
     def confirm(self, message: str) -> bool:
@@ -68,7 +59,7 @@ class ConsoleView(ViewBase, OutputInteractor, InputInteractor):
 
         self._controller.set_src_folder(args.src)
         self._controller.set_dst_folder(args.dst)
-        self._controller.enable_moved_images_log(args.list_items)
+        self._controller.set_verbosity(args.verbosity)
         self._controller.scan_mode(args.scan)
         self._controller.move_mode(args.move)
         self._controller.clean_mode(args.clean)
@@ -100,12 +91,10 @@ class ConsoleView(ViewBase, OutputInteractor, InputInteractor):
             f"{report_line('Total found', total_found)}\n"
         )
 
-    def handle_move_finished(self, report: MoveReport) -> None:
+    @typechecked
+    def file_moved_report_to_str(self, report: MoveReport) -> str:
         assert report.result == MoveResult.MOVED
-        print(
-            f'\r\033[K{report.file_way.src} -> {report.file_way.full_dst}',
-            end=''
-        )
+        return f'\r\033[K{report.file_way.src} -> {report.file_way.full_dst}'
 
     @typechecked
     def close(self):
@@ -119,3 +108,20 @@ class ConsoleView(ViewBase, OutputInteractor, InputInteractor):
             return Right(dst)
 
         return Left(dst)
+
+    @typechecked
+    def move_context(
+        self, moved_reports: Iterable[MoveReport], length: int,
+        item_show_func: Callable
+    ) -> ContextManager[Iterable[MoveReport]]:
+
+        def _item_show_func(report):
+            if report:
+                item_show_func(report)
+
+        return click.progressbar(
+            moved_reports,
+            length=length,
+            bar_template='[%(bar)s]  %(info)s\n',
+            item_show_func=_item_show_func,
+        )
