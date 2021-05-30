@@ -61,7 +61,7 @@ Roadmap:
               The "/dst/folder/" folder does not exist.
               Do You want to create it [y/N]:
         
-        - [ ] 5. Move progress:
+        - [X] 5. Move progress:
 
               [====>                    ] %%
               /current/file/path.ext
