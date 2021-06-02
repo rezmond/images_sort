@@ -2,7 +2,13 @@ from typeguard import typechecked
 
 from core.entities.scanner import ScannerBase
 from core.entities.mover import MoverBase
-from core.types import ScanReport, MoveType, MoveReport
+from core.types import (
+    ScanReport,
+    MoveType,
+    MoveReport,
+    MoveResult,
+    TotalMoveReport,
+)
 from libs import Either, Right
 from .output_boundary import OutputBoundary
 from .input_boundary import InputBoundary
@@ -17,6 +23,7 @@ class MoverModel(InputBoundary):
         scanner: ScannerBase,
     ):
         self._mover = mover
+        self._move_report = TotalMoveReport()
         self._scanner = scanner
         self._output_boundary = None
         self._file_ways = []
@@ -26,7 +33,6 @@ class MoverModel(InputBoundary):
             'clean': False,
             'move': False,
             'scan': False,
-            'verbosity': 0,
         }
 
     @typechecked
@@ -100,7 +106,9 @@ class MoverModel(InputBoundary):
     def _move(self) -> None:
         def _move_generator():
             for file_way in self._file_ways:
-                yield self._mover.move(file_way, self._modes['clean'])
+                report = self._mover.move(file_way, self._modes['clean'])
+                self._add_to_move_report(report)
+                yield report
 
         self._output_boundary.on_move_started(
             _move_generator(), length=len(self._file_ways))
@@ -120,3 +128,20 @@ class MoverModel(InputBoundary):
 
     def set_src_folder(self, value: str) -> None:
         self._src_folder = value
+
+    @typechecked
+    def _add_to_move_report(self, report: MoveReport) -> None:
+        if report.result == MoveResult.MOVED:
+            self._move_report.moved.append(report)
+        elif report.result == MoveResult.ALREADY_EXISTED:
+            self._move_report.already_existed.append(report)
+        else:
+            raise Exception(f'Incorrect move result type "{report.result}"')
+
+    @typechecked
+    def get_total_move_report(self) -> TotalMoveReport:
+        scan_report = self._get_scan_report()
+        self._move_report.no_media = scan_report.no_media
+        self._move_report.no_data = scan_report.no_data
+
+        return self._move_report

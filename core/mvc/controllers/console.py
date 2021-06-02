@@ -36,13 +36,13 @@ class ConsoleViewController(ControllerBase):
         show_context = self._io_interactor.move_context(
             moved_reports,
             length=length,
-            item_show_func=self._notify_file_moved,
+            item_show_func=self._on_file_moved,
         )
         with show_context as moved_reports_wrapped:
             for _ in moved_reports_wrapped:
                 pass
 
     @typechecked
-    def _notify_file_moved(self, report: MoveReport) -> str:
+    def _on_file_moved(self, report: MoveReport) -> str:
         if self._verbosity > 0:
             return self._io_interactor.file_moved_report_to_str(report)

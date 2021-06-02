@@ -93,6 +93,7 @@ class ConsoleView(IoInteractor):
 
     @typechecked
     def file_moved_report_to_str(self, report: MoveReport) -> str:
+        '''Make the method dumber'''
         assert report.result == MoveResult.MOVED
         return f'\r\033[K{report.file_way.src} -> {report.file_way.full_dst}'
 

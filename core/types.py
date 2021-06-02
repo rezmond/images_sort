@@ -32,6 +32,14 @@ class MoveReport:
 
 
 @dataclass(frozen=True)
+class TotalMoveReport:
+    moved: Iterable[MoveReport] = field(default_factory=list)
+    already_existed: Iterable[MoveReport] = field(default_factory=list)
+    no_media: Iterable[MoveReport] = field(default_factory=list)
+    no_data: Iterable[MoveReport] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
 class ScanReport:
     movable: Iterable[FileWay] = field(default_factory=list)
     no_media: Iterable[FileWay] = field(default_factory=list)

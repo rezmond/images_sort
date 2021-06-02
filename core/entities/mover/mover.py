@@ -78,6 +78,7 @@ class Mover(MoverBase):
              move_mode: bool = False) -> MoveReport:
         '''
         TODO: move the move_mode initialisation to a method
+        TODO: write test for case when the file_way has empty "dst" value
         '''
 
         self._fs_actions = FsActions(
