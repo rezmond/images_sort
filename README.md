@@ -65,13 +65,16 @@ Roadmap:
 
               [====>                    ] %%
               /current/file/path.ext
-        - [ ] 6. (If `-v` >= 2) Create report files (hidden)
-        - [ ] 7. Show move report
+        - [X] 6. Create report files (hidden)
+        - [ ] 7. If `-v` >= 2: Show move report
 
               Have been moved:      x
               Already existed:      y
               Not a media:          z
               No data:              q
+
+        - [ ] 8. If `-v` >= 3:
+
               =======================
               Report was existed in: /path/to/src/dir/report.txt
 
