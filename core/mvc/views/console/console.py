@@ -1,5 +1,6 @@
+import os
 import sys
-from typing import Callable, ContextManager, Iterable
+from typing import Callable, ContextManager, Iterable, Optional
 
 import click
 from typeguard import typechecked
@@ -9,6 +10,7 @@ from core.types import MoveReport, MoveResult, ScanReport, TotalMoveReport
 from libs import Either, Left, Right
 from ...controllers import IoInteractor, ControllerBase
 from .parser import parser
+from .report_presenter import ReportPresenter
 
 
 class ConsoleView(IoInteractor):
@@ -93,7 +95,10 @@ class ConsoleView(IoInteractor):
         )
 
     @typechecked
-    def show_total_move_report(self, report: TotalMoveReport) -> None:
+    def show_total_move_report(
+            self,
+            report: TotalMoveReport,
+            log_to_file: Optional[str] = '') -> None:
         print(
             '\n'
             f"{report_line('Have been moved', len(report.moved))}\n"
@@ -101,3 +106,11 @@ class ConsoleView(IoInteractor):
             f"{report_line('Not a media', len(report.no_media))}\n"
             f"{report_line('No data', len(report.no_data))}"
         )
+
+        if not log_to_file:
+            return
+
+        presenter = ReportPresenter(report)
+        with open(os.path.join(log_to_file, 'report.txt'), 'w') as file_:
+            for line in presenter.get_report_lines():
+                file_.write(line)

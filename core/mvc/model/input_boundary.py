@@ -29,14 +29,3 @@ class InputBoundary(ABC):
     @abstractmethod
     def set_src_folder(self, value: str) -> None:
         ''''''
-
-    @property
-    @abstractmethod
-    def on_move_finished(self):
-        ''''''
-
-    @on_move_finished.setter
-    def on_move_finished(self, val):
-        '''
-        It was created for the "+=" operator could work with that property
-        '''

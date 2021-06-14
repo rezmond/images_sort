@@ -110,7 +110,7 @@ class MoverModel(InputBoundary):
                 self._add_to_move_report(report)
                 yield report
             self._output_boundary.on_move_finished(
-                self._get_total_move_report())
+                self._get_total_move_report(), self._dst_folder)
 
         self._output_boundary.on_move_started(
             _move_generator(), length=len(self._file_ways))
@@ -120,10 +120,6 @@ class MoverModel(InputBoundary):
         return self._output_boundary\
             .request_create_dst_folder(dst)\
             .map(self._mover.create_and_set_dst_folder)
-
-    @InputBoundary.on_move_finished.getter
-    def on_move_finished(self):
-        return self._mover.on_move_finished
 
     def set_dst_folder(self, value: str) -> None:
         self._dst_folder = value

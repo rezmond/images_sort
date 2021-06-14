@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import ContextManager, Iterable
+from typing import ContextManager, Iterable, Optional
 
 from typeguard import typechecked
 
@@ -42,5 +42,8 @@ class OutputInteractor(ABC):
         ''''''
 
     @typechecked
-    def show_total_move_report(self, report: TotalMoveReport) -> None:
+    def show_total_move_report(
+            self,
+            report: TotalMoveReport,
+            log_to_file: Optional[str]) -> None:
         ''''''

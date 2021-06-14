@@ -43,5 +43,6 @@ class OutputBoundary(ABC):
 
     @typechecked
     @abstractmethod
-    def on_move_finished(self, report: TotalMoveReport) -> None:
+    def on_move_finished(
+            self, report: TotalMoveReport, dst_folder: str) -> None:
         ''''''

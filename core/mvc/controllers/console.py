@@ -54,6 +54,10 @@ class ConsoleViewController(ControllerBase):
             return self._io_interactor.file_moved_report_to_str(report)
 
     @typechecked
-    def on_move_finished(self, report: TotalMoveReport) -> None:
+    def on_move_finished(
+            self, report: TotalMoveReport, dst_folder: str) -> None:
         if self._verbosity >= Verbosity.MEDIUM:
-            self._io_interactor.show_total_move_report(report)
+            log_to_file = dst_folder \
+                if self._verbosity > Verbosity.MEDIUM else None
+            self._io_interactor\
+                .show_total_move_report(report, log_to_file=log_to_file)

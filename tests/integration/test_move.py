@@ -3,7 +3,7 @@ import contextlib
 from typing import Iterable
 
 from typeguard import typechecked
-from unittest.mock import Mock, patch
+from unittest.mock import call, Mock, patch, mock_open
 
 from core.types import MoveReport
 from core.mvc.views import ConsoleView
@@ -47,7 +47,7 @@ def test_creates_target_folder(container):
 
     caught_io = io.StringIO()
     input_io = io.StringIO('y\n')
-    argv_args = [None, '-m', '-v 1', '/src/folder', '/dst/folder']
+    argv_args = [None, '-m', '-v 3', '/src/folder', '/dst/folder']
     exif_data_getter_mock = Mock(return_value='2000-01-01T12:00:00')
     fs_manipulator = Mock(spec=FsManipulatorCompilation, **{
         'folder_to_file_pathes.return_value': base_pathes,
@@ -69,7 +69,10 @@ def test_creates_target_folder(container):
 
         return mock
 
-    with container.exif_data_getter.override(
+    mock_of_open = mock_open()
+    with patch(
+        'core.mvc.views.console.console.open', mock_of_open
+    ), container.exif_data_getter.override(
         exif_data_getter_mock
     ), contextlib.redirect_stdout(
         caught_io
@@ -104,3 +107,27 @@ def test_creates_target_folder(container):
         '\r\x1b[K/src/path/4.jpg -> /dst/folder/2000/winter (begin)/4.jpg\n'
     )
     assert_lines_equal(expected_str_reports, expected_str_reports)
+
+    report_file_calls = [
+        call('/dst/folder/report.txt', 'w'),
+        call().__enter__(),
+        call().write('Moved:\n'),
+        call().write('======\n'),
+        call().write(
+            '/src/path/1.jpg --> /dst/folder/2000/winter (begin)/1.jpg'),
+        call().write(
+            '/src/path/2.jpg --> /dst/folder/2000/winter (begin)/2.jpg'),
+        call().write(
+            '/src/path/3.jpg --> /dst/folder/2000/winter (begin)/3.jpg'),
+        call().write(
+            '/src/path/4.jpg --> /dst/folder/2000/winter (begin)/4.jpg'),
+        call().write('Already existed:\n'),
+        call().write('================\n'),
+        call().write('Not a media:\n'),
+        call().write('============\n'),
+        call().write('No data:\n'),
+        call().write('========\n'),
+        call().__exit__(None, None, None)
+    ]
+
+    mock_of_open.assert_has_calls(report_file_calls)
