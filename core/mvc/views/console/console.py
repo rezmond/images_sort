@@ -5,7 +5,7 @@ import click
 from typeguard import typechecked
 
 from utils import report_line, report_devider
-from core.types import MoveReport, MoveResult, ScanReport
+from core.types import MoveReport, MoveResult, ScanReport, TotalMoveReport
 from libs import Either, Left, Right
 from ...controllers import IoInteractor, ControllerBase
 from .parser import parser
@@ -90,4 +90,14 @@ class ConsoleView(IoInteractor):
             length=length,
             bar_template='[%(bar)s]  %(info)s\n',
             item_show_func=_item_show_func,
+        )
+
+    @typechecked
+    def show_total_move_report(self, report: TotalMoveReport) -> None:
+        print(
+            '\n'
+            f"{report_line('Have been moved', len(report.moved))}\n"
+            f"{report_line('Already existed', len(report.already_existed))}\n"
+            f"{report_line('Not a media', len(report.no_media))}\n"
+            f"{report_line('No data', len(report.no_data))}"
         )

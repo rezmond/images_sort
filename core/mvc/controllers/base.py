@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from typeguard import typechecked
 
-from core.types import ScanReport, MoveReport
+from core.types import ScanReport, TotalMoveReport
 from ..model import InputBoundary, OutputBoundary
 from .io_interactor import IoInteractor
 
@@ -49,6 +49,10 @@ class ControllerBase(OutputBoundary, ABC):
     @typechecked
     def scan_finished(self, scan_report: ScanReport) -> None:
         self._io_interactor.show_scan_report(scan_report)
+
+    @typechecked
+    def on_move_finished(self, move_report: TotalMoveReport) -> None:
+        ''''''
 
     @typechecked
     def finish(self) -> None:

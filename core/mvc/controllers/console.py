@@ -2,9 +2,15 @@ from typing import Iterable
 
 from typeguard import typechecked
 
-from core.types import MoveReport
+from core.types import MoveReport, TotalMoveReport
 from libs import Either
 from .base import ControllerBase
+
+
+class Verbosity:
+    LOW = 0
+    MEDIUM = 1
+    HIGH = 2
 
 
 class ConsoleViewController(ControllerBase):
@@ -12,7 +18,7 @@ class ConsoleViewController(ControllerBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._verbosity = 0
+        self._verbosity = Verbosity.LOW
 
     @typechecked
     def set_verbosity(self, level: int) -> None:
@@ -44,5 +50,10 @@ class ConsoleViewController(ControllerBase):
 
     @typechecked
     def _on_file_moved(self, report: MoveReport) -> str:
-        if self._verbosity > 0:
+        if self._verbosity > Verbosity.LOW:
             return self._io_interactor.file_moved_report_to_str(report)
+
+    @typechecked
+    def on_move_finished(self, report: TotalMoveReport) -> None:
+        if self._verbosity >= Verbosity.MEDIUM:
+            self._io_interactor.show_total_move_report(report)

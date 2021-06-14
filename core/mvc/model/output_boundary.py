@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Iterable
 from typeguard import typechecked
 
-from core.types import ScanReport, MoveReport
+from core.types import ScanReport, MoveReport, TotalMoveReport
 from libs import Either
 
 
@@ -39,4 +39,9 @@ class OutputBoundary(ABC):
     @typechecked
     @abstractmethod
     def on_move_started(self, moved_reports: Iterable[MoveReport]) -> None:
+        ''''''
+
+    @typechecked
+    @abstractmethod
+    def on_move_finished(self, report: TotalMoveReport) -> None:
         ''''''

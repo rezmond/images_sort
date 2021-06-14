@@ -109,6 +109,8 @@ class MoverModel(InputBoundary):
                 report = self._mover.move(file_way, self._modes['clean'])
                 self._add_to_move_report(report)
                 yield report
+            self._output_boundary.on_move_finished(
+                self._get_total_move_report())
 
         self._output_boundary.on_move_started(
             _move_generator(), length=len(self._file_ways))
@@ -139,9 +141,9 @@ class MoverModel(InputBoundary):
             raise Exception(f'Incorrect move result type "{report.result}"')
 
     @typechecked
-    def get_total_move_report(self) -> TotalMoveReport:
+    def _get_total_move_report(self) -> TotalMoveReport:
         scan_report = self._get_scan_report()
-        self._move_report.no_media = scan_report.no_media
-        self._move_report.no_data = scan_report.no_data
+        self._move_report.no_media.extend(scan_report.no_media)
+        self._move_report.no_data.extend(scan_report.no_data)
 
         return self._move_report

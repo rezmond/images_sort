@@ -3,7 +3,7 @@ from typing import ContextManager, Iterable
 
 from typeguard import typechecked
 
-from core.types import ScanReport, MoveReport
+from core.types import ScanReport, MoveReport, TotalMoveReport
 from libs import Either
 
 
@@ -39,4 +39,8 @@ class OutputInteractor(ABC):
     def move_in_context(
         self, moved_reports: Iterable[MoveReport]
     ) -> ContextManager[Iterable[MoveReport]]:
+        ''''''
+
+    @typechecked
+    def show_total_move_report(self, report: TotalMoveReport) -> None:
         ''''''
