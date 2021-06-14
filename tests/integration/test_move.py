@@ -19,7 +19,8 @@ from .utils import (
 
 class ConsoleViewMock(ConsoleView):
     @typechecked
-    def move_context(self, moved_reports: Iterable[MoveReport], length: int):
+    def move_in_context(
+            self, moved_reports: Iterable[MoveReport], length: int):
         return moved_reports
 
 
@@ -54,7 +55,7 @@ def test_creates_target_folder(container):
 
     caught_report_stings = []
 
-    def move_context_mock(gen, length, item_show_func):
+    def move_in_context_mock(gen, length, item_show_func):
         assert length == 4
 
         moved = list(
@@ -77,7 +78,7 @@ def test_creates_target_folder(container):
         comparator=comparator
     ) as console:
         view = container.view()
-        view.move_context = move_context_mock
+        view.move_in_context = move_in_context_mock
         console.show()
 
     expected_stdout = (

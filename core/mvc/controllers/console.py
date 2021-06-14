@@ -33,7 +33,7 @@ class ConsoleViewController(ControllerBase):
     @typechecked
     def on_move_started(
             self, moved_reports: Iterable[MoveReport], length: int) -> None:
-        show_context = self._io_interactor.move_context(
+        show_context = self._io_interactor.move_in_context(
             moved_reports,
             length=length,
             item_show_func=self._on_file_moved,

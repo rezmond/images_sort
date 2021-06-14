@@ -36,7 +36,7 @@ class OutputInteractor(ABC):
 
     @typechecked
     @abstractmethod
-    def move_context(
+    def move_in_context(
         self, moved_reports: Iterable[MoveReport]
     ) -> ContextManager[Iterable[MoveReport]]:
         ''''''

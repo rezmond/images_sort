@@ -111,7 +111,7 @@ class ConsoleView(IoInteractor):
         return Left(dst)
 
     @typechecked
-    def move_context(
+    def move_in_context(
         self, moved_reports: Iterable[MoveReport], length: int,
         item_show_func: Callable
     ) -> ContextManager[Iterable[MoveReport]]:
