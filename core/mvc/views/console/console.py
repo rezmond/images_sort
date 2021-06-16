@@ -101,6 +101,7 @@ class ConsoleView(IoInteractor):
             log_to_file: Optional[str] = '') -> None:
         print(
             '\n'
+            '\n'
             f"{report_line('Have been moved', len(report.moved))}\n"
             f"{report_line('Already existed', len(report.already_existed))}\n"
             f"{report_line('Not a media', len(report.no_media))}\n"
@@ -111,6 +112,12 @@ class ConsoleView(IoInteractor):
             return
 
         presenter = ReportPresenter(report)
-        with open(os.path.join(log_to_file, 'report.txt'), 'w') as file_:
+        report_file_path = os.path.join(log_to_file, 'report.txt')
+        with open(report_file_path, 'w') as file_:
             for line in presenter.get_report_lines():
                 file_.write(line)
+
+        print(
+            f"{report_devider()}\n"
+            f'Report was existed in: {os.path.abspath(report_file_path)}'
+        )

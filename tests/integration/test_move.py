@@ -90,13 +90,16 @@ def test_creates_target_folder(container):
     expected_stdout = (
         'The "/dst/folder" folder does not exist.\n'
         'Do You want to create it [y/N]: \n'
+        '\n'
         f'Have been moved:   {PAD}4\n'
         f'Already existed:   {PAD}0\n'
         f'Not a media:       {PAD}0\n'
         f'No data:           {PAD}0\n'
+        f'{"=" * 80}\n'
+        'Report was existed in: /dst/folder/report.txt\n'
     )
     assert_lines_equal(
-        caught_io.getvalue().split('\n')[-7:],
+        caught_io.getvalue().split('\n')[-10:],
         expected_stdout
     )
 
