@@ -74,6 +74,6 @@ def assert_lines_equal(actual, expected):
     for actual_line, expected_line in zip(actual_lines, expected_lines):
         assert actual_line == expected_line, (
             'the strings are not equal.\n'
-            f'First:\t{actual_line}\n'
-            f'Second:\t{expected_line}'
+            f'First:\t"{actual_line}"\n'
+            f'Second:\t"{expected_line}"'
         )
