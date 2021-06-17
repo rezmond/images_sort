@@ -73,7 +73,7 @@ Roadmap:
               Not a media:          z
               No data:              q
 
-        - [ ] 8. If `-v` > 2:
+        - [X] 8. If `-v` > 2:
 
               =======================
               Report was existed in: /path/to/src/dir/report.txt
