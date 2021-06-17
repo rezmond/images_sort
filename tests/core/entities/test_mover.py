@@ -6,12 +6,12 @@ from unittest.mock import call, Mock, MagicMock
 import pytest
 
 from core.types import FileWay, MoveType, MoveResult, MoveReport
-from core.entities.fs import FsManipulatorBase
-from core.system_interfaces import FolderCheckerBase
+from core.entities.fs import FsManipulatorBase, FolderCheckerBase
+from core.entities.exceptions import NoArgumentPassedError
 from core.utils.base import Observable
 
 
-class FsManipulatorCompilation(FolderCheckerBase, FsManipulatorBase):
+class FsManipulatorCompilation(FsManipulatorBase, FolderCheckerBase):
     pass
 
 
@@ -90,8 +90,8 @@ def test_move_without_dst_param(container):
             container.comparator.override(Mock()):
         mover = container.mover()
 
-    with pytest.raises(ValueError) as exc_info:
-        mover.move(FileWay(), '')
+    with pytest.raises(NoArgumentPassedError) as exc_info:
+        mover.move(FileWay())
 
     assert 'path has not been set' in str(exc_info.value), \
         'Should catch not set the src or the dst folder path'

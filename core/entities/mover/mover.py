@@ -6,6 +6,7 @@ from typeguard import typechecked
 
 from core.types import Comparator, FileWay, MoveReport, MoveResult
 from libs import Either
+from ..exceptions import NoArgumentPassedError
 from ..fs import FsManipulatorBase, FsActions, FolderPathValidator
 from .base import MoverBase
 
@@ -80,6 +81,9 @@ class Mover(MoverBase):
         TODO: move the move_mode initialisation to a method
         TODO: write test for case when the file_way has empty "dst" value
         '''
+
+        if self._dst_folder is None:
+            raise NoArgumentPassedError('dst')
 
         self._fs_actions = FsActions(
             self._fs_manipulator, self._comparator, move_mode, move_mode)
