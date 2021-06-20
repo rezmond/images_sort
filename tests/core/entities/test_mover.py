@@ -7,7 +7,10 @@ import pytest
 
 from core.types import FileWay, MoveType, MoveResult, MoveReport
 from core.entities.fs import FsManipulatorBase, FolderCheckerBase
-from core.entities.exceptions import NoArgumentPassedError
+from core.entities.exceptions import (
+    NoArgumentPassedError,
+    RelativeFolderPathError,
+)
 from core.utils.base import Observable
 
 
@@ -104,8 +107,8 @@ def test_move_by_relative_path(container):
             container.comparator.override(Mock()):
         mover = container.mover()
 
-    with pytest.raises(ValueError) as exc_info:
-        mover.move(FileWay(), 'test-1')
+    with pytest.raises(RelativeFolderPathError) as exc_info:
+        mover.set_dst_folder('test-1')
 
     assert 'absolute' in str(exc_info.value), \
         'Should catch not absolute the destination folder path'
