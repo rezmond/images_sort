@@ -82,13 +82,11 @@ class Mover(MoverBase):
         TODO: write test for case when the file_way has empty "dst" value
         '''
 
-        if self._dst_folder is None:
-            raise NoArgumentPassedError('dst')
+        full_dst = os.path.join(self.get_dst_folder(), file_way.dst)
 
         self._fs_actions = FsActions(
             self._fs_manipulator, self._comparator, move_mode, move_mode)
 
-        full_dst = os.path.join(self._dst_folder, file_way.dst)
         self._make_dir_if_not_exists(full_dst)
         final_dst = self._move_by_cmp(file_way.src, full_dst)
 
@@ -123,15 +121,22 @@ class Mover(MoverBase):
 
     @typechecked
     def set_dst_folder(self, dst: str) -> Either:
+        def do_set(dst: str):
+            self._dst_folder = dst
+
         return self._validate_dst(dst)\
-            .map(self._set_dst_folder)
+            .map(do_set)
+
+    @typechecked
+    def get_dst_folder(self) -> str:
+        if self._dst_folder is None:
+            raise NoArgumentPassedError('dst')
+
+        return self._dst_folder
 
     @typechecked
     def create_and_set_dst_folder(self, dst: str) -> None:
         self._fs_manipulator.create_folder(dst)
-        self._dst_folder = dst
-
-    def _set_dst_folder(self, dst: str):
         self._dst_folder = dst
 
     def _validate_dst(self, dst: str) -> Either:
