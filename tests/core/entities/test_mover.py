@@ -72,21 +72,6 @@ def from_to_find(predicate):
     )
 
 
-@contextlib.contextmanager
-def check_subscription(container):
-    observable_mock = MagicMock(spec=Observable)
-    fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
-
-    with container.observable.override(observable_mock),\
-            container.fs_manipulator.override(fs_manipulator_mock),\
-            container.comparator.override(Mock()):
-        mover = container.mover()
-
-    handler_mock = Mock()
-    yield mover, handler_mock
-    observable_mock.__iadd__.assert_called_once_with(handler_mock)
-
-
 def test_move_without_dst_param(container):
     fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
     with container.fs_manipulator.override(fs_manipulator_mock),\
@@ -159,11 +144,6 @@ def test_move_by_absolute_path(container):
 
     calls = [call(plan.src, plan.final_dst) for plan in from_to[0:-1]]
     fs_manipulator_mock.copy.assert_has_calls(calls)
-
-
-def test_on_move_finished_subscribe(container):
-    with check_subscription(container) as (mover, handler_mock):
-        mover.on_move_finished += handler_mock
 
 
 def test_delete_duplicates(container):
