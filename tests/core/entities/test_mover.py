@@ -122,7 +122,6 @@ def test_move_by_absolute_path(container):
     def is_file_mock(final_dst):
         return from_to_find(lambda x: x.identical(final_dst)).existed
 
-    on_item_moved_handler_mock = Mock()
     fs_manipulator_mock = Mock(spec=FsManipulatorCompilation, **{
         'isfile': is_file_mock
     })
@@ -131,36 +130,35 @@ def test_move_by_absolute_path(container):
             container.comparator.override(comporator_mock):
         mover = container.mover()
 
-    mover.on_move_finished += on_item_moved_handler_mock
+    mover.set_dst_folder('/dst/path')
 
-    list(mover.move(
-        FileWay(
-            src=plan.src,
-            dst=plan.dst,
-            type=MoveType.MEDIA,
-        ), '/dst/path'
-    ) for plan in from_to)
+    for plan in from_to:
+        report = mover.move(
+            FileWay(
+                src=plan.src,
+                dst=plan.dst,
+                type=MoveType.MEDIA,
+            )
+        )
 
-    copy_mock = fs_manipulator_mock.copy
+        expected = MoveReport(
+            result=(
+                MoveResult.ALREADY_EXISTED
+                if plan.identical(plan.final_dst)
+                else MoveResult.MOVED
+            ),
+            file_way=FileWay(
+                src=plan.src,
+                dst=plan.dst,
+                full_dst=plan.final_dst,
+                type=MoveType.MEDIA,
+            )
+        )
+
+        assert report == expected
+
     calls = [call(plan.src, plan.final_dst) for plan in from_to[0:-1]]
-    copy_mock.assert_has_calls(calls)
-
-    on_item_moved_handler_mock.assert_has_calls(
-        [
-            call(MoveReport(
-                result=(
-                    MoveResult.ALREADY_EXISTED
-                    if plan.identical(plan.final_dst)
-                    else MoveResult.MOVED
-                ),
-                file_way=FileWay(
-                    src=plan.src,
-                    dst=plan.dst,
-                    full_dst=plan.final_dst,
-                    type=MoveType.MEDIA,
-                )
-            ))
-            for plan in from_to])
+    fs_manipulator_mock.copy.assert_has_calls(calls)
 
 
 def test_on_move_finished_subscribe(container):
