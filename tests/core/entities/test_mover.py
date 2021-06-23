@@ -168,12 +168,13 @@ def test_delete_duplicates(container):
             container.comparator.override(comporator_mock):
         mover = container.mover()
 
+    mover.set_dst_folder('/dst/path')
     list(mover.move(
         FileWay(
             src=plan.src,
             dst=plan.dst,
             type=MoveType.MEDIA,
-        ), '/dst/path', True
+        ), True
     ) for plan in from_to)
 
     delete_mock = fs_manipulator_mock.delete
