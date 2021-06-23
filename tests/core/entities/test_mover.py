@@ -1,7 +1,7 @@
 import os
-import contextlib
+from contextlib import nullcontext
 from collections import namedtuple
-from unittest.mock import call, Mock, MagicMock
+from unittest.mock import call, Mock
 
 import pytest
 
@@ -11,7 +11,6 @@ from core.entities.exceptions import (
     NoArgumentPassedError,
     RelativeFolderPathError,
 )
-from core.utils.base import Observable
 
 
 class FsManipulatorCompilation(FsManipulatorBase, FolderCheckerBase):
@@ -72,11 +71,26 @@ def from_to_find(predicate):
     )
 
 
-def test_move_without_dst_param(container):
-    fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
-    with container.fs_manipulator.override(fs_manipulator_mock),\
-            container.comparator.override(Mock()):
+def get_mover(container, **mocks):
+
+    def get_context_manager(name):
+        if name not in mocks:
+            return nullcontext
+
+        return getattr(container, name).override(mocks[name])
+
+    mocks['comparator'] = mocks.get('comparator', Mock())
+    mocks['fs_manipulator'] = mocks.get(
+        'fs_manipulator', Mock(spec=FsManipulatorCompilation))
+
+    with get_context_manager('fs_manipulator'),\
+            get_context_manager('comparator'):
         mover = container.mover()
+    return mover
+
+
+def test_move_without_dst_param(container):
+    mover = get_mover(container)
 
     with pytest.raises(NoArgumentPassedError) as exc_info:
         mover.move(FileWay())
@@ -86,11 +100,7 @@ def test_move_without_dst_param(container):
 
 
 def test_move_by_relative_path(container):
-    fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
-
-    with container.fs_manipulator.override(fs_manipulator_mock),\
-            container.comparator.override(Mock()):
-        mover = container.mover()
+    mover = get_mover(container)
 
     with pytest.raises(RelativeFolderPathError) as exc_info:
         mover.set_dst_folder('test-1')
@@ -111,9 +121,10 @@ def test_move_by_absolute_path(container):
         'isfile': is_file_mock
     })
 
-    with container.fs_manipulator.override(fs_manipulator_mock),\
-            container.comparator.override(comporator_mock):
-        mover = container.mover()
+    mover = get_mover(
+        container,
+        fs_manipulator=fs_manipulator_mock,
+        comparator=comporator_mock)
 
     mover.set_dst_folder('/dst/path')
 
@@ -164,9 +175,10 @@ def test_delete_duplicates(container):
     fs_manipulator_mock = Mock(
         spec=FsManipulatorCompilation, isfile=is_file_mock)
 
-    with container.fs_manipulator.override(fs_manipulator_mock),\
-            container.comparator.override(comporator_mock):
-        mover = container.mover()
+    mover = get_mover(
+        container,
+        fs_manipulator=fs_manipulator_mock,
+        comparator=comporator_mock)
 
     mover.set_dst_folder('/dst/path')
     list(mover.move(
