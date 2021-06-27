@@ -1,5 +1,6 @@
 from datetime import date
 from unittest.mock import Mock
+from functools import partial
 
 import pytest
 
@@ -88,6 +89,22 @@ def test_scan(container):
     def get_dst_path_mock(d):
         return f'dst path of "{d}"'
 
+    def assert_moved_to_correct_dir(scan_generator):
+        for i, report in enumerate(scan_generator):
+            path = base_pathes[i]
+            file_way = partial(FileWay, src=path)
+            date_by_path = get_date_mock(path)
+
+            if date_by_path:
+                expected = file_way(
+                    dst=get_dst_path_mock(date_by_path),
+                    type=MoveType.MEDIA
+                )
+            else:
+                expected = file_way(dst=None, type=MoveType.NO_DATA)
+
+            assert report == expected
+
     move_map_mock = Mock(spec=MoveMapBase, get_dst_path=get_dst_path_mock)
 
     scanner = get_scanner(
@@ -97,19 +114,9 @@ def test_scan(container):
         move_map=move_map_mock,
     )
 
-    scanned = list(scanner.scan('/test'))
+    scan_generator = scanner.scan('/test')
 
-    expected_scanned = [
-        FileWay(
-            src=x,
-            dst=get_dst_path_mock(get_date_mock(x)),
-            type=MoveType.MEDIA)
-        if get_date_mock(x)
-        else FileWay(src=x, dst=None, type=MoveType.NO_DATA)
-        for x in base_pathes
-    ]
-
-    assert scanned == expected_scanned
+    assert_moved_to_correct_dir(scan_generator)
 
 
 def test_filling_not_media(container):
@@ -124,5 +131,6 @@ def test_filling_not_media(container):
     )
 
     result = list(scanner.scan('/test'))
+
     assert result == [
         FileWay(src='/no/media/file.path', type=MoveType.NO_MEDIA)]
