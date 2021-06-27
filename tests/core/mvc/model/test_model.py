@@ -1,36 +1,10 @@
-import contextlib
-from unittest.mock import call, Mock, MagicMock, PropertyMock
-
-import pytest
+from unittest.mock import call, Mock
 
 from core.types import FileWay, MoveType, MoveReport, MoveResult
 from core.entities.scanner.base import ScannerBase
 from core.entities.mover import MoverBase
-from core.utils.base import Observable
 from core.mvc.model import OutputBoundary
 from tests.utils import overrides
-
-
-@pytest.fixture
-def subscription_context(container):
-    @contextlib.contextmanager
-    def setup_subscription_test(prop_name, for_class):
-        prop_mock = PropertyMock()
-        mover_mock = MagicMock(spec=MoverBase)
-        scanner_mock = Mock(spec=ScannerBase)
-        target_class = mover_mock \
-            if for_class == 'mover_mock' else scanner_mock
-        setattr(type(target_class), prop_name, prop_mock)
-        handler_mock = Mock()
-
-        with container.mover.override(mover_mock),\
-                container.scanner.override(scanner_mock):
-            model = container.model()
-
-        prop_mock.assert_not_called()
-        yield model, handler_mock
-        prop_mock.assert_called_once()
-    yield setup_subscription_test
 
 
 def get_model(container, **mocks):
@@ -87,12 +61,6 @@ def test_move_call(container):
 
     mover_mock.set_dst_folder.assert_called_once_with('dst')
     assert_moved()
-
-
-def test_on_move_finish_subscribe(subscription_context):
-    with subscription_context('on_move_finished', 'mover_mock') \
-            as (model, handler_mock):
-        model.on_move_finished += handler_mock
 
 
 def test_clean_mode_safe(container):
