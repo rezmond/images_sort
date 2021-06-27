@@ -1,17 +1,50 @@
 from unittest.mock import call, Mock
 
+import pytest
+
 from core.types import FileWay, MoveType, MoveReport, MoveResult
 from core.entities.scanner.base import ScannerBase
 from core.entities.mover import MoverBase
 from core.mvc.model import OutputBoundary
 from tests.utils import overrides
 
+mover_mock = None
+scanner_mock = None
 
-def get_model(container, **mocks):
-    with overrides(container, **mocks):
-        model = container.model()
 
-    return model
+@pytest.fixture
+def get_model(container):
+    def model_supplier(**mocks):
+        global mover_mock
+        global scanner_mock
+
+        def map_mock(move):
+            move('')
+
+        scanner_mock = Mock(spec=ScannerBase, **{
+            'scan.return_value': move_types
+        })
+
+        mover_mock = Mock(spec=MoverBase, **{
+            'set_dst_folder.return_value': Mock(
+                **{'either.return_value': Mock(map=map_mock)}),
+            'move.return_value': Mock(
+                spec=MoveReport,
+                result=MoveResult.MOVED
+            ),
+        })
+
+        with overrides(
+            container,
+            scanner=scanner_mock,
+            mover=mover_mock,
+            **mocks
+        ):
+            model = container.model()
+
+        return model
+
+    yield model_supplier
 
 
 def scan(model, src):
@@ -32,53 +65,33 @@ def move(model, dst):
     model.move()
 
 
+def assert_moved(dst, is_clean_mode):
+    mover_mock.set_dst_folder.assert_called_once_with(dst)
+    mover_mock.move.assert_has_calls([
+        call(x, is_clean_mode) for x in move_types
+    ])
+
+
 move_types = [FileWay(src=str(x), type=MoveType.MEDIA) for x in range(3)]
 
 
-def test_move_call(container):
-    def map_mock(move):
-        move('')
-
-    scanner_mock = Mock(spec=ScannerBase, **{
-        'scan.return_value': move_types
-    })
-
-    mover_mock = Mock(spec=MoverBase, **{
-        'set_dst_folder.return_value': Mock(
-            **{'either.return_value': Mock(map=map_mock)}),
-        'move.return_value': Mock(spec=MoveReport, result=MoveResult.MOVED),
-    })
-
-    def assert_moved():
-        is_clean_mode = False
-        mover_mock.move.assert_has_calls([
-            call(x, is_clean_mode) for x in move_types
-        ])
-
-    model = get_model(
-        container,
-        scanner=scanner_mock,
-        mover=mover_mock,
-    )
+def test_safe_move(get_model):
+    model = get_model()
 
     scan(model, 'src')
-
     scanner_mock.scan.assert_called_once_with('src')
 
     move(model, 'dst')
-
-    mover_mock.set_dst_folder.assert_called_once_with('dst')
-    assert_moved()
+    assert_moved('dst', False)
 
 
-def test_clean_mode_dangerously(container):
-    scanner_mock = Mock(spec=ScannerBase, **{'scan.return_value': [None]})
-    mover_mock = Mock(spec=MoverBase)
-    with container.mover.override(mover_mock),\
-            container.scanner.override(scanner_mock):
-        model = container.model()
+def test_danger_move(get_model):
+    model = get_model()
+
+    scan(model, 'src')
+    scanner_mock.scan.assert_called_once_with('src')
 
     model.clean_mode(True)
-    model.move()
 
-    mover_mock.move.assert_called_once_with(None, None, True)
+    move(model, 'dst')
+    assert_moved('dst', True)
