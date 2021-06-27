@@ -75,7 +75,7 @@ def get_mover(container, **mocks):
 
     def get_context_manager(name):
         if name not in mocks:
-            return nullcontext
+            return nullcontext()
 
         return getattr(container, name).override(mocks[name])
 
