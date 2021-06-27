@@ -46,6 +46,7 @@ def get_scanner(container, **kwargs):
         'observable': Mock(spec=Observable),
         'fs_manipulator': Mock(spec=FsManipulatorCompilation),
         'move_map': Mock(spec=MoveMapBase),
+        'comparator': Mock(),
     }, **kwargs}
     with overrides(container, **mocks):
         scanner = container.scanner()

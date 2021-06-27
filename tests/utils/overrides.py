@@ -17,7 +17,6 @@ def overrides(container, **mocks):
 
         return getattr(container, name).override(mocks[name])
 
-    mocks['comparator'] = mocks.get('comparator', Mock())
     mocks['fs_manipulator'] = mocks.get(
         'fs_manipulator', Mock(spec=FsManipulatorCompilation))
 

@@ -72,6 +72,7 @@ def from_to_find(predicate):
 
 
 def get_mover(container, **mocks):
+    mocks['comparator'] = mocks.get('comparator', Mock())
     with overrides(container, **mocks):
         mover = container.mover()
 
