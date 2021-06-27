@@ -18,8 +18,8 @@ def get_model(container):
         global mover_mock
         global scanner_mock
 
-        def map_mock(move):
-            move('')
+        def map_mock(f):
+            f('')
 
         scanner_mock = Mock(spec=ScannerBase, **{
             'scan.return_value': move_types
