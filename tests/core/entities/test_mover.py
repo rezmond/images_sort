@@ -1,5 +1,4 @@
 import os
-from contextlib import nullcontext
 from collections import namedtuple
 from unittest.mock import call, Mock
 
@@ -11,6 +10,7 @@ from core.entities.exceptions import (
     NoArgumentPassedError,
     RelativeFolderPathError,
 )
+from tests.utils import overrides
 
 
 class FsManipulatorCompilation(FsManipulatorBase, FolderCheckerBase):
@@ -72,20 +72,9 @@ def from_to_find(predicate):
 
 
 def get_mover(container, **mocks):
-
-    def get_context_manager(name):
-        if name not in mocks:
-            return nullcontext()
-
-        return getattr(container, name).override(mocks[name])
-
-    mocks['comparator'] = mocks.get('comparator', Mock())
-    mocks['fs_manipulator'] = mocks.get(
-        'fs_manipulator', Mock(spec=FsManipulatorCompilation))
-
-    with get_context_manager('fs_manipulator'),\
-            get_context_manager('comparator'):
+    with overrides(container, **mocks):
         mover = container.mover()
+
     return mover
 
 
