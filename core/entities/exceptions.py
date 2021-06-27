@@ -27,4 +27,4 @@ class RelativeFolderPathError(FolderValidationError):
 
 class FolderNotFoundError(FolderValidationError):
     def __str__(self):
-        return f'The "{self._path}" folder does not exist'
+        return f'The "{self._path}" {self._name} folder does not exist'
