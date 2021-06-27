@@ -1,10 +1,12 @@
 from contextlib import nullcontext, contextmanager
 from unittest.mock import Mock
 
-from core.entities.fs import FsManipulatorBase, FolderCheckerBase
+from core.entities.fs import (
+    FolderExtractorBase, FsManipulatorBase, FolderCheckerBase)
 
 
-class FsManipulatorCompilation(FsManipulatorBase, FolderCheckerBase):
+class FsManipulatorCompilation(
+        FolderExtractorBase, FsManipulatorBase, FolderCheckerBase):
     pass
 
 
@@ -25,5 +27,7 @@ def overrides(container, **mocks):
             get_context_manager('date_extractor'), \
             get_context_manager('observable'), \
             get_context_manager('move_map'), \
+            get_context_manager('scanner'), \
+            get_context_manager('mover'), \
             get_context_manager('validator'):
         yield
