@@ -12,56 +12,33 @@ def model():
 
 
 @pytest.fixture
-def view_class():
+def console_view():
     yield Mock(spec=ConsoleView)
 
 
 @pytest.fixture
-def controller(container, model, view_class):
-    with container.model.override(model),\
-            container.view_class.override(view_class):
+def controller(container, model, console_view):
+    with container.model.override(model):
         instance = container.controller()
+
+    instance.set_io_interactor(console_view)
     return instance
 
 
-def test_set_params(controller, model, view_class):
+def test_set_params(controller, model, console_view):
     controller.set_src_folder('/test/src/path')
     controller.set_dst_folder('/test/dst/path')
 
-    view_class.return_value.show.assert_called_once()
     model.set_src_folder.assert_called_once_with('/test/src/path')
     model.set_dst_folder.assert_called_once_with('/test/dst/path')
 
 
-def test_move(controller, model, view_class):
-    controller.move()
-    model.move.assert_called_once()
+def test_move_mode(controller, model, console_view):
+    controller.move_mode(True)
+    model.move_mode.assert_called_once_with(True)
 
 
-def test_enable_moved_images_log(controller, model, view_class):
-    iadd_mock = Mock()
-    model.on_move_finished.__iadd__ = iadd_mock
-    controller.enable_moved_images_log()
-    iadd_mock.assert_called_once()
-
-
-def test_handle_image_moved(controller, model, view_class):
-    def received_handler(*args):
-        return None
-
-    def mock_of_handler(_, handler):
-        nonlocal received_handler
-        received_handler = handler
-
-    model.on_move_finished.__iadd__ = mock_of_handler
-    controller.enable_moved_images_log()
-    received_handler(('a', 'b'))
-
-    view_class.return_value.handle_move_finished\
-        .assert_called_once_with(('a', 'b'))
-
-
-def test_clean_mode_is_passing_value_down(controller, model, view_class):
+def test_clean_mode_is_passing_value_down(controller, model, console_view):
     controller.clean_mode(True)
     controller.clean_mode(False)
     model.clean_mode.assert_has_calls([
