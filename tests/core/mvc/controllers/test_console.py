@@ -12,12 +12,9 @@ def model():
 
 
 @pytest.fixture
-def console_view():
-    yield Mock(spec=ConsoleView)
+def controller(container, model):
+    console_view = Mock(spec=ConsoleView)
 
-
-@pytest.fixture
-def controller(container, model, console_view):
     with container.model.override(model):
         instance = container.controller()
 
@@ -25,7 +22,7 @@ def controller(container, model, console_view):
     return instance
 
 
-def test_set_params(controller, model, console_view):
+def test_set_params(controller, model):
     controller.set_src_folder('/test/src/path')
     controller.set_dst_folder('/test/dst/path')
 
@@ -33,12 +30,12 @@ def test_set_params(controller, model, console_view):
     model.set_dst_folder.assert_called_once_with('/test/dst/path')
 
 
-def test_move_mode(controller, model, console_view):
+def test_move_mode(controller, model):
     controller.move_mode(True)
     model.move_mode.assert_called_once_with(True)
 
 
-def test_clean_mode_is_passing_value_down(controller, model, console_view):
+def test_clean_mode_is_passing_value_down(controller, model):
     controller.clean_mode(True)
     controller.clean_mode(False)
     model.clean_mode.assert_has_calls([
