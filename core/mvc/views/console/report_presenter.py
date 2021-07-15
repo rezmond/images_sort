@@ -31,6 +31,7 @@ class ReportPresenter:
 
         items = getattr(self._report, attribute_name)
         if not items:
+            yield self._line()
             return
 
         for item in items:

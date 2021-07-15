@@ -67,6 +67,7 @@ def test_report_lines():
         '\n'
         'Not a media:\n'
         '============\n'
+        '\n'
         'No data:\n'
         '========\n'
         '/src/4\n'

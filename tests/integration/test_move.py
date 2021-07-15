@@ -127,10 +127,13 @@ def test_creates_target_folder(container):
         call().write('\n'),
         call().write('Already existed:\n'),
         call().write('================\n'),
+        call().write('\n'),
         call().write('Not a media:\n'),
         call().write('============\n'),
+        call().write('\n'),
         call().write('No data:\n'),
         call().write('========\n'),
+        call().write('\n'),
         call().__exit__(None, None, None)
     ]
 
