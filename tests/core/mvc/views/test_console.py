@@ -83,19 +83,16 @@ def test_help_param(view, controller_mock, model_mock):
 
 
 def test_incorrect_param(view, controller_mock, model_mock):
-    file_ = io.StringIO()
-    with contextlib.redirect_stderr(file_),\
-            pytest.raises(SystemExit) as exc_info,\
+    def assert_app_logic_not_called():
+        assert not controller_mock.mock_calls
+        assert not model_mock.mock_calls
+
+    with raises_argument_errors() as exc_data,\
             patch('sys.argv', [None, '--incorrect-parameter']):
         view.show()
-    assert exc_info.value.code == 2, 'Incorrect exit status'
 
-    assert (not controller_mock.mock_calls) \
-        and (not model_mock.mock_calls), \
-        'Nothing should be called when the help instruction was calling'
-
-    printed_help = file_.getvalue()
-    assert str(printed_help).startswith('usage')
+    assert_argument_errors_contains(*exc_data, 'usage')
+    assert_app_logic_not_called()
 
 
 def test_show_report(view, model_mock):
