@@ -117,13 +117,14 @@ def test_creates_target_folder(container):
         call().write('Moved:\n'),
         call().write('======\n'),
         call().write(
-            '/src/path/1.jpg --> /dst/folder/2000/winter (begin)/1.jpg'),
+            '/src/path/1.jpg --> /dst/folder/2000/winter (begin)/1.jpg\n'),
         call().write(
-            '/src/path/2.jpg --> /dst/folder/2000/winter (begin)/2.jpg'),
+            '/src/path/2.jpg --> /dst/folder/2000/winter (begin)/2.jpg\n'),
         call().write(
-            '/src/path/3.jpg --> /dst/folder/2000/winter (begin)/3.jpg'),
+            '/src/path/3.jpg --> /dst/folder/2000/winter (begin)/3.jpg\n'),
         call().write(
-            '/src/path/4.jpg --> /dst/folder/2000/winter (begin)/4.jpg'),
+            '/src/path/4.jpg --> /dst/folder/2000/winter (begin)/4.jpg\n'),
+        call().write('\n'),
         call().write('Already existed:\n'),
         call().write('================\n'),
         call().write('Not a media:\n'),
