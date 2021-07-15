@@ -3,7 +3,7 @@ import argparse
 MAIN_PROGRAMM = 'sorter.py'
 
 parser = argparse.ArgumentParser(
-    description='Gropus some images by EXIF data',
+    description='Groups some images by EXIF data',
     prog=MAIN_PROGRAMM,
 )
 
