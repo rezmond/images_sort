@@ -1,8 +1,8 @@
-from typing import Iterable
+from typing import Callable, Iterable
 
 from typeguard import typechecked
 
-from core.types import TotalMoveReport
+from core.types import FileWay, TotalMoveReport
 
 
 class ReportPresenter:
@@ -11,56 +11,63 @@ class ReportPresenter:
         self._report = report
 
     @staticmethod
-    def _generate_header(text):
-        yield f'{text}:\n'
-        yield '=' * (len(text) + 1) + '\n'
+    @typechecked
+    def _line(string: str = '') -> str:
+        return string + '\n'
 
-    def _get_moved_lines(self):
-        yield from self._generate_header('Moved')
+    @classmethod
+    @typechecked
+    def _generate_header(cls, text: str) -> Iterable[str]:
+        yield cls._line(f'{text}:')
+        yield cls._line('=' * (len(text) + 1))
 
-        moved = self._report.moved
-        if not moved:
+    def _section(
+        self,
+        head: str,
+        attribute_name: str,
+        format_: Callable[[FileWay], str],
+    ):
+        yield from self._generate_header(head)
+
+        items = getattr(self._report, attribute_name)
+        if not items:
             return
 
-        for item in moved:
-            file_way = item.file_way
-            yield f'{file_way.src} --> {file_way.full_dst}'
+        for item in items:
+            yield self._line(format_(item.file_way))
 
-    def _get_already_existed_lines(self):
-        yield from self._generate_header('Already existed')
+        yield self._line()
 
-        already_existed = self._report.already_existed
-        if not already_existed:
-            return
+    def _get_movedlines(self):
+        return self._section(
+            'Moved',
+            'moved',
+            lambda x: f'{x.src} --> {x.full_dst}',
+        )
 
-        for item in already_existed:
-            file_way = item.file_way
-            yield f'{file_way.src} in {file_way.full_dst}'
+    def _get_already_existedlines(self):
+        return self._section(
+            'Already existed',
+            'already_existed',
+            lambda x: f'{x.src} in {x.full_dst}',
+        )
 
-    def _no_media_lines(self):
-        yield from self._generate_header('Not a media')
+    def _no_medialines(self):
+        return self._section(
+            'Not a media',
+            'no_media',
+            lambda x: x.src,
+        )
 
-        no_media = self._report.no_media
-        if not no_media:
-            return
-
-        for item in no_media:
-            file_way = item.file_way
-            yield file_way.src
-
-    def _no_data_lines(self):
-        yield from self._generate_header('No data')
-
-        no_data = self._report.no_data
-        if not no_data:
-            return
-
-        for item in no_data:
-            file_way = item.file_way
-            yield file_way.src
+    def _no_datalines(self):
+        return self._section(
+            'No data',
+            'no_data',
+            lambda x: x.src,
+        )
 
     def get_report_lines(self) -> Iterable[str]:
-        yield from self._get_moved_lines()
-        yield from self._get_already_existed_lines()
-        yield from self._no_media_lines()
-        yield from self._no_data_lines()
+        yield from self._get_movedlines()
+        yield from self._get_already_existedlines()
+        yield from self._no_medialines()
+        yield from self._no_datalines()
