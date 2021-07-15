@@ -64,6 +64,17 @@ def test_required_src_folder(view):
     assert_argument_errors_contains(*exc_data, 'src', 'required')
 
 
+def test_required_dst_folder(view):
+    '''
+    The dst argument might be unnecessary during scan only mode
+    '''
+    with patch('sys.argv', [None, '/src/folder']),\
+            raises_argument_errors() as exc_data:
+        view.show()
+
+    assert_argument_errors_contains(*exc_data, 'dst', 'required')
+
+
 def test_help_param(view, controller_mock, model_mock):
     file_ = io.StringIO()
     with contextlib.redirect_stdout(file_),\
