@@ -6,7 +6,6 @@ from typeguard import typechecked
 
 from core.types import Comparator, FileWay, MoveReport, MoveResult
 from libs import Either
-from ..exceptions import NoArgumentPassedError
 from ..fs import FsManipulatorBase, FsActions, FolderPathValidator
 from .base import MoverBase
 
@@ -129,9 +128,6 @@ class Mover(MoverBase):
 
     @typechecked
     def get_dst_folder(self) -> str:
-        if self._dst_folder is None:
-            raise NoArgumentPassedError('dst')
-
         return self._dst_folder
 
     @typechecked

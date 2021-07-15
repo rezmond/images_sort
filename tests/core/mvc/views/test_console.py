@@ -4,7 +4,6 @@ from unittest.mock import patch, call, Mock, MagicMock
 
 import pytest
 
-from core.entities.exceptions import NoArgumentPassedError
 from core.mvc.controllers import ControllerBase
 from core.mvc.model import MoverModel
 from core.types import MoveReport, FileWay, MoveType, MoveResult

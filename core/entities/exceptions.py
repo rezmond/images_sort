@@ -9,15 +9,6 @@ class FolderValidationError(SorterError):
         self._path = path
 
 
-class NoArgumentPassedError(FolderValidationError):
-
-    def __str__(self):
-        return (
-            'The "{0}" folder\'s path has not been set.'
-            ' Please set the "{0}" folder path and try again.'
-            .format(self._name))
-
-
 class RelativeFolderPathError(FolderValidationError):
     def __str__(self):
         return (

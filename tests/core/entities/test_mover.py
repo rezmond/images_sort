@@ -6,10 +6,7 @@ import pytest
 
 from core.types import FileWay, MoveType, MoveResult, MoveReport
 from core.entities.fs import FsManipulatorBase, FolderCheckerBase
-from core.entities.exceptions import (
-    NoArgumentPassedError,
-    RelativeFolderPathError,
-)
+from core.entities.exceptions import RelativeFolderPathError
 from tests.utils import overrides
 
 
@@ -77,16 +74,6 @@ def get_mover(container, **mocks):
         mover = container.mover()
 
     return mover
-
-
-def test_move_without_dst_param(container):
-    mover = get_mover(container)
-
-    with pytest.raises(NoArgumentPassedError) as exc_info:
-        mover.move(FileWay())
-
-    assert 'path has not been set' in str(exc_info.value), \
-        'Should catch not set the src or the dst folder path'
 
 
 def test_move_by_relative_path(container):

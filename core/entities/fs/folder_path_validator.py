@@ -3,10 +3,7 @@ import os
 from typeguard import typechecked
 
 from libs import Right, Left, Either
-from ..exceptions import (
-    NoArgumentPassedError,
-    RelativeFolderPathError,
-)
+from ..exceptions import RelativeFolderPathError
 from .folder_checker_base import FolderCheckerBase
 
 
@@ -18,10 +15,6 @@ class FolderPathValidator:
 
     @typechecked
     def validate(self, name: str, path: str) -> Either:
-
-        if not path:
-            raise NoArgumentPassedError(name)
-
         if not os.path.isabs(path):
             raise RelativeFolderPathError(name, path)
 
