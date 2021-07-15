@@ -22,6 +22,11 @@ class ControllerBase(OutputBoundary, ABC):
         self._io_interactor = io_interactor
 
     @typechecked
+    @abstractmethod
+    def set_verbosity(self, level: int) -> None:
+        ''''''
+
+    @typechecked
     def clean_mode(self, enable: bool) -> None:
         self._input_boundary.clean_mode(enable)
 

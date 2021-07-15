@@ -20,9 +20,11 @@ def controller_mock():
 
 
 @pytest.fixture
-def view(container, model_mock, controller_mock):
-    view_class = container.view_class()
-    yield view_class(controller_mock, model_mock)
+def view(container, controller_mock):
+    with container.controller.override(controller_mock):
+        view = container.view()
+
+    yield view
 
 
 def test_filled_params(view, controller_mock):
@@ -34,23 +36,6 @@ def test_filled_params(view, controller_mock):
         call.set_src_folder('/src/folder'),
         call.set_dst_folder('/dst/folder'),
     ])
-
-
-def test_param_list_items_true(view, controller_mock):
-
-    with patch('sys.argv', [None, '-l', '/src/folder', '/dst/folder']):
-        view.show()
-
-    controller_mock.enable_moved_images_log\
-        .assert_called_once_with(True)
-
-
-def test_param_list_items_false(view, controller_mock):
-    with patch('sys.argv', [None, '/src/folder', '/dst/folder']):
-        view.show()
-
-    controller_mock.enable_moved_images_log\
-        .assert_called_once_with(False)
 
 
 def test_help_param(view, controller_mock, model_mock):
@@ -88,22 +73,20 @@ def test_incorrect_param(view, controller_mock, model_mock):
 
 
 def test_show_report(view, model_mock):
-    caught_io = io.StringIO()
 
     src = '/src/path/test.jpeg'
     final_dst = '/dst/path/test_6.jpeg'
 
-    with contextlib.redirect_stdout(caught_io):
-        view.handle_move_finished(MoveReport(
-            file_way=FileWay(
-                src=src,
-                dst='/dst/path',
-                full_dst=final_dst,
-                type=MoveType.MEDIA
-            ),
-            result=MoveResult.MOVED,
-        ))
-
-    printed_list = caught_io.getvalue()
+    file_way = FileWay(
+        src=src,
+        dst='/dst/path',
+        full_dst=final_dst,
+        type=MoveType.MEDIA
+    )
+    move_report = MoveReport(
+        file_way=file_way,
+        result=MoveResult.MOVED,
+    )
+    printed_list = view.file_moved_report_to_str(move_report)
 
     assert printed_list == f'\r\033[K{src} -> {final_dst}'
