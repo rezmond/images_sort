@@ -93,6 +93,8 @@ class MoverModel(InputBoundary):
         if not is_confirmed:
             self._output_boundary.finish()
 
+        # TODO: Implement the moving after confirm
+
     @typechecked
     def move(self) -> None:
         self._mover\
