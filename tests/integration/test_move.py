@@ -38,7 +38,7 @@ def test_creates_target_folder(container):
     def isfile_mock(_):
         return False
 
-    def create_folder(_):
+    def makedirs(_):
         nonlocal is_dst_folder_existed
         is_dst_folder_existed = True
 
@@ -53,7 +53,7 @@ def test_creates_target_folder(container):
         'folder_to_file_pathes.return_value': base_pathes,
         'isfolder': false_if_dst,
         'isfile': isfile_mock,
-        'create_folder': create_folder,
+        'makedirs': makedirs,
     })
 
     caught_report_stings = []

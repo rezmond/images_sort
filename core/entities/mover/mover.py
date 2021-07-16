@@ -132,7 +132,7 @@ class Mover(MoverBase):
 
     @typechecked
     def create_and_set_dst_folder(self, dst: str) -> None:
-        self._fs_manipulator.create_folder(dst)
+        self._fs_manipulator.makedirs(dst)
         self._dst_folder = dst
 
     def _validate_dst(self, dst: str) -> Either:
