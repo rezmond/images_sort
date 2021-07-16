@@ -9,8 +9,10 @@ def main():
 
     controller = container.controller()
     view = container.view()
+    model = container.model()
 
     controller.set_io_interactor(view)
+    model.set_output_boundary(controller)
     controller.show()
 
 
