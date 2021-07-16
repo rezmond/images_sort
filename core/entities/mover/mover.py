@@ -78,8 +78,9 @@ class Mover(MoverBase):
              move_mode: bool = False) -> MoveReport:
         '''
         TODO: move the move_mode initialisation to a method
-        TODO: write test for case when the file_way has empty "dst" value
         '''
+        assert file_way.dst is not None, (
+            f'The file way {file_way} has empty destination.')
 
         full_dst = os.path.join(self.get_dst_folder(), file_way.dst)
 

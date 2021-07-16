@@ -76,6 +76,22 @@ def get_mover(container, **mocks):
     return mover
 
 
+def move_to_epmty(container, file_way):
+    mover = get_mover(container)
+    mover.set_dst_folder('/dst/path')
+
+    with pytest.raises(AssertionError) as exc_info:
+        mover.move(
+            file_way
+        )
+
+    return exc_info.value
+
+
+def is_empty_destination_error_raised(exception):
+    return 'empty destination' in str(exception)
+
+
 def test_move_by_relative_path(container):
     mover = get_mover(container)
 
@@ -182,3 +198,19 @@ def test_delete_duplicates(container):
 
     copy_mock = fs_manipulator_mock.copy
     copy_mock.assert_not_called()
+
+
+def test_move_no_data(container):
+    exception = move_to_epmty(container, FileWay(
+        src='/src/path/data/1.jpg',
+        type=MoveType.NO_DATA,
+    ))
+    assert is_empty_destination_error_raised(exception)
+
+
+def test_move_no_media(container):
+    exception = move_to_epmty(container, FileWay(
+        src='/src/path/data/2.jpg',
+        type=MoveType.NO_MEDIA,
+    ))
+    assert is_empty_destination_error_raised(exception)
