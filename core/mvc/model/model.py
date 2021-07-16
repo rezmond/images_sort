@@ -107,7 +107,8 @@ class MoverModel(InputBoundary):
     @typechecked
     def _move(self) -> None:
         def _move_generator():
-            for file_way in self._file_ways:
+            scan_report = self._get_scan_report()
+            for file_way in scan_report.movable:
                 report = self._mover.move(file_way, self._modes['clean'])
                 self._add_to_move_report(report)
                 yield report
