@@ -1,4 +1,5 @@
 from typeguard import typechecked
+from functools import partial
 
 from core.entities.scanner import ScannerBase
 from core.entities.mover import MoverBase
@@ -142,7 +143,12 @@ class MoverModel(InputBoundary):
     @typechecked
     def _get_total_move_report(self) -> TotalMoveReport:
         scan_report = self._get_scan_report()
-        self._move_report.no_media.extend(scan_report.no_media)
-        self._move_report.no_data.extend(scan_report.no_data)
+        dead_move_report = partial(MoveReport, result=None)
+        self._move_report.no_media.extend(
+            (dead_move_report(file_way=x) for x in scan_report.no_media)
+        )
+        self._move_report.no_data.extend(
+            (dead_move_report(file_way=x) for x in scan_report.no_data)
+        )
 
         return self._move_report
