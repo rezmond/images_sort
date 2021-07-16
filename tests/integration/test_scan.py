@@ -13,12 +13,13 @@ base_scan_output = (
     '\r\033[K2: /src/path/2.jpg'
     '\r\033[K3: /src/path/3.jpg'
     '\r\033[K4: /src/path/4.jpg'
+    '\r\033[K5: /src/path/5.mp4'
     '\n'
     f'Movable:      {PAD}4\n'
     f'Not a media:  {PAD}0\n'
-    f'No data:      {PAD}0\n'
+    f'No data:      {PAD}1\n'
     f'====={"=" * 70}=====\n'
-    f'Total found:  {PAD}4\n'
+    f'Total found:  {PAD}5\n'
     '\n'
 )
 

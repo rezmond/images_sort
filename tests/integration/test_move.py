@@ -59,7 +59,7 @@ def test_creates_target_folder(container):
     caught_report_stings = []
 
     def move_in_context_mock(gen, length, item_show_func):
-        assert length == 4
+        assert length == len(base_pathes)
 
         moved = list(
             map(pipe(item_show_func, caught_report_stings.append), gen))
@@ -94,7 +94,7 @@ def test_creates_target_folder(container):
         f'Have been moved:   {PAD}4\n'
         f'Already existed:   {PAD}0\n'
         f'Not a media:       {PAD}0\n'
-        f'No data:           {PAD}0\n'
+        f'No data:           {PAD}1\n'
         f'{"=" * 80}\n'
         'Report was existed in: /dst/folder/report.txt\n'
     )
@@ -133,6 +133,7 @@ def test_creates_target_folder(container):
         call().write('\n'),
         call().write('No data:\n'),
         call().write('========\n'),
+        call().write('/src/path/5.mp4\n'),
         call().write('\n'),
         call().__exit__(None, None, None)
     ]

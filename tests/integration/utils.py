@@ -13,6 +13,7 @@ base_path_map = (
     ('/src/path/2.jpg', date.fromisoformat('2017-03-14')),
     ('/src/path/3.jpg', date.fromisoformat('2017-06-20')),
     ('/src/path/4.jpg', date.fromisoformat('2017-12-30')),
+    ('/src/path/5.mp4', None),
 )
 
 base_pathes = [path for (path, _) in base_path_map]
@@ -74,6 +75,6 @@ def assert_lines_equal(actual, expected):
     for actual_line, expected_line in zip(actual_lines, expected_lines):
         assert actual_line == expected_line, (
             'the strings are not equal.\n'
-            f'First:\t"{actual_line}"\n'
-            f'Second:\t"{expected_line}"'
+            f'First:\t "{actual_line}"\n'
+            f'Second:\t "{expected_line}"'
         )
