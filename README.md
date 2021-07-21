@@ -23,7 +23,7 @@ Run tests with the coverage:
 
 Roadmap:
 
-   - [ ] The moving process view:
+   - [X] The moving process view:
 
 
         Prompt:
