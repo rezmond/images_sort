@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Optional
 
 from typeguard import typechecked
 
@@ -49,7 +49,10 @@ class ConsoleViewController(ControllerBase):
                 pass
 
     @typechecked
-    def _on_file_moved(self, report: MoveReport) -> str:
+    def _on_file_moved(self, report: MoveReport) -> Optional[str]:
+        '''
+        TODO: add a test case for the none str returnig value
+        '''
         if self._verbosity > Verbosity.LOW:
             return self._io_interactor.file_moved_report_to_str(report)
 
