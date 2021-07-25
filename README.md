@@ -78,7 +78,7 @@ Roadmap:
               =======================
               Report was existed in: /path/to/src/dir/report.txt
 
-
+   - [ ] Add count of each moving group in the move report
    - [ ] May be. Add flags to skip some of step in previous section
    - [ ] Update the script help
    - [ ] Case for images without exif data, but with file name like "20200429_*.jpg"
