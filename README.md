@@ -64,7 +64,7 @@ Roadmap:
         - [X] 5. Move progress:
 
               [====>                    ] %%
-              /current/file/path.ext
+              /current/file/path.ext --> /new/file/path.ext
         - [X] 6. Create report files (hidden)
         - [X] 7. If `-v` >= 2: Show move report
 

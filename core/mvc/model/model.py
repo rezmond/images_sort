@@ -107,7 +107,7 @@ class MoverModel(InputBoundary):
 
     @typechecked
     def _move(self) -> None:
-        def _move_generator():
+        def move_generator():
             scan_report = self._get_scan_report()
             for file_way in scan_report.movable:
                 report = self._mover.move(file_way, self._modes['clean'])
@@ -117,7 +117,7 @@ class MoverModel(InputBoundary):
                 self._get_total_move_report(), self._dst_folder)
 
         self._output_boundary.on_move_started(
-            _move_generator(), length=len(self._file_ways))
+            move_generator(), length=len(self._file_ways))
 
     @typechecked
     def _resolve_dst_does_not_exist(self, dst: str) -> Either:

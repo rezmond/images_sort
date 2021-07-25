@@ -80,10 +80,10 @@ def test_creates_target_folder(container):
     )
 
     expected_str_reports = (
-        '\r\x1b[K/src/path/1.jpg -> /dst/folder/2000/winter (begin)/1.jpg'
-        '\r\x1b[K/src/path/2.jpg -> /dst/folder/2000/winter (begin)/2.jpg'
-        '\r\x1b[K/src/path/3.jpg -> /dst/folder/2000/winter (begin)/3.jpg'
-        '\r\x1b[K/src/path/4.jpg -> /dst/folder/2000/winter (begin)/4.jpg'
+        '\r\x1b[K/src/path/1.jpg --> /dst/folder/2000/winter (begin)/1.jpg'
+        '\r\x1b[K/src/path/2.jpg --> /dst/folder/2000/winter (begin)/2.jpg'
+        '\r\x1b[K/src/path/3.jpg --> /dst/folder/2000/winter (begin)/3.jpg'
+        '\r\x1b[K/src/path/4.jpg --> /dst/folder/2000/winter (begin)/4.jpg'
     )
 
     assert_lines_equal(''.join(progressbar_mock.moved), expected_str_reports)

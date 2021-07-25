@@ -40,7 +40,7 @@ class ConsoleView(IoInteractor):
 
     @typechecked
     def scanned_file(self, path: str, total: int) -> None:
-        print(f'\r\033[K{total}: {path}', end='')
+        print(self._the_same_line(f'{total}: {path}'), end='')
 
     @typechecked
     def show_scan_report(self, scan_report: ScanReport) -> None:
@@ -83,8 +83,8 @@ class ConsoleView(IoInteractor):
                 f'The "{report.result}" result is not'
                 f' equal to "{MoveResult.MOVED}"'
             )
-            return (
-                f'\r\033[K{report.file_way.src} -> {report.file_way.full_dst}'
+            return self._the_same_line(
+                f'{report.file_way.src} --> {report.file_way.full_dst}'
             )
 
         @typechecked
@@ -99,6 +99,11 @@ class ConsoleView(IoInteractor):
             bar_template='[%(bar)s]  %(info)s\n',
             item_show_func=item_show_func,
         )
+
+    @staticmethod
+    @typechecked
+    def _the_same_line(line: str) -> str:
+        return f'\r\033[K{line}'
 
     @typechecked
     def show_total_move_report(

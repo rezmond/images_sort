@@ -134,4 +134,4 @@ def test_show_report(view, model_mock):
             for _ in moved_reports_wrapped:
                 pass
 
-    assert ''.join(progressbar_mock.moved) == f'\r\033[K{src} -> {final_dst}'
+    assert ''.join(progressbar_mock.moved) == f'\r\033[K{src} --> {final_dst}'
