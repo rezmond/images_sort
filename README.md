@@ -84,3 +84,4 @@ Roadmap:
    - [ ] Case for images without exif data, but with file name like "20200429_*.jpg"
    - [X] Introduce the `mvc` folder
    - [ ] Is the target folder needed on scanning only mode?
+   - [ ] Implement the "verbosity" argument validation
