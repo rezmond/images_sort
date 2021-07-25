@@ -79,7 +79,10 @@ class ConsoleView(IoInteractor):
 
         @typechecked
         def report_to_str(report: MoveReport) -> str:
-            assert report.result == MoveResult.MOVED
+            assert report.result == MoveResult.MOVED, (
+                f'The "{report.result}" result is not'
+                f' equal to "{MoveResult.MOVED}"'
+            )
             return (
                 f'\r\033[K{report.file_way.src} -> {report.file_way.full_dst}'
             )
