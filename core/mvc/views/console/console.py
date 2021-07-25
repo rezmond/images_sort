@@ -88,11 +88,11 @@ class ConsoleView(IoInteractor):
             )
 
             if report.result == MoveResult.MOVED:
-                return self._the_same_line(
+                return (
                     f'{report.file_way.src} --> {report.file_way.full_dst}'
                 )
 
-            return self._the_same_line(report.file_way.src)
+            return report.file_way.src
 
         @typechecked
         def item_show_func(report: Optional[MoveReport]) -> Optional[str]:
@@ -103,7 +103,6 @@ class ConsoleView(IoInteractor):
         return click.progressbar(
             moved_reports,
             length=length,
-            bar_template='[%(bar)s]  %(info)s\n',
             item_show_func=item_show_func,
         )
 
