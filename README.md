@@ -85,3 +85,5 @@ Roadmap:
    - [X] Introduce the `mvc` folder
    - [ ] Is the target folder needed on scanning only mode?
    - [ ] Implement the "verbosity" argument validation
+   - [ ] Add the glob for path processing
+   - [ ] Add indents to report for text-editors that can collapse sections
