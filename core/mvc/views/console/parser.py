@@ -34,4 +34,6 @@ parser.add_argument(
     '-c', '--clean',
     default=False,
     action='store_true',
-    help='remove the duplicates and actually move the files')
+    help='remove the duplicates and actually move the files.'
+    ' If the argument was not provided the actual move will be'
+    ' applied through copy.')
