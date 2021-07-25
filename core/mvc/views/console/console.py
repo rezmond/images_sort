@@ -79,13 +79,20 @@ class ConsoleView(IoInteractor):
 
         @typechecked
         def report_to_str(report: MoveReport) -> str:
-            assert report.result == MoveResult.MOVED, (
-                f'The "{report.result}" result is not'
-                f' equal to "{MoveResult.MOVED}"'
+            allowed_report_results = (
+                MoveResult.MOVED, MoveResult.ALREADY_EXISTED,)
+
+            assert report.result in allowed_report_results, (
+                f'The "{report.result}" result value should equal one of these'
+                f'[{"], [".join(allowed_report_results)}]'
             )
-            return self._the_same_line(
-                f'{report.file_way.src} --> {report.file_way.full_dst}'
-            )
+
+            if report.result == MoveResult.MOVED:
+                return self._the_same_line(
+                    f'{report.file_way.src} --> {report.file_way.full_dst}'
+                )
+
+            return self._the_same_line(report.file_way.src)
 
         @typechecked
         def item_show_func(report: Optional[MoveReport]) -> Optional[str]:
