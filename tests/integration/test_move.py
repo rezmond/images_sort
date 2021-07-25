@@ -1,13 +1,9 @@
 import io
 import contextlib
-from typing import Iterable
 
-from typeguard import typechecked
 from unittest.mock import call, Mock, patch, mock_open
 
-from core.types import MoveReport
-from core.mvc.views import ConsoleView
-from utils import pipe
+from tests.utils import get_progressbar_mock
 from .utils import (
     base_pathes,
     redirect_stdin,
@@ -15,13 +11,6 @@ from .utils import (
     assert_lines_equal,
     FsManipulatorCompilation,
 )
-
-
-class ConsoleViewMock(ConsoleView):
-    @typechecked
-    def move_in_context(
-            self, moved_reports: Iterable[MoveReport], length: int):
-        return moved_reports
 
 
 PAD = ' ' * 60
@@ -56,20 +45,8 @@ def test_creates_target_folder(container):
         'makedirs': makedirs,
     })
 
-    caught_report_stings = []
-
-    def move_in_context_mock(gen, length, item_show_func):
-        assert length == len(base_pathes)
-
-        moved = list(
-            map(pipe(item_show_func, caught_report_stings.append), gen))
-        mock = Mock()
-        mock.__enter__ = Mock(return_value=moved)
-        mock.__exit__ = Mock(return_value=False)
-
-        return mock
-
     mock_of_open = mock_open()
+    progressbar_mock = get_progressbar_mock(len(base_pathes))
     with patch(
         'core.mvc.views.console.console.open', mock_of_open
     ), container.exif_data_getter.override(
@@ -78,13 +55,12 @@ def test_creates_target_folder(container):
         caught_io
     ), redirect_stdin(
         input_io
-    ), with_controller(
+    ), patch('click.progressbar', progressbar_mock), \
+        with_controller(
         container, argv_args,
         fs_manipulator=fs_manipulator,
         comparator=comparator
     ) as console:
-        view = container.view()
-        view.move_in_context = move_in_context_mock
         console.show()
 
     expected_stdout = (
@@ -104,12 +80,13 @@ def test_creates_target_folder(container):
     )
 
     expected_str_reports = (
-        '\r\x1b[K/src/path/1.jpg -> /dst/folder/2000/winter (begin)/1.jpg\n'
-        '\r\x1b[K/src/path/2.jpg -> /dst/folder/2000/winter (begin)/2.jpg\n'
-        '\r\x1b[K/src/path/3.jpg -> /dst/folder/2000/winter (begin)/3.jpg\n'
-        '\r\x1b[K/src/path/4.jpg -> /dst/folder/2000/winter (begin)/4.jpg\n'
+        '\r\x1b[K/src/path/1.jpg -> /dst/folder/2000/winter (begin)/1.jpg'
+        '\r\x1b[K/src/path/2.jpg -> /dst/folder/2000/winter (begin)/2.jpg'
+        '\r\x1b[K/src/path/3.jpg -> /dst/folder/2000/winter (begin)/3.jpg'
+        '\r\x1b[K/src/path/4.jpg -> /dst/folder/2000/winter (begin)/4.jpg'
     )
-    assert_lines_equal(expected_str_reports, expected_str_reports)
+
+    assert_lines_equal(''.join(progressbar_mock.moved), expected_str_reports)
 
     report_file_calls = [
         call('/dst/folder/report.txt', 'w'),

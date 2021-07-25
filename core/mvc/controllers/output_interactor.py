@@ -31,13 +31,9 @@ class OutputInteractor(ABC):
 
     @typechecked
     @abstractmethod
-    def file_moved_report_to_str(self, report: MoveReport) -> str:
-        ''''''
-
-    @typechecked
-    @abstractmethod
     def move_in_context(
-        self, moved_reports: Iterable[MoveReport]
+        self, moved_reports: Iterable[MoveReport], length: int,
+        should_report_be_shown: bool
     ) -> ContextManager[Iterable[MoveReport]]:
         ''''''
 

@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Callable, ContextManager, Iterable, Optional
+from typing import ContextManager, Iterable, Optional
 
 import click
 from typeguard import typechecked
@@ -59,12 +59,6 @@ class ConsoleView(IoInteractor):
         )
 
     @typechecked
-    def file_moved_report_to_str(self, report: MoveReport) -> str:
-        '''Make the method dumber'''
-        assert report.result == MoveResult.MOVED
-        return f'\r\033[K{report.file_way.src} -> {report.file_way.full_dst}'
-
-    @typechecked
     def close(self):
         sys.exit(0)
 
@@ -80,18 +74,27 @@ class ConsoleView(IoInteractor):
     @typechecked
     def move_in_context(
         self, moved_reports: Iterable[MoveReport], length: int,
-        item_show_func: Callable
+        should_report_be_shown: bool
     ) -> ContextManager[Iterable[MoveReport]]:
 
-        def _item_show_func(report):
-            if report:
-                item_show_func(report)
+        @typechecked
+        def report_to_str(report: MoveReport) -> str:
+            assert report.result == MoveResult.MOVED
+            return (
+                f'\r\033[K{report.file_way.src} -> {report.file_way.full_dst}'
+            )
+
+        @typechecked
+        def item_show_func(report: Optional[MoveReport]) -> Optional[str]:
+            if report and should_report_be_shown:
+                return report_to_str(report)
+            return None
 
         return click.progressbar(
             moved_reports,
             length=length,
             bar_template='[%(bar)s]  %(info)s\n',
-            item_show_func=_item_show_func,
+            item_show_func=item_show_func,
         )
 
     @typechecked

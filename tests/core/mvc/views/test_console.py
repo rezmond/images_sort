@@ -7,6 +7,7 @@ import pytest
 from core.mvc.controllers import ControllerBase
 from core.mvc.model import MoverModel
 from core.types import MoveReport, FileWay, MoveType, MoveResult
+from tests.utils import get_progressbar_mock
 
 
 @pytest.fixture
@@ -120,6 +121,17 @@ def test_show_report(view, model_mock):
         file_way=file_way,
         result=MoveResult.MOVED,
     )
-    printed_list = view.file_moved_report_to_str(move_report)
 
-    assert printed_list == f'\r\033[K{src} -> {final_dst}'
+    progressbar_mock = get_progressbar_mock(1)
+
+    with patch('click.progressbar', progressbar_mock):
+        show_context = view.move_in_context(
+            (move_report,),
+            length=1,
+            should_report_be_shown=True,
+        )
+        with show_context as moved_reports_wrapped:
+            for _ in moved_reports_wrapped:
+                pass
+
+    assert ''.join(progressbar_mock.moved) == f'\r\033[K{src} -> {final_dst}'

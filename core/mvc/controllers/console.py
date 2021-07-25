@@ -42,19 +42,11 @@ class ConsoleViewController(ControllerBase):
         show_context = self._io_interactor.move_in_context(
             moved_reports,
             length=length,
-            item_show_func=self._on_file_moved,
+            should_report_be_shown=self._verbosity > Verbosity.LOW,
         )
         with show_context as moved_reports_wrapped:
             for _ in moved_reports_wrapped:
                 pass
-
-    @typechecked
-    def _on_file_moved(self, report: MoveReport) -> Optional[str]:
-        '''
-        TODO: add a test case for the none str returnig value
-        '''
-        if self._verbosity > Verbosity.LOW:
-            return self._io_interactor.file_moved_report_to_str(report)
 
     @typechecked
     def on_move_finished(
