@@ -52,7 +52,10 @@ def scan(model, src):
         list(move_gen)
 
     output_boundary_mock = Mock(
-        spec=OutputBoundary, on_move_started=on_move_started)
+        spec=OutputBoundary,
+        on_move_started=on_move_started,
+        **{'confirm.return_value': False}
+    )
 
     model.set_output_boundary(output_boundary_mock)
 

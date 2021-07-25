@@ -91,10 +91,10 @@ class MoverModel(InputBoundary):
         is_confirmed = self._output_boundary.confirm(
             f'Do You want to move the {movable_count} files')
 
-        if not is_confirmed:
+        if is_confirmed:
+            self.move()
+        else:
             self._output_boundary.finish()
-
-        # TODO: Implement the moving after confirm
 
     @typechecked
     def move(self) -> None:
