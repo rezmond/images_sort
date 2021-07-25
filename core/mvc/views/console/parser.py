@@ -1,5 +1,7 @@
 import argparse
 
+from core.types import Verbosity
+
 MAIN_PROGRAMM = 'sorter.py'
 
 parser = argparse.ArgumentParser(
@@ -17,9 +19,10 @@ parser.add_argument(
     help='the destination folder full path.')
 parser.add_argument(
     '-v', '--verbosity',
-    default=0,
+    default=Verbosity.LOW,
     type=int,
-    help='verbosity level')
+    help='verbosity level.'
+    f' The allowed verbosities are: {list(map(int, Verbosity))}')
 parser.add_argument(
     '-s', '--scan',
     default=False,

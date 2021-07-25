@@ -2,15 +2,9 @@ from typing import Iterable
 
 from typeguard import typechecked
 
-from core.types import MoveReport, TotalMoveReport
+from core.types import MoveReport, TotalMoveReport, Verbosity
 from libs import Either
 from .base import ControllerBase
-
-
-class Verbosity:
-    LOW = 0
-    MEDIUM = 1
-    HIGH = 2
 
 
 class ConsoleViewController(ControllerBase):
@@ -22,7 +16,7 @@ class ConsoleViewController(ControllerBase):
 
     @typechecked
     def set_verbosity(self, level: int) -> None:
-        self._verbosity = level
+        self._verbosity = Verbosity(level)
 
     @typechecked
     def show(self) -> None:

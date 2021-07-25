@@ -36,7 +36,7 @@ def test_creates_target_folder(container):
 
     caught_io = io.StringIO()
     input_io = io.StringIO('y\ny\n')
-    argv_args = [None, '-v 3', '/src/folder', '/dst/folder']
+    argv_args = [None, '-v 2', '/src/folder', '/dst/folder']
     exif_data_getter_mock = Mock(return_value='2000-01-01T12:00:00')
     fs_manipulator = Mock(spec=FsManipulatorCompilation, **{
         'folder_to_file_pathes.return_value': base_pathes,

@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import Enum, auto, IntEnum
 from typing import Callable, Iterable
-
 
 Comparator = Callable[[str, str], bool]
 
@@ -15,6 +14,12 @@ class MoveType(Enum):
 class MoveResult(Enum):
     MOVED = auto()
     ALREADY_EXISTED = auto()
+
+
+class Verbosity(IntEnum):
+    LOW = 0
+    MEDIUM = 1
+    HIGH = 2
 
 
 @dataclass(frozen=True)
