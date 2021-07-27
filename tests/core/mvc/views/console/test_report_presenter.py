@@ -56,20 +56,20 @@ def test_report_lines():
     actual = ''.join(reporter.get_report_lines())
 
     assert actual == (
-        'Moved:\n'
-        '======\n'
+        'Moved (2):\n'
+        '==========\n'
         '/src/1.1 --> /full_dst/1.1\n'
         '/src/1.2 --> /full_dst/1.2\n'
         '\n'
-        'Already existed:\n'
-        '================\n'
+        'Already existed (1):\n'
+        '====================\n'
         '/src/2 in /full_dst/2\n'
         '\n'
-        'Not a media:\n'
-        '============\n'
+        'Not a media (0):\n'
+        '================\n'
         '\n'
-        'No data:\n'
-        '========\n'
+        'No data (1):\n'
+        '============\n'
         '/src/4\n'
         '\n'
     )

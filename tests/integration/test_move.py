@@ -92,8 +92,8 @@ def test_creates_target_folder(container):
     report_file_calls = [
         call('/dst/folder/report.txt', 'w'),
         call().__enter__(),
-        call().write('Moved:\n'),
-        call().write('======\n'),
+        call().write('Moved (4):\n'),
+        call().write('==========\n'),
         call().write(
             '/src/path/1.jpg --> /dst/folder/2000/winter (begin)/1.jpg\n'),
         call().write(
@@ -103,14 +103,14 @@ def test_creates_target_folder(container):
         call().write(
             '/src/path/4.jpg --> /dst/folder/2000/winter (begin)/4.jpg\n'),
         call().write('\n'),
-        call().write('Already existed:\n'),
+        call().write('Already existed (0):\n'),
+        call().write('====================\n'),
+        call().write('\n'),
+        call().write('Not a media (0):\n'),
         call().write('================\n'),
         call().write('\n'),
-        call().write('Not a media:\n'),
+        call().write('No data (1):\n'),
         call().write('============\n'),
-        call().write('\n'),
-        call().write('No data:\n'),
-        call().write('========\n'),
         call().write('/src/path/5.mp4\n'),
         call().write('\n'),
         call().__exit__(None, None, None)

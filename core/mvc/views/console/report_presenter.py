@@ -17,9 +17,10 @@ class ReportPresenter:
 
     @classmethod
     @typechecked
-    def _generate_header(cls, text: str) -> Iterable[str]:
-        yield cls._line(f'{text}:')
-        yield cls._line('=' * (len(text) + 1))
+    def _generate_header(cls, head: str, count: int) -> Iterable[str]:
+        text = f'{head} ({count}):'
+        yield cls._line(text)
+        yield cls._line('=' * len(text))
 
     def _section(
         self,
@@ -27,9 +28,10 @@ class ReportPresenter:
         attribute_name: str,
         format_: Callable[[FileWay], str],
     ):
-        yield from self._generate_header(head)
-
         items = getattr(self._report, attribute_name)
+
+        yield from self._generate_header(head, len(items))
+
         if not items:
             yield self._line()
             return
