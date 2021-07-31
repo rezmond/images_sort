@@ -33,14 +33,11 @@ class ConsoleViewController(ControllerBase):
     @typechecked
     def on_move_started(
             self, moved_reports: Iterable[MoveReport], length: int) -> None:
-        show_context = self._io_interactor.move_in_context(
+        self._io_interactor.show_moving_progress(
             moved_reports,
             length=length,
             should_report_be_shown=self._verbosity > Verbosity.LOW,
         )
-        with show_context as moved_reports_wrapped:
-            for _ in moved_reports_wrapped:
-                pass
 
     @typechecked
     def on_move_finished(

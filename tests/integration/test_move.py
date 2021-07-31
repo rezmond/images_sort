@@ -16,6 +16,13 @@ from .utils import (
 PAD = ' ' * 60
 
 
+def move_line(item):
+    return (
+        f'\n\x1b[K/src/path/{item}.jpg --> '
+        f'/dst/folder/2000/winter (begin)/{item}.jpg\x1b[2A\n'
+    )
+
+
 def test_creates_target_folder(container):
     is_dst_folder_existed = False
 
@@ -74,20 +81,12 @@ def test_creates_target_folder(container):
         f'No data:           {PAD}1\n'
         f'{"=" * 80}\n'
         'Report was existed in: /dst/folder/report.txt\n'
-    )
+    ) + ''.join((move_line(1), move_line(2), move_line(3), move_line(4)))
+
     assert_lines_equal(
-        caught_io.getvalue().split('\n')[-10:],
+        caught_io.getvalue().split('\n')[-18:],
         expected_stdout
     )
-
-    expected_str_reports = (
-        '\r\x1b[K/src/path/1.jpg --> /dst/folder/2000/winter (begin)/1.jpg'
-        '\r\x1b[K/src/path/2.jpg --> /dst/folder/2000/winter (begin)/2.jpg'
-        '\r\x1b[K/src/path/3.jpg --> /dst/folder/2000/winter (begin)/3.jpg'
-        '\r\x1b[K/src/path/4.jpg --> /dst/folder/2000/winter (begin)/4.jpg'
-    )
-
-    assert_lines_equal(''.join(progressbar_mock.moved), expected_str_reports)
 
     report_file_calls = [
         call('/dst/folder/report.txt', 'w'),

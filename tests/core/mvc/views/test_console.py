@@ -107,7 +107,7 @@ def test_incorrect_param(view, controller_mock, model_mock):
 
 
 def test_show_report(view, model_mock):
-
+    caught_io = io.StringIO()
     src = '/src/path/test.jpeg'
     final_dst = '/dst/path/test_6.jpeg'
 
@@ -124,14 +124,12 @@ def test_show_report(view, model_mock):
 
     progressbar_mock = get_progressbar_mock(1)
 
-    with patch('click.progressbar', progressbar_mock):
-        show_context = view.move_in_context(
+    with patch('click.progressbar', progressbar_mock), \
+            contextlib.redirect_stdout(caught_io):
+        view.show_moving_progress(
             (move_report,),
             length=1,
             should_report_be_shown=True,
         )
-        with show_context as moved_reports_wrapped:
-            for _ in moved_reports_wrapped:
-                pass
 
-    assert ''.join(progressbar_mock.moved) == f'\r\033[K{src} --> {final_dst}'
+    assert caught_io.getvalue() == f'\n\033[K{src} --> {final_dst}\033[2A\n'

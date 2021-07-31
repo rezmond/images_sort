@@ -72,10 +72,10 @@ class ConsoleView(IoInteractor):
         return Left(dst)
 
     @typechecked
-    def move_in_context(
+    def show_moving_progress(
         self, moved_reports: Iterable[MoveReport], length: int,
         should_report_be_shown: bool
-    ) -> ContextManager[Iterable[MoveReport]]:
+    ) -> None:
 
         @typechecked
         def report_to_str(report: MoveReport) -> str:
@@ -100,11 +100,13 @@ class ConsoleView(IoInteractor):
                 return report_to_str(report)
             return None
 
-        return click.progressbar(
+        with click.progressbar(
             moved_reports,
             length=length,
-            item_show_func=item_show_func,
-        )
+            bar_template='[%(bar)s] %(info)s\n',
+        ) as generator:
+            for report in generator:
+                print(f'\n\033[K{item_show_func(report) or ""}\033[2A')
 
     @staticmethod
     @typechecked
