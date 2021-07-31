@@ -71,7 +71,8 @@ def assert_lines_equal(actual, expected):
 
     expected_lines = expected.split('\n')
 
-    assert len(actual_lines) == len(expected_lines)
+    assert len(actual_lines) == len(expected_lines), \
+        f'Lines count mismatch {len(actual_lines)} != {len(expected_lines)}'
     for actual_line, expected_line in zip(actual_lines, expected_lines):
         assert actual_line == expected_line, (
             'the strings are not equal.\n'
