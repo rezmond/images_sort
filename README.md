@@ -79,7 +79,6 @@ Roadmap:
               Report was existed in: /path/to/src/dir/report.txt
 
    - [X] Add count of each moving group in the move report
-   - [ ] May be. Add flags to skip some of step in previous section
    - [ ] Update the script help
    - [ ] Case for images without exif data, but with file name like "20200429_*.jpg"
    - [X] Introduce the `mvc` folder
@@ -87,3 +86,5 @@ Roadmap:
    - [ ] Implement the "verbosity" argument validation
    - [ ] Add the glob for path processing
    - [ ] Add indents to report for text-editors that can collapse sections
+   - [ ] If the "report.txt" already existes then create the file with new name
+   - [ ] Add the "--exclued" option for exclude some files or folders from source folder
