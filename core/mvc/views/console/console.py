@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import ContextManager, Iterable, Optional
+from typing import Iterable, Optional
 
 import click
 from typeguard import typechecked

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import ContextManager, Iterable, Optional
+from typing import Iterable, Optional
 
 from typeguard import typechecked
 
