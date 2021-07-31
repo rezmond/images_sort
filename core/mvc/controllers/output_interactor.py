@@ -31,10 +31,10 @@ class OutputInteractor(ABC):
 
     @typechecked
     @abstractmethod
-    def move_in_context(
+    def show_moving_progress(
         self, moved_reports: Iterable[MoveReport], length: int,
         should_report_be_shown: bool
-    ) -> ContextManager[Iterable[MoveReport]]:
+    ) -> None:
         ''''''
 
     @typechecked
