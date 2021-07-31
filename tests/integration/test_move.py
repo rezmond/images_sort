@@ -71,9 +71,12 @@ def test_creates_target_folder(container):
         console.show()
 
     expected_stdout = (
+        '\n'
         'Do You want to move the 4 files [y/N]: '
         'The "/dst/folder" folder does not exist.\n'
         'Do You want to create it [y/N]: \n'
+        '\n'
+        '\n'
         '\n'
         f'Have been moved:   {PAD}4\n'
         f'Already existed:   {PAD}0\n'
@@ -84,7 +87,7 @@ def test_creates_target_folder(container):
     ) + ''.join((move_line(1), move_line(2), move_line(3), move_line(4)))
 
     assert_lines_equal(
-        caught_io.getvalue().split('\n')[-18:],
+        caught_io.getvalue().split('\n')[-21:],
         expected_stdout
     )
 

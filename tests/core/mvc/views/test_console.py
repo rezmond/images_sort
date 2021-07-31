@@ -132,4 +132,4 @@ def test_show_report(view, model_mock):
             should_report_be_shown=True,
         )
 
-    assert caught_io.getvalue() == f'\n\033[K{src} --> {final_dst}\033[2A\n'
+    assert caught_io.getvalue() == f'\n\n\033[K{src} --> {final_dst}\033[2A\n'

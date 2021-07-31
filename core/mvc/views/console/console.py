@@ -17,6 +17,9 @@ class ConsoleView(IoInteractor):
     def __init__(self, controller=ControllerBase):
         self._controller = controller
 
+    def _separate_section(self):
+        print()
+
     @typechecked
     def confirm(self, message: str) -> bool:
         return click.confirm(message)
@@ -44,6 +47,8 @@ class ConsoleView(IoInteractor):
 
     @typechecked
     def show_scan_report(self, scan_report: ScanReport) -> None:
+        self._separate_section()
+
         total_found = sum(map(len, (
             scan_report.movable,
             scan_report.no_media,
@@ -76,6 +81,7 @@ class ConsoleView(IoInteractor):
         self, moved_reports: Iterable[MoveReport], length: int,
         should_report_be_shown: bool
     ) -> None:
+        self._separate_section()
 
         @typechecked
         def report_to_str(report: MoveReport) -> str:
@@ -118,6 +124,7 @@ class ConsoleView(IoInteractor):
             self,
             report: TotalMoveReport,
             log_to_file: Optional[str] = '') -> None:
+        self._separate_section()
         print(
             '\n'
             '\n'
