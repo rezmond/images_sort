@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from operator import itemgetter
 
-from utils import pipe
+from src.utils import pipe
 
 
 class MediaPresenterBase(metaclass=ABCMeta):

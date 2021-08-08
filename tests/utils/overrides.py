@@ -1,7 +1,7 @@
 from contextlib import nullcontext, contextmanager
 from unittest.mock import Mock
 
-from src.entities.fs import (
+from src.core.fs import (
     FolderExtractorBase, FsManipulatorBase, FolderCheckerBase)
 
 

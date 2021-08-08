@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.entities import MediaPresenterBase
+from src.core import MediaPresenterBase
 
 
 class VideoPresenter(MediaPresenterBase):

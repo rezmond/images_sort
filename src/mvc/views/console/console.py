@@ -5,7 +5,7 @@ from typing import Iterable, Optional
 import click
 from typeguard import typechecked
 
-from utils import report_line, report_devider
+from src.utils import report_line, report_devider
 from src.types import MoveReport, MoveResult, ScanReport, TotalMoveReport
 from libs import Either, Left, Right
 from ...controllers import IoInteractor, ControllerBase

@@ -3,7 +3,7 @@ import sys
 from datetime import date
 from unittest.mock import patch, Mock
 
-from src.entities import (
+from src.core import (
     FolderExtractorBase,
     FsManipulatorBase,
 )

@@ -4,13 +4,13 @@ from functools import partial
 
 import pytest
 
-from src.entities import (
+from src.core import (
     DateExtractorBase,
     FolderExtractorBase,
     FolderCheckerBase,
     MoveMapBase,
 )
-from src.entities.exceptions import FolderNotFoundError
+from src.core.exceptions import FolderNotFoundError
 from src.types import FileWay, MoveType
 from src.utils.base import Observable
 from tests.utils import overrides

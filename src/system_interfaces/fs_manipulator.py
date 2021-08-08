@@ -4,7 +4,7 @@ import shutil
 from typeguard import typechecked
 from typing import Iterable
 
-from src.entities import FsManipulatorBase, FolderExtractorBase
+from src.core import FsManipulatorBase, FolderExtractorBase
 
 
 class FsManipulator(FsManipulatorBase, FolderExtractorBase):

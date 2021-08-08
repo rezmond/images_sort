@@ -2,9 +2,9 @@ import filecmp
 
 from dependency_injector import containers, providers
 
-from src.entities import Mover, Scanner
+from src.core import Mover, Scanner
 from src.utils.base import Observable
-from src.entities.date_extractor import DateExtractor
+from src.core.date_extractor import DateExtractor
 from src.use_cases.media_presenters import VideoPresenter, ImagePresenter
 from src.use_cases.move_map import MoveMap
 from src.system_interfaces import FsManipulator

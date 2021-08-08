@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pytest
 
-from src.entities import MediaPresenterBase
+from src.core import MediaPresenterBase
 
 
 def create_media_mock(*extensions):

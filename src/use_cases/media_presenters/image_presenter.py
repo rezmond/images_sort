@@ -4,7 +4,7 @@ from typing import Optional, Callable
 from dateutil.parser import isoparse
 from typeguard import typechecked
 
-from src.entities import MediaPresenterBase
+from src.core import MediaPresenterBase
 
 ExifDataGetter = Callable[[str], Optional[str]]
 

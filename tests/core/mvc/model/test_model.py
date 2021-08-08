@@ -3,8 +3,8 @@ from unittest.mock import call, Mock
 import pytest
 
 from src.types import FileWay, MoveType, MoveReport, MoveResult
-from src.entities.scanner.base import ScannerBase
-from src.entities.mover import MoverBase
+from src.core.scanner.base import ScannerBase
+from src.core.mover import MoverBase
 from src.mvc.model import OutputBoundary
 from tests.utils import overrides
 

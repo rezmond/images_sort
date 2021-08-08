@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from src.entities.fs import FsActions, FsManipulatorBase
+from src.core.fs import FsActions, FsManipulatorBase
 from src.types import Comparator
 
 
