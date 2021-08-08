@@ -37,7 +37,7 @@ class ReportPresenter:
             return
 
         for item in items:
-            yield self._line(format_(item.file_way))
+            yield self._line(f'    {format_(item.file_way)}')
 
         yield self._line()
 
