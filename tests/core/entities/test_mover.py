@@ -4,9 +4,9 @@ from unittest.mock import call, Mock
 
 import pytest
 
-from core.types import FileWay, MoveType, MoveResult, MoveReport
-from core.entities.fs import FsManipulatorBase, FolderCheckerBase
-from core.entities.exceptions import RelativeFolderPathError
+from src.types import FileWay, MoveType, MoveResult, MoveReport
+from src.entities.fs import FsManipulatorBase, FolderCheckerBase
+from src.entities.exceptions import RelativeFolderPathError
 from tests.utils import overrides
 
 

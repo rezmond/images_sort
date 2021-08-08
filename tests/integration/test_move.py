@@ -55,7 +55,7 @@ def test_creates_target_folder(container):
     mock_of_open = mock_open()
     progressbar_mock = get_progressbar_mock(len(base_pathes))
     with patch(
-        'core.mvc.views.console.console.open', mock_of_open
+        'src.mvc.views.console.console.open', mock_of_open
     ), container.exif_data_getter.override(
         exif_data_getter_mock
     ), contextlib.redirect_stdout(

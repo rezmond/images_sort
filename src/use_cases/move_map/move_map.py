@@ -4,7 +4,7 @@ from datetime import datetime
 
 from typeguard import typechecked
 
-from core.entities import MoveMapBase
+from src.entities import MoveMapBase
 
 # TODO: add the "Seasons" prefix
 

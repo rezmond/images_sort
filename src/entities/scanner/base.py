@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterator
 
-from core.types import FileWay
+from src.types import FileWay
 
 
 class ScannerBase(ABC):

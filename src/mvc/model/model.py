@@ -1,9 +1,9 @@
 from typeguard import typechecked
 from functools import partial
 
-from core.entities.scanner import ScannerBase
-from core.entities.mover import MoverBase
-from core.types import (
+from src.entities.scanner import ScannerBase
+from src.entities.mover import MoverBase
+from src.types import (
     ScanReport,
     MoveType,
     MoveReport,

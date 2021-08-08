@@ -2,7 +2,7 @@ from typing import Iterable
 
 from typeguard import typechecked
 
-from core.types import MoveReport, TotalMoveReport, Verbosity
+from src.types import MoveReport, TotalMoveReport, Verbosity
 from libs import Either
 from .base import ControllerBase
 

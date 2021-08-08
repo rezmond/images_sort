@@ -1,6 +1,6 @@
 import argparse
 
-from core.types import Verbosity
+from src.types import Verbosity
 
 MAIN_PROGRAMM = 'sorter.py'
 

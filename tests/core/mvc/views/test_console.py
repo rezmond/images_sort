@@ -4,9 +4,9 @@ from unittest.mock import patch, call, Mock, MagicMock, mock_open
 
 import pytest
 
-from core.mvc.controllers import ControllerBase
-from core.mvc.model import MoverModel
-from core.types import MoveReport, FileWay, MoveType, MoveResult, TotalMoveReport
+from src.mvc.controllers import ControllerBase
+from src.mvc.model import MoverModel
+from src.types import MoveReport, FileWay, MoveType, MoveResult, TotalMoveReport
 from tests.utils import get_progressbar_mock
 
 
@@ -150,7 +150,7 @@ def test_report_file_name(view, model_mock):
     with contextlib.redirect_stdout(caught_io),\
         patch('os.path.exists', is_exists_mock), \
         patch(
-        'core.mvc.views.console.console.open', mock_of_open
+        'src.mvc.views.console.console.open', mock_of_open
     ):
         view.show_total_move_report(
             TotalMoveReport(), log_to_folder="/dst/path")

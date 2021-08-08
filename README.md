@@ -18,7 +18,7 @@ Run tests:
 Run tests with the coverage:
 
 `
-    pytest --cov="./core" --cov-report=html
+    pytest --cov="./src" --cov-report=html
 `
 
 Roadmap:

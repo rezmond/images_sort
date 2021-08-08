@@ -6,7 +6,7 @@ import click
 from typeguard import typechecked
 
 from utils import report_line, report_devider
-from core.types import MoveReport, MoveResult, ScanReport, TotalMoveReport
+from src.types import MoveReport, MoveResult, ScanReport, TotalMoveReport
 from libs import Either, Left, Right
 from ...controllers import IoInteractor, ControllerBase
 from .parser import parser

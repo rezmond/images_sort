@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Iterable
 from typeguard import typechecked
 
-from core.types import ScanReport, MoveReport, TotalMoveReport
+from src.types import ScanReport, MoveReport, TotalMoveReport
 from libs import Either
 
 

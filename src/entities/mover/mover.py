@@ -4,7 +4,7 @@ from typing import Tuple
 
 from typeguard import typechecked
 
-from core.types import Comparator, FileWay, MoveReport, MoveResult
+from src.types import Comparator, FileWay, MoveReport, MoveResult
 from libs import Either
 from ..fs import FsManipulatorBase, FsActions, FolderPathValidator
 from .base import MoverBase

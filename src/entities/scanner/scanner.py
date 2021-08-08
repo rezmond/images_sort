@@ -2,7 +2,7 @@ from typing import Tuple, Iterator
 
 from typeguard import typechecked
 
-from core.types import MoveType, FileWay
+from src.types import MoveType, FileWay
 from ..fs import FolderExtractorBase, FolderPathValidator, FolderCheckerBase
 from ..exceptions import FolderNotFoundError
 from .base import ScannerBase

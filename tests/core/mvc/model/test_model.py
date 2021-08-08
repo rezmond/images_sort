@@ -2,10 +2,10 @@ from unittest.mock import call, Mock
 
 import pytest
 
-from core.types import FileWay, MoveType, MoveReport, MoveResult
-from core.entities.scanner.base import ScannerBase
-from core.entities.mover import MoverBase
-from core.mvc.model import OutputBoundary
+from src.types import FileWay, MoveType, MoveReport, MoveResult
+from src.entities.scanner.base import ScannerBase
+from src.entities.mover import MoverBase
+from src.mvc.model import OutputBoundary
 from tests.utils import overrides
 
 mover_mock = None

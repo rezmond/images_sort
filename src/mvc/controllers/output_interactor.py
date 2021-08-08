@@ -3,7 +3,7 @@ from typing import Iterable, Optional
 
 from typeguard import typechecked
 
-from core.types import ScanReport, MoveReport, TotalMoveReport
+from src.types import ScanReport, MoveReport, TotalMoveReport
 from libs import Either
 
 

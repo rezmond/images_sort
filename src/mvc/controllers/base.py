@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from typeguard import typechecked
 
-from core.types import ScanReport, TotalMoveReport
+from src.types import ScanReport, TotalMoveReport
 from ..model import InputBoundary, OutputBoundary
 from .io_interactor import IoInteractor
 

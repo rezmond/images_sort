@@ -1,6 +1,6 @@
 from typeguard import typechecked
 
-from core.types import Comparator
+from src.types import Comparator
 from .manipulator import FsManipulatorBase
 
 

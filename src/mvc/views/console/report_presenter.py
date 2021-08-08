@@ -2,7 +2,7 @@ from typing import Callable, Iterable
 
 from typeguard import typechecked
 
-from core.types import FileWay, TotalMoveReport
+from src.types import FileWay, TotalMoveReport
 
 
 class ReportPresenter:

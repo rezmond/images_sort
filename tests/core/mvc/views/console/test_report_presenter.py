@@ -1,5 +1,5 @@
-from core.mvc.views.console.report_presenter import ReportPresenter
-from core.types import (
+from src.mvc.views.console.report_presenter import ReportPresenter
+from src.types import (
     FileWay,
     MoveReport,
     MoveResult,

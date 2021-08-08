@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from core.types import FileWay, MoveReport
+from src.types import FileWay, MoveReport
 
 from libs import Either
 

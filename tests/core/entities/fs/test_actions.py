@@ -2,8 +2,8 @@ from unittest import mock
 
 import pytest
 
-from core.entities.fs import FsActions, FsManipulatorBase
-from core.types import Comparator
+from src.entities.fs import FsActions, FsManipulatorBase
+from src.types import Comparator
 
 
 @pytest.fixture
