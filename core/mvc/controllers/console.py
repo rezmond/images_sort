@@ -43,7 +43,7 @@ class ConsoleViewController(ControllerBase):
     def on_move_finished(
             self, report: TotalMoveReport, dst_folder: str) -> None:
         if self._verbosity >= Verbosity.MEDIUM:
-            log_to_file = dst_folder \
+            log_to_folder = dst_folder \
                 if self._verbosity > Verbosity.MEDIUM else None
             self._io_interactor\
-                .show_total_move_report(report, log_to_file=log_to_file)
+                .show_total_move_report(report, log_to_folder=log_to_folder)

@@ -41,5 +41,5 @@ class OutputInteractor(ABC):
     def show_total_move_report(
             self,
             report: TotalMoveReport,
-            log_to_file: Optional[str]) -> None:
+            log_to_folder: Optional[str]) -> None:
         ''''''

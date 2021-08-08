@@ -119,11 +119,26 @@ class ConsoleView(IoInteractor):
     def _the_same_line(line: str) -> str:
         return f'\r\033[K{line}'
 
+    @staticmethod
+    @typechecked
+    def _generate_report_file_path(folder_path: str) -> str:
+        attempt = 0
+
+        while True:
+            suffix = f'-{attempt}' if attempt > 0 else ''
+            file_path = os.path.join(folder_path, f'report{suffix}.txt')
+            attempt += 1
+
+            if not os.path.exists(file_path):
+                break
+
+        return file_path
+
     @typechecked
     def show_total_move_report(
             self,
             report: TotalMoveReport,
-            log_to_file: Optional[str] = '') -> None:
+            log_to_folder: Optional[str] = '') -> None:
         self._separate_section()
         print(
             '\n'
@@ -134,11 +149,11 @@ class ConsoleView(IoInteractor):
             f"{report_line('No data', len(report.no_data))}"
         )
 
-        if not log_to_file:
+        if not log_to_folder:
             return
 
         presenter = ReportPresenter(report)
-        report_file_path = os.path.join(log_to_file, 'report.txt')
+        report_file_path = self._generate_report_file_path(log_to_folder)
         with open(report_file_path, 'w') as file_:
             for line in presenter.get_report_lines():
                 file_.write(line)

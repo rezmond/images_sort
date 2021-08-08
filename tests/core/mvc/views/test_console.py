@@ -1,12 +1,12 @@
 import io
 import contextlib
-from unittest.mock import patch, call, Mock, MagicMock
+from unittest.mock import patch, call, Mock, MagicMock, mock_open
 
 import pytest
 
 from core.mvc.controllers import ControllerBase
 from core.mvc.model import MoverModel
-from core.types import MoveReport, FileWay, MoveType, MoveResult
+from core.types import MoveReport, FileWay, MoveType, MoveResult, TotalMoveReport
 from tests.utils import get_progressbar_mock
 
 
@@ -133,3 +133,28 @@ def test_show_report(view, model_mock):
         )
 
     assert caught_io.getvalue() == f'\n\n\033[K{src} --> {final_dst}\033[2A\n'
+
+
+def test_report_file_name(view, model_mock):
+    caught_io = io.StringIO()
+    is_exists_check_attempts_count = 0
+    expected_attempts = 3
+
+    def is_exists_mock(file_path):
+        nonlocal is_exists_check_attempts_count
+        is_exists_check_attempts_count += 1
+        return is_exists_check_attempts_count < expected_attempts
+
+    mock_of_open = mock_open()
+
+    with contextlib.redirect_stdout(caught_io),\
+        patch('os.path.exists', is_exists_mock), \
+        patch(
+        'core.mvc.views.console.console.open', mock_of_open
+    ):
+        view.show_total_move_report(
+            TotalMoveReport(), log_to_folder="/dst/path")
+
+    assert mock_of_open.mock_calls[0] == call(
+        f'/dst/path/report-{expected_attempts - 1}.txt', 'w'
+    )

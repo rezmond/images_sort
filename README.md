@@ -86,5 +86,5 @@ Roadmap:
    - [ ] Implement the "verbosity" argument validation
    - [ ] Add the glob for path processing
    - [X] Add indents to report for text-editors that can collapse sections
-   - [ ] If the "report.txt" already existes then create the file with new name
+   - [X] If the "report.txt" already existes then create the file with new name
    - [ ] Add the "--exclued" option for exclude some files or folders from source folder
