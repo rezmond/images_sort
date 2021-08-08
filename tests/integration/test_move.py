@@ -97,13 +97,13 @@ def test_creates_target_folder(container):
         call().write('Moved (4):\n'),
         call().write('==========\n'),
         call().write(
-            '/src/path/1.jpg --> /dst/folder/2000/winter (begin)/1.jpg\n'),
+            '    /src/path/1.jpg --> /dst/folder/2000/winter (begin)/1.jpg\n'),
         call().write(
-            '/src/path/2.jpg --> /dst/folder/2000/winter (begin)/2.jpg\n'),
+            '    /src/path/2.jpg --> /dst/folder/2000/winter (begin)/2.jpg\n'),
         call().write(
-            '/src/path/3.jpg --> /dst/folder/2000/winter (begin)/3.jpg\n'),
+            '    /src/path/3.jpg --> /dst/folder/2000/winter (begin)/3.jpg\n'),
         call().write(
-            '/src/path/4.jpg --> /dst/folder/2000/winter (begin)/4.jpg\n'),
+            '    /src/path/4.jpg --> /dst/folder/2000/winter (begin)/4.jpg\n'),
         call().write('\n'),
         call().write('Already existed (0):\n'),
         call().write('====================\n'),
@@ -113,7 +113,7 @@ def test_creates_target_folder(container):
         call().write('\n'),
         call().write('No data (1):\n'),
         call().write('============\n'),
-        call().write('/src/path/5.mp4\n'),
+        call().write('    /src/path/5.mp4\n'),
         call().write('\n'),
         call().__exit__(None, None, None)
     ]
