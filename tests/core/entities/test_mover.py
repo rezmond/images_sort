@@ -76,14 +76,12 @@ def get_mover(container, **mocks):
     return mover
 
 
-def move_to_epmty(container, file_way):
+def move_to_empty(container, file_way):
     mover = get_mover(container)
     mover.set_dst_folder('/dst/path')
 
     with pytest.raises(AssertionError) as exc_info:
-        mover.move(
-            file_way
-        )
+        mover.move(file_way)
 
     return exc_info.value
 
@@ -201,7 +199,7 @@ def test_delete_duplicates(container):
 
 
 def test_move_no_data(container):
-    exception = move_to_epmty(container, FileWay(
+    exception = move_to_empty(container, FileWay(
         src='/src/path/data/1.jpg',
         type=MoveType.NO_DATA,
     ))
@@ -209,7 +207,7 @@ def test_move_no_data(container):
 
 
 def test_move_no_media(container):
-    exception = move_to_epmty(container, FileWay(
+    exception = move_to_empty(container, FileWay(
         src='/src/path/data/2.jpg',
         type=MoveType.NO_MEDIA,
     ))

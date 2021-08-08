@@ -56,8 +56,7 @@ class Mover(MoverBase):
         is_dst_file_identical = partial(self._fs_actions.compare, src=src)
 
         num = 1
-        is_new_dst_path_busy = is_dst_path_busy
-        while is_new_dst_path_busy(dst_file_path):
+        while is_dst_path_busy(dst_file_path):
             if is_dst_file_identical(dst=dst_file_path):
                 return False, dst_file_path
 
