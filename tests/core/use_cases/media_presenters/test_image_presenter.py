@@ -24,3 +24,15 @@ def test_correct_none_handle(container):
         instance = container.image_presenter()
 
     assert instance.get_date('') is None
+
+
+def test_getting_from_file_Nname(container):
+    exif_data_getter_mock = Mock(return_value=None)
+    with container.exif_data_getter.override(exif_data_getter_mock):
+        instance = container.image_presenter()
+
+    assert instance.get_date('20000429_123') == datetime(2000, 4, 29, 0, 0, 0)
+    assert instance.get_date('20000429_456') == datetime(2000, 4, 29, 0, 0, 0)
+    assert instance.get_date('20000529_456') == datetime(2000, 5, 29, 0, 0, 0)
+    assert instance.get_date('20000529456') is None
+    assert instance.get_date('20000431_123') is None
