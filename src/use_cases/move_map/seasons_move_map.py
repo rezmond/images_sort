@@ -6,10 +6,8 @@ from typeguard import typechecked
 
 from src.core import MoveMapBase
 
-# TODO: add the "Seasons" prefix
 
-
-class MoveMap(MoveMapBase):
+class SeasonsMoveMap(MoveMapBase):
 
     BLOCKS = {
         'winter (begin)': (1, 2),

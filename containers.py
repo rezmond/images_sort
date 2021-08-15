@@ -6,7 +6,7 @@ from src.core import Mover, Scanner
 from src.utils.base import Observable
 from src.core.date_extractor import DateExtractor
 from src.use_cases.media_presenters import VideoPresenter, ImagePresenter
-from src.use_cases.move_map import MoveMap
+from src.use_cases.move_map import SeasonsMoveMap
 from src.system_interfaces import FsManipulator
 from src.mvc.controllers import ConsoleViewController
 from src.mvc.model import MoverModel
@@ -44,7 +44,7 @@ class Container(containers.DeclarativeContainer):
         media_presenters=media_presenters
     )
 
-    move_map = providers.Factory(MoveMap)
+    move_map = providers.Factory(SeasonsMoveMap)
 
     scanner = providers.Factory(
         Scanner,

@@ -1,1 +1,1 @@
-from .move_map import MoveMap
+from .seasons_move_map import SeasonsMoveMap
