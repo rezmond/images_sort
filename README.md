@@ -80,7 +80,7 @@ Roadmap:
 
    - [X] Add count of each moving group in the move report
    - [ ] Update the script help
-   - [ ] Case for images without exif data, but with file name like "20200429_*.jpg"
+   - [X] Case for images without exif data, but with file name like "20200429_*.jpg"
    - [X] Introduce the `mvc` folder
    - [ ] Is the target folder needed on scanning only mode?
    - [ ] Implement the "verbosity" argument validation
