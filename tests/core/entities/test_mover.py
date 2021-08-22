@@ -212,3 +212,17 @@ def test_move_no_media(container):
         type=MoveType.NO_MEDIA,
     ))
     assert is_empty_destination_error_raised(exception)
+
+
+def test_create_and_set_dst_folder(container):
+    target_dst_folder = '/dst/path/2017/summer/'
+    fs_manipulator_mock = Mock(
+        spec=FsManipulatorCompilation
+    )
+    mover = get_mover(container, fs_manipulator=fs_manipulator_mock)
+
+    mover.create_and_set_dst_folder(target_dst_folder)
+
+    fs_manipulator_mock.makedirs.assert_called_once_with(
+        target_dst_folder)
+    assert mover.get_dst_folder() == target_dst_folder
