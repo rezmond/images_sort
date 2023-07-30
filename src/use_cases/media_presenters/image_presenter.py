@@ -40,10 +40,26 @@ class ImagePresenter(MediaPresenterBase):
     def _get_date_from_file_name(path: str) -> Optional[datetime.date]:
         filename = os.path.basename(path)
 
-        pattern_length = 9
+        pattern1_length = 9
         try:
             return datetime.strptime(
-                filename[:pattern_length], '%Y%m%d_')
+                filename[:pattern1_length], '%Y%m%d_')
+        except ValueError:
+            pass
+
+        # IMG-20220316-WA0000
+        pattern2_length = 12
+        try:
+            return datetime.strptime(
+                filename[:pattern2_length], 'IMG-%Y%m%d')
+        except ValueError:
+            pass
+
+        # PXL_20220910_153412777.MP.jpg
+        pattern3_length = 12
+        try:
+            return datetime.strptime(
+                filename[:pattern3_length], 'PXL_%Y%m%d')
         except ValueError:
             return None
 
