@@ -22,7 +22,8 @@ parser.add_argument(
     default=Verbosity.LOW,
     type=int,
     help='verbosity level.'
-    f' The allowed verbosities are: {list(map(int, Verbosity))}')
+    f' The allowed verbosities are: {list(map(int, Verbosity))}.'
+    f' {Verbosity.HIGH} - creates a report file within the target folder')
 parser.add_argument(
     '-s', '--scan',
     default=False,
