@@ -1,0 +1,12 @@
+exifread==2.1.2
+<<<<<<< HEAD
+pytest==6.0.2
+pytest-cov==2.10.1
+typeguard==2.2.2
+python-dateutil==2.8.1
+dependency-injector==4.31.0
+=======
+pytest==5.2.0
+pytest-cov==2.6.0
+typeguard==2.2.2
+>>>>>>> c591f6a... Update the "pytest" library.
