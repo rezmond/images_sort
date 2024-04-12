@@ -88,4 +88,5 @@ Roadmap:
    - [X] Add indents to report for text-editors that can collapse sections
    - [X] If the "report.txt" already existes then create the file with new name
    - [ ] Add the "--exclued" option for exclude some files or folders from source folder
-   - [ ] It might be worth getting rid of wrapping of os functions, because they are pretty stable..
+   - [ ] It might be worth getting rid of wrapping of os functions, because they are pretty stable
+   - [ ] Scanning the target folder for already exists but not in supposed folder, items
