@@ -11,8 +11,8 @@ class ControllerBase(OutputBoundary, ABC):
 
     @typechecked
     def __init__(
-            self,
-            input_boundary: InputBoundary,
+        self,
+        input_boundary: InputBoundary,
     ) -> None:
         self._input_boundary = input_boundary
         self._io_interactor = None
