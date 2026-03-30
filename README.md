@@ -110,4 +110,8 @@ docker compose down
    - [X] Add indents to report for text-editors that can collapse sections
    - [X] If the "report.txt" already existes then create the file with new name
    - [ ] Add the "--exclued" option for exclude some files or folders from source folder
-   - [ ] It might be worth getting rid of wrapping of os functions, because they are pretty stable..
+   - [ ] It might be worth getting rid of wrapping of os functions, because they are pretty stable
+   - [ ] Scan the target folder for existing media files before moving/copying in any subfolder or file name
+   - [ ] Implement customisation of group criterias (e.g. move only images with specific exif data) and add it to the help message
+   - [ ] Implement the "--dry-run" option, which will not move/copy any files but only print what would be done. This should be as replacement of the default bhavior
+   - [ ] Add custom filineme patterns for moving files (e.g. "20200429_*.jpg")
