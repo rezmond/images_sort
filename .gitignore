@@ -109,3 +109,4 @@ ENV/
 
 *.sublime-*
 /.claude/
+/.qwen/
