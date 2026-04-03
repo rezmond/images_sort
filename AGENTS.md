@@ -82,3 +82,12 @@ Images are organized by seasons (based on month):
 ## Testing
 
 The project uses pytest for testing and includes comprehensive test coverage for all major components. Tests are organized in the `tests/` directory following the same structure as `src/`.
+
+
+## Instructions for LLM
+Fix the root cause but not a symptom.
+
+Do not comment almost every line of code. Comment only where there is a non-obvious logic.
+
+## Code style
+For string values use teh single quotes (`'`).
