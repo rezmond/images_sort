@@ -47,66 +47,7 @@ The application follows an MVC (Model-View-Controller) architectural pattern wit
 
 ## Building and Running
 
-To run the application:
-```bash
-python3 start <src> <dst>
-```
-
-Where:
-- `<src>` is the source directory path
-- `<dst>` is the destination directory path
-
-### Command Options
-* `-s, --scan`: Start the scan process only
-* `-r, --report`: Create a report after moving files (requires -m parameter)
-* `-m, --move`: Scan and then move files
-* `-v, --verbose`: Set verbosity level (higher number = more detail)
-
-Run tests:
-```bash
-pytest
-```
-
-Run tests with coverage:
-```bash
-pytest --cov="./src" --cov-report=html
-```
-
-## Directory Structure
-
-```
-/app
-├── start.py                    # Entry point
-├── containers.py               # Dependency injection configuration
-├── src/
-│   ├── core/
-│   │   ├── scanner/            # File scanning and date extraction logic
-│   │   ├── mover/              # File moving logic
-│   │   ├── date_extractor/     # Date extraction logic
-│   │   └── fs/                 # File system operations
-│   ├── mvc/
-│   │   ├── controllers/        # Controller implementations
-│   │   ├── model/              # Model logic
-│   │   └── views/              # View logic
-│   ├── system_interfaces/      # File system operations interface
-│   ├── use_cases/              # Business logic for presenters and map
-│   └── utils/                  # Utility functions
-├── tests/                      # Test files
-├── requirements.txt            # Project dependencies
-└── README.md
-```
-
-## Dependencies
-
-The project uses the following key dependencies:
-- `exifread==2.1.2` - For EXIF data processing in images
-- `pytest==6.2.5` - Testing framework
-- `pytest-cov==2.10.1` - Code coverage reporting
-- `typeguard==2.2.2` - Type checking
-- `python-dateutil==2.8.1` - Date parsing
-- `dependency-injector==4.41.0` - Dependency injection
-- `click==8.0.0` - Command-line interface
-- `PyMonad==2.4.0` - Functional programming tools
+See README.md if needed
 
 ## Usage Pattern
 
