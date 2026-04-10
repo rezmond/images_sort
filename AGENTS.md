@@ -91,3 +91,4 @@ Do not comment almost every line of code. Comment only where there is a non-obvi
 
 ## Code style
 For string values use teh single quotes (`'`).
+For work with monads pattern matching is more priority than `isinstance` usage.
