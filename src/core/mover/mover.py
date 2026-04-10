@@ -4,19 +4,19 @@ from typing import Tuple
 
 from typeguard import typechecked
 
-from src.types import Comparator, FileWay, MoveReport, MoveResult
 from libs import Either
-from ..fs import FsManipulatorBase, FsActions, FolderPathValidator
+from src.types import Comparator, FileWay, MoveReport, MoveResult
+
+from ..fs import FolderPathValidator, FsActions, FsManipulatorBase
 from .base import MoverBase
 
 
 class Mover(MoverBase):
-
     @typechecked
     def __init__(
-            self,
-            fs_manipulator: FsManipulatorBase,
-            comparator: Comparator,
+        self,
+        fs_manipulator: FsManipulatorBase,
+        comparator: Comparator,
     ) -> None:
         self._fs_manipulator = fs_manipulator
         self._fs_actions = None
@@ -36,14 +36,14 @@ class Mover(MoverBase):
         same names.
 
         If a file exists and it is identical, then the current method
-        will return fully path to target folder with the False value of
+        will return full path to target folder with the False value of
         the first argument.
 
         If a file with that name exists but it is not identical, then the
         current method will rename the target file name added a number til
         the name will unique.
 
-        :returns: (<can be moved>, <final_path>)
+        :returns: (can_be_moved: bool, final_path: str)
         """
         curr_file_name = os.path.split(src)[1]
         dst_file_path = os.path.join(dst_dir, curr_file_name)
@@ -72,19 +72,19 @@ class Mover(MoverBase):
             self._fs_manipulator.makedirs(path)
 
     @typechecked
-    def move(self,
-             file_way: FileWay,
-             move_mode: bool = False) -> MoveReport:
-        '''
-        TODO: move the move_mode initialisation to a method
-        '''
+    def move(self, file_way: FileWay, move_mode: bool = False) -> MoveReport:
+        """
+        TODO: move the move_mode initialization to a method
+        """
         assert file_way.dst is not None, (
-            f'The file way {file_way} has empty destination.')
+            f'The file way {file_way} has empty destination.'
+        )
 
         full_dst = os.path.join(self.get_dst_folder(), file_way.dst)
 
         self._fs_actions = FsActions(
-            self._fs_manipulator, self._comparator, move_mode, move_mode)
+            self._fs_manipulator, self._comparator, move_mode, move_mode
+        )
 
         self._make_dir_if_not_exists(full_dst)
         final_dst = self._move_by_cmp(file_way.src, full_dst)
@@ -95,7 +95,9 @@ class Mover(MoverBase):
                 dst=file_way.dst,
                 full_dst=final_dst,
                 type=file_way.type,
-            ), result=self._move_result)
+            ),
+            result=self._move_result,
+        )
 
     @typechecked
     def _move_by_cmp(self, src: str, full_dst: str) -> str:
@@ -123,8 +125,7 @@ class Mover(MoverBase):
         def do_set(dst: str):
             self._dst_folder = dst
 
-        return self._validate_dst(dst)\
-            .map(do_set)
+        return self._validate_dst(dst).map(do_set)
 
     @typechecked
     def get_dst_folder(self) -> str:
@@ -136,7 +137,7 @@ class Mover(MoverBase):
         self._dst_folder = dst
 
     def _validate_dst(self, dst: str) -> Either:
-        '''
+        """
         Without typechecked because it will check arguments manually
-        '''
+        """
         return self._folder_path_validator.validate('destination', dst)

@@ -1,24 +1,24 @@
-from typing import Tuple, Iterator
+from typing import Iterator, Tuple
 
 from typeguard import typechecked
 
-from src.types import MoveType, FileWay
-from ..fs import FolderExtractorBase, FolderPathValidator, FolderCheckerBase
+from src.types import FileWay, MoveType
+
 from ..exceptions import FolderNotFoundError
+from ..fs import FolderCheckerBase, FolderExtractorBase, FolderPathValidator
 from .base import ScannerBase
 from .date_extractor_base import DateExtractorBase
 from .move_map_base import MoveMapBase
 
 
 class Scanner(ScannerBase):
-
     @typechecked
     def __init__(
-            self,
-            date_extractor: DateExtractorBase,
-            folder_extractor: FolderExtractorBase,
-            fs_manipulator: FolderCheckerBase,
-            move_map: MoveMapBase,
+        self,
+        date_extractor: DateExtractorBase,
+        folder_extractor: FolderExtractorBase,
+        fs_manipulator: FolderCheckerBase,
+        move_map: MoveMapBase,
     ) -> None:
         self._date_extractor = date_extractor
         self._folder_extractor = folder_extractor
@@ -36,10 +36,10 @@ class Scanner(ScannerBase):
             yield path, False
 
     @typechecked
-    def scan(self, src_folder: str) -> Iterator[FileWay]:
-        self._validate_src(src_folder)
+    def scan(self, folder: str) -> Iterator[FileWay]:
+        self._validate_src(folder)
 
-        for path, is_media in self._get_media_pairs(src_folder):
+        for path, is_media in self._get_media_pairs(folder):
             if not is_media:
                 yield FileWay(type=MoveType.NO_MEDIA, src=path)
                 continue

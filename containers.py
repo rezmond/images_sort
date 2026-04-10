@@ -2,20 +2,19 @@ import filecmp
 
 from dependency_injector import containers, providers
 
+from libs import get_exif_data
 from src.core import Mover, Scanner
-from src.utils.base import Observable
 from src.core.date_extractor import DateExtractor
-from src.use_cases.media_presenters import VideoPresenter, ImagePresenter
-from src.use_cases.move_map import SeasonsMoveMap
-from src.system_interfaces import FsManipulator
 from src.mvc.controllers import ConsoleViewController
 from src.mvc.model import MoverModel
 from src.mvc.views import ConsoleView
-from libs import get_exif_data
+from src.system_interfaces import FsManipulator
+from src.use_cases.media_presenters import ImagePresenter, VideoPresenter
+from src.use_cases.move_map import SeasonsMoveMap
+from src.utils.base import Observable
 
 
 class Container(containers.DeclarativeContainer):
-
     config = providers.Configuration()
 
     observable = providers.Factory(
@@ -39,10 +38,7 @@ class Container(containers.DeclarativeContainer):
         providers.Singleton(image_presenter),
     )
 
-    date_extractor = providers.Factory(
-        DateExtractor,
-        media_presenters=media_presenters
-    )
+    date_extractor = providers.Factory(DateExtractor, media_presenters=media_presenters)
 
     move_map = providers.Factory(SeasonsMoveMap)
 

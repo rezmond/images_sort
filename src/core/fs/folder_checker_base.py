@@ -1,8 +1,8 @@
-
-from abc import ABCMeta, abstractstaticmethod
+from abc import ABCMeta, abstractmethod
 
 
 class FolderCheckerBase(metaclass=ABCMeta):
-    @abstractstaticmethod
-    def isfolder(path: str) -> None:
-        '''Return true if the pathname refers to an existing directory'''
+    @staticmethod
+    @abstractmethod
+    def isfolder(path: str) -> bool:
+        """Return true if the pathname refers to an existing directory"""

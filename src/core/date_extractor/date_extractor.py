@@ -6,12 +6,12 @@ from typing import Iterable, Optional
 from typeguard import typechecked
 
 from src.utils import pipe
+
 from ..scanner import DateExtractorBase
 from .media_presenter_base import MediaPresenterBase
 
 
 class DateExtractor(DateExtractorBase):
-
     @typechecked
     def __init__(self, media_presenters: Iterable[MediaPresenterBase]) -> None:
         self._ext_to_presenter_map = {}
@@ -31,7 +31,7 @@ class DateExtractor(DateExtractorBase):
         return self._get_ext(path) in self._ext_to_presenter_map
 
     @typechecked
-    def get_date(self, path: str) -> Optional[datetime.date]:
+    def get_date(self, path: str) -> Optional[datetime]:
         if not self.is_allowed_extension(path):
             return
 
@@ -42,8 +42,4 @@ class DateExtractor(DateExtractorBase):
     @staticmethod
     @typechecked
     def _get_ext(path: str) -> str:
-        return pipe(
-            os.path.splitext,
-            itemgetter(1),
-            str.lower
-        )(path)
+        return pipe(os.path.splitext, itemgetter(1), str.lower)(path)

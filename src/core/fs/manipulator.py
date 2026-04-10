@@ -1,26 +1,30 @@
-from abc import abstractstaticmethod
+from abc import abstractmethod
 
 from .folder_checker_base import FolderCheckerBase
 
 
 class FsManipulatorBase(FolderCheckerBase):
-
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def move(src: str, dst: str) -> None:
-        '''Moves a fs node'''
+        """Moves a fs node"""
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def copy(src: str, dst: str) -> None:
-        '''Copies a fs node'''
+        """Copies a fs node"""
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def delete(path: str) -> None:
-        '''Deletes a fs node'''
+        """Deletes a fs node"""
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def makedirs(path: str) -> None:
-        '''Makes dirs by provided path'''
+        """Makes dirs by provided path"""
 
-    @abstractstaticmethod
-    def isfile(path: str) -> None:
-        '''Test whether a path is a regular file'''
+    @staticmethod
+    @abstractmethod
+    def isfile(path: str) -> bool:
+        """Test whether a path is a regular file"""

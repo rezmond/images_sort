@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from enum import Enum, auto, IntEnum
+from enum import Enum, IntEnum, auto
 from typing import Callable, Iterable
 
 Comparator = Callable[[str, str], bool]

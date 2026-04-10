@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 from dateutil.parser import isoparse
 from typeguard import typechecked
@@ -11,11 +11,7 @@ ExifDataGetter = Callable[[str], Optional[str]]
 
 
 class ImagePresenter(MediaPresenterBase):
-    ALLOWED_EXTENSIONS = (
-        '.jpg',
-        '.jpeg',
-        '.png'
-    )
+    ALLOWED_EXTENSIONS = ('.jpg', '.jpeg', '.png')
 
     @typechecked
     def __init__(self, get_exif_data: ExifDataGetter) -> None:
@@ -42,29 +38,26 @@ class ImagePresenter(MediaPresenterBase):
 
         pattern1_length = 9
         try:
-            return datetime.strptime(
-                filename[:pattern1_length], '%Y%m%d_')
+            return datetime.strptime(filename[:pattern1_length], '%Y%m%d_')
         except ValueError:
             pass
 
         # IMG-20220316-WA0000
         pattern2_length = 12
         try:
-            return datetime.strptime(
-                filename[:pattern2_length], 'IMG-%Y%m%d')
+            return datetime.strptime(filename[:pattern2_length], 'IMG-%Y%m%d')
         except ValueError:
             pass
 
         # PXL_20220910_153412777.MP.jpg
         pattern3_length = 12
         try:
-            return datetime.strptime(
-                filename[:pattern3_length], 'PXL_%Y%m%d')
+            return datetime.strptime(filename[:pattern3_length], 'PXL_%Y%m%d')
         except ValueError:
             return None
 
     @typechecked
-    def get_date(self, path: str) -> Optional[datetime.date]:
+    def get_date(self, path: str) -> Optional[datetime]:
         date_from_exif = self._get_date_from_exif(path)
         if date_from_exif is not None:
             return date_from_exif

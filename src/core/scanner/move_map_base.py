@@ -7,5 +7,5 @@ from typeguard import typechecked
 class MoveMapBase(ABC):
     @typechecked
     @abstractmethod
-    def get_dst_path(self, date: datetime.date) -> dict:
-        '''Returns ready destination path by received date'''
+    def get_dst_path(self, date: datetime) -> str:
+        """Returns ready destination path by received date"""

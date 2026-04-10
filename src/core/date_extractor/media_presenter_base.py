@@ -2,6 +2,7 @@ import os
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
 from operator import itemgetter
+from typing import Optional
 
 from src.utils import pipe
 
@@ -14,8 +15,8 @@ class MediaPresenterBase(metaclass=ABCMeta):
         return cls.ALLOWED_EXTENSIONS
 
     @abstractmethod
-    def get_date(self, path: str) -> datetime.date:
-        '''Returns a date based on media'''
+    def get_date(self, path: str) -> Optional[datetime]:
+        """Returns a date based on media"""
 
     @staticmethod
     def _get_clean_file_name(path):

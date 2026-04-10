@@ -1,7 +1,7 @@
 import contextlib
 import sys
 from datetime import date
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 from src.core import (
     FolderExtractorBase,
@@ -32,10 +32,13 @@ def redirect_stdin(new_stdin):
 
 
 def get_fs_manipulator_mock():
-    return Mock(spec=FsManipulatorCompilation, **{
-        'folder_to_file_pathes.return_value': base_pathes,
-        'isfolder.return_value': True,
-    })
+    return Mock(
+        spec=FsManipulatorCompilation,
+        **{
+            'folder_to_file_pathes.return_value': base_pathes,
+            'isfolder.return_value': True,
+        },
+    )
 
 
 def get_comparator_mock():
@@ -44,13 +47,13 @@ def get_comparator_mock():
 
 @contextlib.contextmanager
 def with_controller(container, argv_args, **mocks):
-    fs_manipulator_mock = mocks.get(
-        'fs_manipulator', get_fs_manipulator_mock())
-    comparator_mock = mocks.get(
-        'comparator', get_comparator_mock())
-    with patch('sys.argv', argv_args), \
-            container.fs_manipulator.override(fs_manipulator_mock),\
-            container.comparator.override(comparator_mock):
+    fs_manipulator_mock = mocks.get('fs_manipulator', get_fs_manipulator_mock())
+    comparator_mock = mocks.get('comparator', get_comparator_mock())
+    with (
+        patch('sys.argv', argv_args),
+        container.fs_manipulator.override(fs_manipulator_mock),
+        container.comparator.override(comparator_mock),
+    ):
         view = container.view()
 
         controller = container.controller()
@@ -71,8 +74,9 @@ def assert_lines_equal(actual, expected):
 
     expected_lines = expected.split('\n')
 
-    assert len(actual_lines) == len(expected_lines), \
+    assert len(actual_lines) == len(expected_lines), (
         f'Lines count mismatch {len(actual_lines)} != {len(expected_lines)}'
+    )
     for actual_line, expected_line in zip(actual_lines, expected_lines):
         assert actual_line == expected_line, (
             'the strings are not equal.\n'

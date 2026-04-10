@@ -1,22 +1,23 @@
-from typeguard import typechecked
 from functools import partial
 
-from src.core.scanner import ScannerBase
+from typeguard import typechecked
+
+from libs import Either, Right
 from src.core.mover import MoverBase
+from src.core.scanner import ScannerBase
 from src.types import (
-    ScanReport,
-    MoveType,
     MoveReport,
     MoveResult,
+    MoveType,
+    ScanReport,
     TotalMoveReport,
 )
-from libs import Either, Right
-from .output_boundary import OutputBoundary
+
 from .input_boundary import InputBoundary
+from .output_boundary import OutputBoundary
 
 
 class MoverModel(InputBoundary):
-
     @typechecked
     def __init__(
         self,
@@ -89,7 +90,8 @@ class MoverModel(InputBoundary):
         scan_report = self._get_scan_report()
         movable_count = len(scan_report.movable)
         is_confirmed = self._output_boundary.confirm(
-            f'Do You want to move the {movable_count} files')
+            f'Do You want to move the {movable_count} files'
+        )
 
         if is_confirmed:
             self.move()
@@ -98,12 +100,10 @@ class MoverModel(InputBoundary):
 
     @typechecked
     def move(self) -> None:
-        self._mover\
-            .set_dst_folder(self._dst_folder)\
-            .either(
-                self._resolve_dst_does_not_exist,
-                lambda _: Right(None),
-            ).map(lambda _: self._move())
+        self._mover.set_dst_folder(self._dst_folder).either(
+            self._resolve_dst_does_not_exist,
+            lambda _: Right(None),
+        ).map(self._move)
 
     @typechecked
     def _move(self) -> None:
@@ -114,16 +114,18 @@ class MoverModel(InputBoundary):
                 self._add_to_move_report(report)
                 yield report
             self._output_boundary.on_move_finished(
-                self._get_total_move_report(), self._dst_folder)
+                self._get_total_move_report(), self._dst_folder
+            )
 
         self._output_boundary.on_move_started(
-            move_generator(), length=len(self._file_ways))
+            move_generator(), length=len(self._file_ways)
+        )
 
     @typechecked
     def _resolve_dst_does_not_exist(self, dst: str) -> Either:
-        return self._output_boundary\
-            .request_create_dst_folder(dst)\
-            .map(self._mover.create_and_set_dst_folder)
+        return self._output_boundary.request_create_dst_folder(dst).map(
+            self._mover.create_and_set_dst_folder
+        )
 
     def set_dst_folder(self, value: str) -> None:
         self._dst_folder = value

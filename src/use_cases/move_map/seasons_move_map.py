@@ -1,5 +1,4 @@
 import os
-
 from datetime import datetime
 
 from typeguard import typechecked
@@ -8,7 +7,6 @@ from src.core import MoveMapBase
 
 
 class SeasonsMoveMap(MoveMapBase):
-
     BLOCKS = {
         'winter (begin)': (1, 2),
         'spring': (3, 5),
@@ -22,15 +20,16 @@ class SeasonsMoveMap(MoveMapBase):
         """
         Return month name in human readable format
         """
-        assert month in range(1, 13), \
+        assert month in range(1, 13), (
             'Month number must be from 1 to 12. Not "{0}"'.format(month)
+        )
 
         for key, value in self.BLOCKS.items():
             if value[0] <= month <= value[1]:
                 return key
 
     @typechecked
-    def get_dst_path(self, date: datetime.date):
+    def get_dst_path(self, date: datetime) -> str:
         return os.path.join(
             self._get_year_chunk(date),
             self._get_month_chunk(date),
