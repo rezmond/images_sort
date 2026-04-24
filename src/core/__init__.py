@@ -3,7 +3,7 @@
 from .date_extractor import DateExtractor, MediaPresenterBase
 from .fs import FolderCheckerBase, FolderExtractorBase, FsManipulatorBase
 from .mover import Mover, MoverBase
-from .scanner import DateExtractorBase, MoveMapBase, Scanner, ScannerBase
+from .scanners import DateExtractorBase, MoveMapBase, Scanner, ScannerBase
 
 __all__ = [
     'Mover',

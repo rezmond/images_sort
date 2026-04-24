@@ -4,7 +4,7 @@ from typeguard import typechecked
 
 from libs import Either, Right
 from src.core.mover import MoverBase
-from src.core.scanner import ScannerBase
+from src.core.scanners import ScannerBase, TargetFolderScannerBase
 from src.types import (
     MoveReport,
     MoveResult,
@@ -23,10 +23,12 @@ class MoverModel(InputBoundary):
         self,
         mover: MoverBase,
         scanner: ScannerBase,
+        target_folder_scanner: TargetFolderScannerBase,
     ):
         self._mover = mover
         self._move_report = TotalMoveReport()
         self._scanner = scanner
+        self._target_folder_scanner = target_folder_scanner
         self._output_boundary = None
         self._file_ways = []
         self._src_folder = None
@@ -55,6 +57,10 @@ class MoverModel(InputBoundary):
 
     @typechecked
     def scan(self) -> None:
+        assert self._src_folder, 'Source folder must be set before scanning'
+        assert self._dst_folder, 'Destination folder must be set before scanning'
+        assert self._output_boundary, 'Output boundary must be set before scanning'
+
         for file_way in self._scanner.scan(self._src_folder):
             self._file_ways.append(file_way)
             self._output_boundary.scanned_file(
@@ -100,6 +106,10 @@ class MoverModel(InputBoundary):
 
     @typechecked
     def move(self) -> None:
+        assert self._dst_folder, 'Destination folder must be set before moving files'
+
+        self._target_folder_scanner.scan(self._dst_folder)
+
         self._mover.set_dst_folder(self._dst_folder).either(
             self._resolve_dst_does_not_exist,
             lambda _: Right(None),

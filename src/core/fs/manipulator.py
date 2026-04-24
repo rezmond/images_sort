@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from libs.monads import Result
+
 from .folder_checker_base import FolderCheckerBase
 
 
@@ -28,3 +30,8 @@ class FsManipulatorBase(FolderCheckerBase):
     @abstractmethod
     def isfile(path: str) -> bool:
         """Test whether a path is a regular file"""
+
+    @staticmethod
+    @abstractmethod
+    def getsize(path: str) -> Result[int, str]:
+        """Get the Result size of a file in bytes. We don't want to throw an exception if the file doesn't exist"""

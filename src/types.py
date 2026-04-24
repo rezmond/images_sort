@@ -25,7 +25,7 @@ class Verbosity(IntEnum):
 @dataclass(frozen=True)
 class FileWay:
     src: str = None
-    dst: str = None  # TODO: rename because it is not full path
+    dst: str | None = None  # TODO: rename because it is not full path
     full_dst: str = None
     type: MoveType = None
 

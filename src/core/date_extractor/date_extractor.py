@@ -7,7 +7,7 @@ from typeguard import typechecked
 
 from src.utils import pipe
 
-from ..scanner import DateExtractorBase
+from ..scanners import DateExtractorBase
 from .media_presenter_base import MediaPresenterBase
 
 

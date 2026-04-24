@@ -30,6 +30,17 @@ class FsManipulator(FsManipulatorBase, FolderExtractorBase):
         return os.path.isfile(path)
 
     @staticmethod
+    def getsize(path: str) -> Result[int, str]:
+        try:
+            return Success(os.path.getsize(path))
+        except (OSError, IOError):
+            # TODO: Log the error for debugging purposes (would need proper logging in real implementation)
+            return Failure(path)
+        except Exception:
+            # TODO: Log the error for debugging purposes (would need proper logging in real implementation)
+            return Failure(path)
+
+    @staticmethod
     def isfolder(path: str) -> bool:
         return os.path.isdir(path)
 

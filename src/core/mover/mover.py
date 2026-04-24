@@ -1,10 +1,10 @@
 import os
-from functools import partial
 from typing import Tuple
 
 from typeguard import typechecked
 
 from libs import Either
+from src.core.scanners.base import TargetFolderScannerBase
 from src.types import Comparator, FileWay, MoveReport, MoveResult
 
 from ..fs import FolderPathValidator, FsActions, FsManipulatorBase
@@ -17,19 +17,20 @@ class Mover(MoverBase):
         self,
         fs_manipulator: FsManipulatorBase,
         comparator: Comparator,
+        target_folder_scanner: TargetFolderScannerBase,
     ) -> None:
         self._fs_manipulator = fs_manipulator
         self._fs_actions = None
-        self._move_result = None
         self._dst_folder = None
         self._comparator = comparator
         self._folder_path_validator = FolderPathValidator(self._fs_manipulator)
+        self._target_folder_scanner = target_folder_scanner
 
     @typechecked
     def _cmp_files(
         self,
-        dst_dir: str,
         src: str,
+        dst_dir: str,
     ) -> Tuple[bool, str]:
         """
         Check the destination folder for already existed files with the
@@ -45,26 +46,39 @@ class Mover(MoverBase):
 
         :returns: (can_be_moved: bool, final_path: str)
         """
-        curr_file_name = os.path.split(src)[1]
+        curr_file_name = os.path.basename(src)
         dst_file_path = os.path.join(dst_dir, curr_file_name)
 
-        is_dst_path_busy = self._fs_manipulator.isfile
-        if not is_dst_path_busy(dst_file_path):
-            return True, dst_file_path
+        if self._target_folder_scanner.detect_duplicates(src):
+            return False, dst_file_path
 
+        final_dst_file_path = (
+            dst_file_path
+            if not self._fs_manipulator.isfile(dst_file_path)
+            else self._generate_unique_file_path(src, dst_dir)
+        )
+        return True, final_dst_file_path
+
+    @typechecked
+    def _generate_unique_file_path(self, src: str, dst_dir: str) -> str:
+        """Return a full unique file path by appending a number if needed."""
+
+        curr_file_name = os.path.basename(src)
         base_file_name, extension = os.path.splitext(curr_file_name)
-        is_dst_file_identical = partial(self._fs_actions.compare, src=src)
 
-        num = 1
-        while is_dst_path_busy(dst_file_path):
-            if is_dst_file_identical(dst=dst_file_path):
-                return False, dst_file_path
+        num = 0
 
-            curr_file_name = f'{base_file_name}_{num}{extension}'
-            dst_file_path = os.path.join(dst_dir, curr_file_name)
+        def next_name():
+            nonlocal num
             num += 1
+            return os.path.join(dst_dir, f'{base_file_name}_{num}{extension}')
 
-        return True, dst_file_path
+        while True:
+            dst_file_path = next_name()
+            if not self._fs_manipulator.isfile(dst_file_path):
+                break
+
+        return dst_file_path
 
     @typechecked
     def _make_dir_if_not_exists(self, path: str) -> None:
@@ -87,38 +101,36 @@ class Mover(MoverBase):
         )
 
         self._make_dir_if_not_exists(full_dst)
-        final_dst = self._move_by_cmp(file_way.src, full_dst)
+        full_dst, move_result = self._move_by_cmp(file_way.src, full_dst)
 
         return MoveReport(
             file_way=FileWay(
                 src=file_way.src,
                 dst=file_way.dst,
-                full_dst=final_dst,
+                full_dst=full_dst,
                 type=file_way.type,
             ),
-            result=self._move_result,
+            result=move_result,
         )
 
     @typechecked
-    def _move_by_cmp(self, src: str, full_dst: str) -> str:
-        to_move, result_path = self._cmp_files(full_dst, src)
+    def _move_by_cmp(self, src: str, full_dst: str) -> Tuple[str, MoveResult]:
+        no_duplicates, final_path = self._cmp_files(src, full_dst)
 
-        if to_move:
-            self._physical_move(src, result_path)
+        if no_duplicates:
+            self._physical_move(src, final_path)
+            return final_path, MoveResult.MOVED
         else:
-            self._resolve_conflict(src)
-
-        return result_path
+            self._resolve_duplicate(src)
+            return final_path, MoveResult.ALREADY_EXISTED
 
     @typechecked
     def _physical_move(self, src: str, result_path: str) -> None:
         self._fs_actions.move(src, result_path)
-        self._move_result = MoveResult.MOVED
 
     @typechecked
-    def _resolve_conflict(self, src: str) -> None:
+    def _resolve_duplicate(self, src: str) -> None:
         self._fs_actions.delete(src)
-        self._move_result = MoveResult.ALREADY_EXISTED
 
     @typechecked
     def set_dst_folder(self, dst: str) -> Either:
@@ -128,7 +140,7 @@ class Mover(MoverBase):
         return self._validate_dst(dst).map(do_set)
 
     @typechecked
-    def get_dst_folder(self) -> str:
+    def get_dst_folder(self) -> str | None:
         return self._dst_folder
 
     @typechecked

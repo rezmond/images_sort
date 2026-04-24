@@ -5,6 +5,7 @@ from dependency_injector import containers, providers
 from libs import get_exif_data
 from src.core import Mover, Scanner
 from src.core.date_extractor import DateExtractor
+from src.core.scanners import TargetFolderScanner
 from src.mvc.controllers import ConsoleViewController
 from src.mvc.model import MoverModel
 from src.mvc.views import ConsoleView
@@ -50,18 +51,26 @@ class Container(containers.DeclarativeContainer):
         move_map=move_map,
     )
 
+    target_folder_scanner = providers.Factory(
+        TargetFolderScanner,
+        folder_extractor=fs_manipulator,
+        fs_manipulator=fs_manipulator,
+    )
+
     comparator = providers.Object(filecmp.cmp)
 
     mover = providers.Factory(
         Mover,
         fs_manipulator=fs_manipulator,
         comparator=comparator,
+        target_folder_scanner=target_folder_scanner,
     )
 
     model = providers.Singleton(
         MoverModel,
         mover=mover,
         scanner=scanner,
+        target_folder_scanner=target_folder_scanner,
     )
 
     controller = providers.Singleton(
