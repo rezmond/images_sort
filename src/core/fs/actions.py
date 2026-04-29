@@ -35,4 +35,7 @@ class FsActions:
 
     @typechecked
     def compare(self, src: str, dst: str) -> bool:
+        """
+        TODO: check - do we really need it?
+        """
         return self._comparator(src, dst)

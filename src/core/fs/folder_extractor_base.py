@@ -3,6 +3,9 @@ from typing import Iterable
 
 from typeguard import typechecked
 
+"""
+TODO: Get rid of that in favor of FsManipulation ?
+"""
 
 
 class FolderExtractorBase(metaclass=ABCMeta):

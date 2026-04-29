@@ -47,6 +47,9 @@ class FsManipulator(FsManipulatorBase, FolderExtractorBase):
     @staticmethod
     @typechecked
     def folder_to_file_pathes(path: str) -> Iterable[str]:
+        """
+        TODO: check if we can use the "os.scandir" instead of "os.walk"
+        """
         for dirpath, _, filenames in os.walk(path):
             for filename in filenames:
                 yield os.path.join(dirpath, filename)
