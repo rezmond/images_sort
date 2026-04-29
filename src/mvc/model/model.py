@@ -63,8 +63,7 @@ class MoverModel(InputBoundary):
 
         for file_way in self._scanner.scan(self._src_folder):
             self._file_ways.append(file_way)
-            self._output_boundary.scanned_file(
-                file_way.src, len(self._file_ways))
+            self._output_boundary.scanned_file(file_way.src, len(self._file_ways))
 
         self._output_boundary.scan_finished(self._get_scan_report())
 

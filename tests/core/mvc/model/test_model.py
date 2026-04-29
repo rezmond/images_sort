@@ -1,11 +1,11 @@
-from unittest.mock import call, Mock
+from unittest.mock import Mock, call
 
 import pytest
 
-from src.types import FileWay, MoveType, MoveReport, MoveResult
-from src.core.scanners.base import ScannerBase
 from src.core.mover import MoverBase
+from src.core.scanners.base import ScannerBase
 from src.mvc.model import OutputBoundary
+from src.types import FileWay, MoveReport, MoveResult, MoveType
 from tests.utils import overrides
 
 mover_mock = None
@@ -21,25 +21,19 @@ def get_model(container):
         def map_mock(f):
             f('')
 
-        scanner_mock = Mock(spec=ScannerBase, **{
-            'scan.return_value': move_types
-        })
+        scanner_mock = Mock(spec=ScannerBase, **{'scan.return_value': move_types})
 
-        mover_mock = Mock(spec=MoverBase, **{
-            'set_dst_folder.return_value': Mock(
-                **{'either.return_value': Mock(map=map_mock)}),
-            'move.return_value': Mock(
-                spec=MoveReport,
-                result=MoveResult.MOVED
-            ),
-        })
+        mover_mock = Mock(
+            spec=MoverBase,
+            **{
+                'set_dst_folder.return_value': Mock(
+                    **{'either.return_value': Mock(map=map_mock)}
+                ),
+                'move.return_value': Mock(spec=MoveReport, result=MoveResult.MOVED),
+            },
+        )
 
-        with overrides(
-            container,
-            scanner=scanner_mock,
-            mover=mover_mock,
-            **mocks
-        ):
+        with overrides(container, scanner=scanner_mock, mover=mover_mock, **mocks):
             model = container.model()
 
         return model
@@ -54,7 +48,7 @@ def scan(model, src):
     output_boundary_mock = Mock(
         spec=OutputBoundary,
         on_move_started=on_move_started,
-        **{'confirm.return_value': False}
+        **{'confirm.return_value': False},
     )
 
     model.set_output_boundary(output_boundary_mock)
@@ -71,13 +65,10 @@ def move(model, dst):
 def assert_moved(dst, move_types, is_clean_mode):
     mover_mock.set_dst_folder.assert_called_once_with(dst)
     assert mover_mock.move.call_count == len(move_types)
-    mover_mock.move.assert_has_calls([
-        call(x, is_clean_mode) for x in move_types
-    ])
+    mover_mock.move.assert_has_calls([call(x, is_clean_mode) for x in move_types])
 
 
-simple_move_types = [FileWay(src=str(x), type=MoveType.MEDIA)
-                     for x in range(3)]
+simple_move_types = [FileWay(src=str(x), type=MoveType.MEDIA) for x in range(3)]
 complex_move_types = [
     FileWay(src='/src/path/1', type=MoveType.MEDIA),
     FileWay(src='/src/path/2', type=MoveType.NO_DATA),
@@ -114,4 +105,4 @@ def test_moving_complex_data(get_model):
     scanner_mock.scan.assert_called_once_with('src')
 
     move(model, 'dst')
-    assert_moved('dst', (complex_move_types[0], ), False)
+    assert_moved('dst', (complex_move_types[0],), False)

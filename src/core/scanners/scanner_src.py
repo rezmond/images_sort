@@ -27,13 +27,8 @@ class Scanner(ScannerBase):
 
     @typechecked
     def _get_media_pairs(self, dir_path: str) -> Iterator[Tuple[str, bool]]:
-        pathes = self._folder_extractor.folder_to_file_pathes(dir_path)
-        for path in pathes:
-            if self._date_extractor.is_allowed_extension(path):
-                yield path, True
-                continue
-
-            yield path, False
+        for path in self._folder_extractor.folder_to_file_pathes(dir_path):
+            yield path, self._date_extractor.is_allowed_extension(path)
 
     @typechecked
     def scan(self, folder: str) -> Iterator[FileWay]:
