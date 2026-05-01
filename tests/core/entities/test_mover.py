@@ -107,12 +107,12 @@ def test_move_by_relative_path(container):
 def test_move_by_absolute_path(container):
     current_plan = EMPTY_PLAN
 
-    def comporator_mock(_, final_dst):
+    def comporator_mock(_, _final_dst):
         return current_plan.dst_path_is_busy
 
     checked_planes = set()
 
-    def is_file_mock(final_dst):
+    def is_file_mock(_final_dst):
         if current_plan in checked_planes:
             return False
 

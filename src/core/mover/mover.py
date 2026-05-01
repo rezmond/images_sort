@@ -120,9 +120,9 @@ class Mover(MoverBase):
         if no_duplicates:
             self._physical_move(src, final_path)
             return final_path, MoveResult.MOVED
-        else:
-            self._resolve_duplicate(src)
-            return final_path, MoveResult.ALREADY_EXISTED
+
+        self._resolve_duplicate(src)
+        return final_path, MoveResult.ALREADY_EXISTED
 
     @typechecked
     def _physical_move(self, src: str, result_path: str) -> None:
