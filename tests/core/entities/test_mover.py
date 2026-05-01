@@ -1,12 +1,14 @@
 import os
-from collections import namedtuple
-from unittest.mock import call, Mock
+from typing import NamedTuple
+from unittest.mock import Mock, call
 
 import pytest
 
-from src.types import FileWay, MoveType, MoveResult, MoveReport
-from src.core.fs import FsManipulatorBase, FolderCheckerBase
+from libs.monads import Success
 from src.core.exceptions import RelativeFolderPathError
+from src.core.fs import FolderCheckerBase, FsManipulatorBase
+from src.core.scanners import TargetFolderScannerBase
+from src.types import FileWay, MoveReport, MoveResult, MoveType
 from tests.utils import overrides
 
 
@@ -14,13 +16,16 @@ class FsManipulatorCompilation(FsManipulatorBase, FolderCheckerBase):
     pass
 
 
-MovePlan = namedtuple(
-    'MovePlan', ('src', 'dst', 'final_dst', 'existed', 'identical'))
+class MovePlan(NamedTuple):
+    src: str
+    dst: str
+    final_dst: str
+    dst_path_is_busy: bool
+    same_content: bool
+    size: int
 
 
-def noop(_):
-    return None
-
+EMPTY_PLAN = MovePlan('', '', '', False, False, 0)
 
 from_to = (
     MovePlan(
@@ -28,44 +33,42 @@ from_to = (
         '2017/spring/',
         '/dst/path/2017/spring/2_1.jpg',
         True,
-        lambda x: x.endswith('/2.jpg'),
+        False,
+        1,
     ),
     MovePlan(
         '/src/path/data/3.jpg',
         '2017/summer/',
         '/dst/path/2017/summer/3.jpg',
         False,
-        noop,
+        False,
+        2,
     ),
     MovePlan(
         '/src/path/data/5.jpg',
         '2017/winter (end)/',
         '/dst/path/2017/winter (end)/5.jpg',
         False,
-        noop,
+        False,
+        3,
     ),
     MovePlan(
         '/src/path/data/4.jpg',
         '2017/winter (end)/',
         '/dst/path/2017/winter (end)/4.jpg',
         False,
-        noop,
+        False,
+        4,
     ),
     MovePlan(
         '/src/path/data/1.jpg',
         '2017/winter (begin)/',
         '/dst/path/2017/winter (begin)/1.jpg',
+        False,
         True,
-        lambda x: x.endswith('/1.jpg'),
+        5,
     ),
 )
-
-
-def from_to_find(predicate):
-    return next(
-        (plan for plan in from_to if predicate(plan)),
-        MovePlan('', '', '', False, noop)
-    )
 
 
 def get_mover(container, **mocks):
@@ -96,30 +99,53 @@ def test_move_by_relative_path(container):
     with pytest.raises(RelativeFolderPathError) as exc_info:
         mover.set_dst_folder('test-1')
 
-    assert 'absolute' in str(exc_info.value), \
+    assert 'absolute' in str(exc_info.value), (
         'Should catch not absolute the destination folder path'
+    )
 
 
 def test_move_by_absolute_path(container):
+    current_plan = EMPTY_PLAN
 
     def comporator_mock(_, final_dst):
-        return from_to_find(lambda x: x.final_dst == final_dst).existed
+        return current_plan.dst_path_is_busy
+
+    checked_planes = set()
 
     def is_file_mock(final_dst):
-        return from_to_find(lambda x: x.identical(final_dst)).existed
+        if current_plan in checked_planes:
+            return False
 
-    fs_manipulator_mock = Mock(spec=FsManipulatorCompilation, **{
-        'isfile': is_file_mock
-    })
+        checked_planes.add(current_plan)
+        return current_plan.dst_path_is_busy
+
+    def getsize_mock(_path):
+        return Success(current_plan.size)
+
+    def detect_duplicates_mock(_src_file):
+        return current_plan.same_content
+
+    fs_manipulator_mock = Mock(
+        spec=FsManipulatorCompilation,
+        **{'isfile': is_file_mock, 'getsize': getsize_mock},
+    )
+
+    target_folder_scanner_mock = Mock(
+        spec=TargetFolderScannerBase,
+        detect_duplicates=detect_duplicates_mock,
+    )
 
     mover = get_mover(
         container,
         fs_manipulator=fs_manipulator_mock,
-        comparator=comporator_mock)
+        comparator=comporator_mock,
+        target_folder_scanner=target_folder_scanner_mock,
+    )
 
     mover.set_dst_folder('/dst/path')
 
     for plan in from_to:
+        current_plan = plan
         report = mover.move(
             FileWay(
                 src=plan.src,
@@ -130,16 +156,14 @@ def test_move_by_absolute_path(container):
 
         expected = MoveReport(
             result=(
-                MoveResult.ALREADY_EXISTED
-                if plan.identical(plan.final_dst)
-                else MoveResult.MOVED
+                MoveResult.ALREADY_EXISTED if plan.same_content else MoveResult.MOVED
             ),
             file_way=FileWay(
                 src=plan.src,
                 dst=plan.dst,
                 full_dst=plan.final_dst,
                 type=MoveType.MEDIA,
-            )
+            ),
         )
 
         assert report == expected
@@ -149,9 +173,11 @@ def test_move_by_absolute_path(container):
 
 
 def test_delete_duplicates(container):
-    to_delete = from_to[0: 2]
+    current_plan = EMPTY_PLAN
+    to_delete = from_to[0:2]
     to_delete_dst = [
-        os.path.join('/dst/path', x) for x in (
+        os.path.join('/dst/path', x)
+        for x in (
             '2017/spring/2.jpg',
             '2017/summer/3.jpg',
         )
@@ -163,35 +189,53 @@ def test_delete_duplicates(container):
     def is_file_mock(path):
         return path in to_delete_dst
 
+    def getsize_mock(_path):
+        return Success(current_plan.size)
+
+    def detect_duplicates_mock(_src_file):
+        return current_plan in to_delete
+
     fs_manipulator_mock = Mock(
-        spec=FsManipulatorCompilation, isfile=is_file_mock)
+        spec=FsManipulatorCompilation, isfile=is_file_mock, getsize=getsize_mock
+    )
+
+    target_folder_scanner_mock = Mock(
+        spec=TargetFolderScannerBase,
+        detect_duplicates=detect_duplicates_mock,
+    )
 
     mover = get_mover(
         container,
         fs_manipulator=fs_manipulator_mock,
-        comparator=comporator_mock)
+        comparator=comporator_mock,
+        target_folder_scanner=target_folder_scanner_mock,
+    )
 
     mover.set_dst_folder('/dst/path')
-    list(mover.move(
-        FileWay(
-            src=plan.src,
-            dst=plan.dst,
-            type=MoveType.MEDIA,
-        ), True
-    ) for plan in from_to)
+
+    for plan in from_to:
+        current_plan = plan
+        mover.move(
+            FileWay(
+                src=plan.src,
+                dst=plan.dst,
+                type=MoveType.MEDIA,
+            ),
+            True,
+        )
 
     delete_mock = fs_manipulator_mock.delete
-    delete_mock.assert_has_calls(
-        [call(plan.src) for plan in to_delete])
+    delete_mock.assert_has_calls([call(plan.src) for plan in to_delete])
 
     def build_final_dst(plan):
-        return os.path.join(
-            '/dst/path', plan.dst, os.path.basename(plan.src))
+        return os.path.join('/dst/path', plan.dst, os.path.basename(plan.src))
 
     move_mock = fs_manipulator_mock.move
     expects = [
         call(plan.src, build_final_dst(plan))
-        for plan in from_to if plan not in to_delete]
+        for plan in from_to
+        if plan not in to_delete
+    ]
     move_mock.assert_has_calls(expects)
 
     copy_mock = fs_manipulator_mock.copy
@@ -199,30 +243,33 @@ def test_delete_duplicates(container):
 
 
 def test_move_no_data(container):
-    exception = move_to_empty(container, FileWay(
-        src='/src/path/data/1.jpg',
-        type=MoveType.NO_DATA,
-    ))
+    exception = move_to_empty(
+        container,
+        FileWay(
+            src='/src/path/data/1.jpg',
+            type=MoveType.NO_DATA,
+        ),
+    )
     assert is_empty_destination_error_raised(exception)
 
 
 def test_move_no_media(container):
-    exception = move_to_empty(container, FileWay(
-        src='/src/path/data/2.jpg',
-        type=MoveType.NO_MEDIA,
-    ))
+    exception = move_to_empty(
+        container,
+        FileWay(
+            src='/src/path/data/2.jpg',
+            type=MoveType.NO_MEDIA,
+        ),
+    )
     assert is_empty_destination_error_raised(exception)
 
 
 def test_create_and_set_dst_folder(container):
     target_dst_folder = '/dst/path/2017/summer/'
-    fs_manipulator_mock = Mock(
-        spec=FsManipulatorCompilation
-    )
+    fs_manipulator_mock = Mock(spec=FsManipulatorCompilation)
     mover = get_mover(container, fs_manipulator=fs_manipulator_mock)
 
     mover.create_and_set_dst_folder(target_dst_folder)
 
-    fs_manipulator_mock.makedirs.assert_called_once_with(
-        target_dst_folder)
+    fs_manipulator_mock.makedirs.assert_called_once_with(target_dst_folder)
     assert mover.get_dst_folder() == target_dst_folder

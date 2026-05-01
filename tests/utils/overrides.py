@@ -1,12 +1,12 @@
-from contextlib import nullcontext, contextmanager
+from contextlib import contextmanager, nullcontext
 from unittest.mock import Mock
 
-from src.core.fs import (
-    FolderExtractorBase, FsManipulatorBase, FolderCheckerBase)
+from src.core.fs import FolderCheckerBase, FolderExtractorBase, FsManipulatorBase
 
 
 class FsManipulatorCompilation(
-        FolderExtractorBase, FsManipulatorBase, FolderCheckerBase):
+    FolderExtractorBase, FsManipulatorBase, FolderCheckerBase
+):
     pass
 
 
@@ -20,14 +20,18 @@ def overrides(container, **mocks):
         return getattr(container, name).override(mocks[name])
 
     mocks['fs_manipulator'] = mocks.get(
-        'fs_manipulator', Mock(spec=FsManipulatorCompilation))
+        'fs_manipulator', Mock(spec=FsManipulatorCompilation)
+    )
 
-    with get_context_manager('fs_manipulator'),\
-            get_context_manager('comparator'), \
-            get_context_manager('date_extractor'), \
-            get_context_manager('observable'), \
-            get_context_manager('move_map'), \
-            get_context_manager('scanner'), \
-            get_context_manager('mover'), \
-            get_context_manager('validator'):
+    with (
+        get_context_manager('fs_manipulator'),
+        get_context_manager('comparator'),
+        get_context_manager('date_extractor'),
+        get_context_manager('observable'),
+        get_context_manager('move_map'),
+        get_context_manager('scanner'),
+        get_context_manager('mover'),
+        get_context_manager('validator'),
+        get_context_manager('target_folder_scanner'),
+    ):
         yield
