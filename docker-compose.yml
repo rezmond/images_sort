@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: py-dev:3.10
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    environment:
+      - PYTHONUNBUFFERED=1
+    user: "${UID:-1000}:${GID:-1000}"
+    stdin_open: true
+    tty: true

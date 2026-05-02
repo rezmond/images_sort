@@ -2,26 +2,48 @@
 # images_sort
 Sort images by year and season.
 
-(Temporary) Start project:
-from the project folder directory run
+## Scripts
 
-`
-    python3 start <src> <dst>
-`
+All the scripts are considered to open from the project directory
 
-Run tests:
+(Temporary solution) **Start project**:
 
-`
-    pytest
-`
+```bash
+python3 start <src> <dst>
+```
 
-Run tests with the coverage:
+**Run tests**:
 
-`
-    pytest --cov="./src" --cov-report=html
-`
+```bash
+pytest
+```
 
-Roadmap:
+**Run tests with the coverage**:
+
+```bash
+pytest --cov="./src" --cov-report=html
+```
+
+### Docker
+
+**Create and start container:**
+```bash
+UID=$(id -u) GID=$(id -g) docker compose up -d
+```
+Note: starts a container on background with host OS user privileges 
+
+**Open container:**
+```bash
+docker compose exec app bash
+```
+The `app` is the name of the container
+
+**Tear down the container:**
+```bash
+docker compose down
+```
+
+## Roadmap:
 
    - [X] The moving process view:
 
